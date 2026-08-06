@@ -1,0 +1,84 @@
+:root {
+  --bg: #0a0a14;
+  --surface: #13131f;
+  --surface-raised: #191927;
+  --accent: #7b4f9e;
+  --accent-soft: #7b4f9e33;
+  --accent-glow: #9b6fc2;
+  --gold: #c9a84c;
+  --text: #f0eee8;
+  --text-muted: #8a8699;
+  --border: #2a2840;
+
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-quote: 'Lora', serif;
+
+  --radius: 10px;
+  --shadow-glow: 0 0 0 rgba(123, 79, 158, 0);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, #1c1430 0%, transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--text);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

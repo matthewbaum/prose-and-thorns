@@ -1,0 +1,84 @@
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 28px 24px 22px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #12101c 0%, rgba(10, 10, 20, 0) 100%);
+}
+
+.wordmark {
+  text-align: center;
+}
+
+.wordmark h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 2.1rem;
+  letter-spacing: 0.04em;
+  margin: 0;
+  color: var(--text);
+  text-shadow: 0 0 24px var(--accent-soft);
+}
+
+.thorn-divider {
+  color: var(--gold);
+  font-size: 0.55em;
+  vertical-align: middle;
+  margin: 0 10px;
+  display: inline-block;
+}
+
+.tagline {
+  margin: 6px 0 0;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.result-count {
+  position: absolute;
+  right: 24px;
+  bottom: 22px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.sidebar-toggle {
+  display: none;
+  position: absolute;
+  left: 20px;
+  bottom: 24px;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.sidebar-toggle span {
+  width: 22px;
+  height: 2px;
+  background: var(--text);
+  display: block;
+  border-radius: 2px;
+}
+
+@media (max-width: 900px) {
+  .sidebar-toggle {
+    display: flex;
+  }
+
+  .wordmark h1 {
+    font-size: 1.5rem;
+  }
+
+  .result-count {
+    display: none;
+  }
+}
