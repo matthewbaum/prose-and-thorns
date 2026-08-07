@@ -27,3 +27,15 @@ export function fetchBooks(filters) {
 export function fetchBook(id) {
   return request(`/books/${id}`);
 }
+
+export function fetchShelves() {
+  return request('/shelves');
+}
+
+export function searchBooks(query) {
+  return request(`/books/search?q=${encodeURIComponent(query)}`);
+}
+
+export function fetchRecommendations(ids, mode = 'any') {
+  return request(`/recommendations?ids=${ids.join(',')}&mode=${mode}`);
+}

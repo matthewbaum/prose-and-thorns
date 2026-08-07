@@ -64,6 +64,19 @@ export default function QualityRadar({ profile }) {
         return <circle key={i} cx={x} cy={y} r="3" fill="var(--gold)" />;
       })}
 
+      {gridRings.map((level) => (
+        <text
+          key={`scale-${level}`}
+          x={CENTER + 5}
+          y={CENTER - (level / LEVELS) * MAX_R}
+          textAnchor="start"
+          dominantBaseline="middle"
+          className="radar-scale-label"
+        >
+          {level}
+        </text>
+      ))}
+
       {QUALITY_DIMENSIONS.map((d, i) => {
         const [x, y] = pointFor(i, total, LEVELS + 1.05);
         return (

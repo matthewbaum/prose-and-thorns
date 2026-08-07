@@ -7,6 +7,21 @@ export const SERIES_STATUS = [
   { value: 'duology-ongoing', label: 'Duology (ongoing)' },
 ];
 
+export const AGE_CATEGORY = [
+  { value: 'any', label: 'Any' },
+  { value: 'young-adult', label: 'Young Adult' },
+  { value: 'new-adult', label: 'New Adult' },
+  { value: 'adult', label: 'Adult' },
+];
+
+export const PUBLISHER_TYPE = [
+  { value: 'any', label: 'Any' },
+  { value: 'traditional-major', label: 'Major Publisher (Big 5)' },
+  { value: 'traditional-indie', label: 'Indie/Specialty Press' },
+  { value: 'self-published', label: 'Self-Published' },
+  { value: 'kindle-unlimited-exclusive', label: 'Kindle Unlimited Exclusive' },
+];
+
 export const SERIES_LENGTH = [
   { value: '1', label: '1 book (standalone)' },
   { value: '2', label: '2 books' },

@@ -4,6 +4,7 @@ const CONFIDENCE_LABEL = {
   high: 'High confidence',
   medium: 'Medium confidence',
   low: 'Limited reviews',
+  editorial: 'AI editorial assessment',
 };
 
 export default function QualityDimension({ label, data }) {

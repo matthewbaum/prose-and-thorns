@@ -1,8 +1,12 @@
 import React from 'react';
 import CollapsibleSection from './CollapsibleSection.jsx';
+import CheckboxFilterSection from './CheckboxFilterSection.jsx';
+import RadioFilterSection from './RadioFilterSection.jsx';
 import ScoreMethodologyInfo from './ScoreMethodologyInfo.jsx';
 import {
   SERIES_STATUS,
+  AGE_CATEGORY,
+  PUBLISHER_TYPE,
   SERIES_LENGTH,
   SUBGENRE,
   ROMANCE_TROPES,
@@ -16,23 +20,6 @@ import '../styles/FilterPanel.css';
 
 function toggleValue(list, value) {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
-}
-
-function CheckboxList({ options, selected, onToggle }) {
-  return (
-    <div className="checkbox-list">
-      {options.map((opt) => (
-        <label key={opt.value} className="checkbox-item">
-          <input
-            type="checkbox"
-            checked={selected.includes(opt.value)}
-            onChange={() => onToggle(opt.value)}
-          />
-          <span>{opt.label}</span>
-        </label>
-      ))}
-    </div>
-  );
 }
 
 export default function FilterPanel({ filters, onChange, onReset, open, onClose }) {
@@ -52,84 +39,73 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
           </div>
         </div>
 
-        <CollapsibleSection title="Series Status">
-          <div className="radio-list">
-            {SERIES_STATUS.map((opt) => (
-              <label key={opt.value} className="radio-item">
-                <input
-                  type="radio"
-                  name="series_status"
-                  checked={filters.series_status === opt.value}
-                  onChange={() => onChange({ series_status: opt.value })}
-                />
-                <span>{opt.label}</span>
-              </label>
-            ))}
-          </div>
-        </CollapsibleSection>
+        <RadioFilterSection
+          title="Series Status"
+          options={SERIES_STATUS}
+          selected={filters.series_status}
+          defaultValue="any"
+          onSelect={(value) => onChange({ series_status: value })}
+        />
 
-        <CollapsibleSection title="Series Length">
-          <CheckboxList
-            options={SERIES_LENGTH}
-            selected={filters.series_length}
-            onToggle={(value) =>
-              onChange({ series_length: toggleValue(filters.series_length, value) })
-            }
-          />
-        </CollapsibleSection>
+        <RadioFilterSection
+          title="Age Category"
+          options={AGE_CATEGORY}
+          selected={filters.age_category}
+          defaultValue="any"
+          onSelect={(value) => onChange({ age_category: value })}
+        />
 
-        <CollapsibleSection title="Subgenre">
-          <CheckboxList
-            options={SUBGENRE}
-            selected={filters.subgenre}
-            onToggle={(value) => onChange({ subgenre: toggleValue(filters.subgenre, value) })}
-          />
-        </CollapsibleSection>
+        <RadioFilterSection
+          title="Publisher Type"
+          options={PUBLISHER_TYPE}
+          selected={filters.publisher_type}
+          defaultValue="any"
+          onSelect={(value) => onChange({ publisher_type: value })}
+        />
 
-        <CollapsibleSection title="Romance Tropes" defaultOpen={false}>
-          <CheckboxList
-            options={ROMANCE_TROPES}
-            selected={filters.romance_tropes}
-            onToggle={(value) =>
-              onChange({ romance_tropes: toggleValue(filters.romance_tropes, value) })
-            }
-          />
-        </CollapsibleSection>
+        <CheckboxFilterSection
+          title="Series Length"
+          options={SERIES_LENGTH}
+          selected={filters.series_length}
+          onToggle={(value) =>
+            onChange({ series_length: toggleValue(filters.series_length, value) })
+          }
+        />
 
-        <CollapsibleSection title="Plot Tropes" defaultOpen={false}>
-          <CheckboxList
-            options={PLOT_TROPES}
-            selected={filters.plot_tropes}
-            onToggle={(value) =>
-              onChange({ plot_tropes: toggleValue(filters.plot_tropes, value) })
-            }
-          />
-        </CollapsibleSection>
+        <CheckboxFilterSection
+          title="Subgenre"
+          options={SUBGENRE}
+          selected={filters.subgenre}
+          onToggle={(value) => onChange({ subgenre: toggleValue(filters.subgenre, value) })}
+        />
 
-        <CollapsibleSection title="Spice Level">
-          <div className="radio-list">
-            <label className="radio-item">
-              <input
-                type="radio"
-                name="spice"
-                checked={!filters.spice_min}
-                onChange={() => onChange({ spice_min: '', spice_max: '' })}
-              />
-              <span>Any</span>
-            </label>
-            {SPICE_LEVELS.map((opt) => (
-              <label key={opt.value} className="radio-item">
-                <input
-                  type="radio"
-                  name="spice"
-                  checked={filters.spice_min === opt.value}
-                  onChange={() => onChange({ spice_min: opt.value, spice_max: opt.value })}
-                />
-                <span>{opt.label}</span>
-              </label>
-            ))}
-          </div>
-        </CollapsibleSection>
+        <CheckboxFilterSection
+          title="Romance Tropes"
+          defaultOpen={false}
+          options={ROMANCE_TROPES}
+          selected={filters.romance_tropes}
+          onToggle={(value) =>
+            onChange({ romance_tropes: toggleValue(filters.romance_tropes, value) })
+          }
+        />
+
+        <CheckboxFilterSection
+          title="Plot Tropes"
+          defaultOpen={false}
+          options={PLOT_TROPES}
+          selected={filters.plot_tropes}
+          onToggle={(value) =>
+            onChange({ plot_tropes: toggleValue(filters.plot_tropes, value) })
+          }
+        />
+
+        <RadioFilterSection
+          title="Spice Level"
+          options={[{ value: '', label: 'Any' }, ...SPICE_LEVELS]}
+          selected={filters.spice_min || ''}
+          defaultValue=""
+          onSelect={(value) => onChange({ spice_min: value, spice_max: value })}
+        />
 
         <CollapsibleSection
           title="Minimum Quality Score"
@@ -137,34 +113,41 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
           headerExtra={<ScoreMethodologyInfo label="" />}
         >
           <div className="slider-list">
-            {MIN_QUALITY_FILTERS.map((f) => (
-              <div key={f.key} className="slider-item">
-                <div className="slider-label">
-                  <span>{f.label}</span>
-                  <span className="slider-value">{filters[f.key]}</span>
+            {MIN_QUALITY_FILTERS.map((f) => {
+              // Per-dimension scores are stored as whole numbers only (Claude's
+              // synthesis never outputs a fractional dimension score) — finer
+              // steps there would just be fake precision. Overall is a genuine
+              // average of six of those integers, so it's meaningfully fractional.
+              const step = f.key === 'min_overall' ? 0.1 : 1;
+              return (
+                <div key={f.key} className="slider-item">
+                  <div className="slider-label">
+                    <span>{f.label}</span>
+                    <span className="slider-value">{filters[f.key].toFixed(1)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step={step}
+                    value={filters[f.key]}
+                    onChange={(e) => onChange({ [f.key]: Number(e.target.value) })}
+                  />
                 </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  step="1"
-                  value={filters[f.key]}
-                  onChange={(e) => onChange({ [f.key]: Number(e.target.value) })}
-                />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection title="Content Warnings — Exclude" defaultOpen={false}>
-          <CheckboxList
-            options={CONTENT_WARNINGS}
-            selected={filters.exclude_warnings}
-            onToggle={(value) =>
-              onChange({ exclude_warnings: toggleValue(filters.exclude_warnings, value) })
-            }
-          />
-        </CollapsibleSection>
+        <CheckboxFilterSection
+          title="Content Warnings — Exclude"
+          defaultOpen={false}
+          options={CONTENT_WARNINGS}
+          selected={filters.exclude_warnings}
+          onToggle={(value) =>
+            onChange({ exclude_warnings: toggleValue(filters.exclude_warnings, value) })
+          }
+        />
 
         <div className="filter-section">
           <label className="sort-label" htmlFor="sort-select">

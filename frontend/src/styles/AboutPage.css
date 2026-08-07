@@ -1,0 +1,30 @@
+.about-page {
+  max-width: 620px;
+  margin: 20px auto 60px;
+  padding: 0 16px;
+}
+
+.about-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--text);
+  text-align: center;
+  margin: 0 0 32px;
+}
+
+.about-page p {
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: var(--text);
+  margin: 0 0 20px;
+}
+
+.about-note {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.about-page .browse-all-btn {
+  display: block;
+  margin: 32px auto 0;
+}

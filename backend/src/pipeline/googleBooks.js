@@ -11,21 +11,103 @@ function parseSeriesFromTitle(title) {
   return { seriesName: match[1].trim(), seriesPosition: Number(match[2]) };
 }
 
+// Google's ranking sometimes puts a box set, "deluxe illustrated" companion,
+// or the wrong book in a series ahead of the actual title being searched for
+// (verified: this silently corrupted 8/99 books in this catalog — e.g. a
+// "Caraval" search top hit was "Finale", book 3 of the same series). Score
+// every returned candidate against the seed title instead of blindly taking
+// index 0.
+const WRONG_PRODUCT_PATTERN =
+  /\b(box set|boxed set|collection|bundle|deluxe|illustrated|omnibus|gift set|ebook collection)\b/i;
+
+function normalizeTitle(s) {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function titleMatchScore(candidateTitle, seedTitle) {
+  const c = normalizeTitle(candidateTitle || '');
+  const s = normalizeTitle(seedTitle || '');
+  if (!c || !s) return -Infinity;
+
+  let score = 0;
+  if (c === s) score += 3;
+  else if (c.startsWith(s) || s.startsWith(c)) score += 2;
+  else if (c.includes(s) || s.includes(c)) score += 1;
+
+  const cWords = new Set(c.split(' '));
+  const sWords = new Set(s.split(' '));
+  const overlap = [...sWords].filter((w) => cWords.has(w)).length;
+  score += overlap / Math.max(sWords.size, 1);
+
+  if (WRONG_PRODUCT_PATTERN.test(candidateTitle || '')) score -= 5;
+
+  return score;
+}
+
+async function fetchVolumes(apiKey, q) {
+  const url = `${API_BASE}?q=${encodeURIComponent(q)}&maxResults=5&key=${apiKey}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Google Books API error ${res.status}: ${await res.text()}`);
+  }
+  const data = await res.json();
+  return data.items || [];
+}
+
+// A candidate this weak (no real title overlap, or an explicit wrong-product
+// match) is worse than no match at all — better to fall back to displaying
+// our own seed title than confidently show the wrong book (verified case:
+// "Once Bitten" isn't indexed on Google Books under that title for this
+// author at all — every candidate for it scores below this bar).
+const MIN_ACCEPTABLE_SCORE = 0.5;
+
+async function searchVolumes(apiKey, structuredQuery, unstructuredQuery, seedTitle) {
+  // Try both query forms and pick the best candidate across both result
+  // sets — the structured intitle:/inauthor: query can return a handful of
+  // wrong-but-nonempty results (so the old "fallback only if empty" logic
+  // never reaches the unstructured query even when it has the right book,
+  // e.g. an ampersand title variant only the unstructured search finds).
+  const [structuredItems, unstructuredItems] = await Promise.all([
+    fetchVolumes(apiKey, structuredQuery),
+    fetchVolumes(apiKey, unstructuredQuery),
+  ]);
+
+  const seen = new Set();
+  const allItems = [...structuredItems, ...unstructuredItems].filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+  if (allItems.length === 0) return null;
+
+  const ranked = allItems
+    .map((item) => ({ item, score: titleMatchScore(item.volumeInfo?.title, seedTitle) }))
+    .sort((a, b) => b.score - a.score);
+
+  if (ranked[0].score < MIN_ACCEPTABLE_SCORE) return null;
+  return ranked[0].item;
+}
+
 export async function fetchGoogleBooksData(title, author) {
   const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
   if (!apiKey) {
     throw new Error('GOOGLE_BOOKS_API_KEY is not set');
   }
 
-  const q = `intitle:${title} inauthor:${author}`;
-  const url = `${API_BASE}?q=${encodeURIComponent(q)}&maxResults=5&key=${apiKey}`;
-
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Google Books API error ${res.status}: ${await res.text()}`);
-  }
-  const data = await res.json();
-  const item = data.items?.[0];
+  // The strict intitle:/inauthor: query is brittle — e.g. it fails on accented
+  // names ("Renee Ahdieh" vs. the catalogued "Renée Ahdieh") or title variants
+  // (an ampersand vs. "and"). Query both forms and pick the best-scoring
+  // candidate across both result sets rather than trusting either alone.
+  const item = await searchVolumes(
+    apiKey,
+    `intitle:${title} inauthor:${author}`,
+    `${title} ${author}`,
+    title
+  );
   if (!item) {
     log(`No Google Books match for "${title}" by ${author}`);
     return null;
@@ -34,8 +116,14 @@ export async function fetchGoogleBooksData(title, author) {
   const info = item.volumeInfo || {};
   const saleInfo = item.saleInfo || {};
   const images = info.imageLinks || {};
-  const coverUrl =
+  const rawCoverUrl =
     images.extraLarge || images.large || images.medium || images.small || images.thumbnail || null;
+  // Google's public volumes.list response only ever populates `thumbnail`
+  // (128x192) for the vast majority of titles — the larger imageLinks fields
+  // are essentially never present. Its content server does serve much higher
+  // resolution at the same URL for higher `zoom` values (verified: zoom=3 is
+  // ~575x863 vs. zoom=1's 128x192), so upgrade whatever URL we got.
+  const coverUrl = rawCoverUrl ? rawCoverUrl.replace(/([?&]zoom=)\d+/, '$13') : null;
 
   const { seriesName, seriesPosition } = parseSeriesFromTitle(info.title || title);
 

@@ -3,8 +3,12 @@ dist/
 build/
 .env
 *.log
-backend/data/*.sqlite
+# The .sqlite file itself IS committed (see prose-and-thorns.sqlite below) —
+# it's the built catalog, and this pilot deploys it as-is rather than
+# provisioning a separate persistent database. Only the transient
+# journal/WAL/shm files are excluded, since those are regenerated on open.
 backend/data/*.sqlite-journal
 backend/data/*.sqlite-wal
 backend/data/*.sqlite-shm
 .DS_Store
+backend/data/manual-reviews/

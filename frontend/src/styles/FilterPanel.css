@@ -102,6 +102,80 @@
   margin-top: 10px;
 }
 
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  margin-left: 6px;
+  border-radius: 20px;
+  background: var(--accent);
+  color: var(--text);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.filter-done-btn {
+  margin-top: 12px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.filter-done-btn:hover {
+  background: var(--accent);
+}
+
+.filter-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-summary-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: var(--text);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  padding: 3px 6px 3px 10px;
+  border-radius: 20px;
+}
+
+.filter-chip-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.filter-chip-remove:hover {
+  color: var(--text);
+}
+
+.filter-summary-edit {
+  align-self: flex-start;
+  font-size: 0.75rem;
+}
+
 .checkbox-list,
 .radio-list {
   display: flex;

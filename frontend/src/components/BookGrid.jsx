@@ -1,8 +1,16 @@
 import React from 'react';
 import BookCard from './BookCard.jsx';
+import RatingLegend from './RatingLegend.jsx';
 import '../styles/BookGrid.css';
 
-export default function BookGrid({ books, loading, onSelect }) {
+export default function BookGrid({
+  books,
+  loading,
+  onSelect,
+  filters,
+  emptyTitle = 'No books match these filters yet.',
+  emptySub = 'Try loosening a filter or two.',
+}) {
   if (loading) {
     return (
       <div className="book-grid">
@@ -16,17 +24,20 @@ export default function BookGrid({ books, loading, onSelect }) {
   if (books.length === 0) {
     return (
       <div className="empty-state">
-        <p>No books match these filters yet.</p>
-        <p className="empty-state-sub">Try loosening a filter or two.</p>
+        <p>{emptyTitle}</p>
+        <p className="empty-state-sub">{emptySub}</p>
       </div>
     );
   }
 
   return (
-    <div className="book-grid">
-      {books.map((book) => (
-        <BookCard key={book.id} book={book} onSelect={onSelect} />
-      ))}
-    </div>
+    <>
+      <RatingLegend />
+      <div className="book-grid">
+        {books.map((book) => (
+          <BookCard key={book.id} book={book} onSelect={onSelect} filters={filters} />
+        ))}
+      </div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { SPICE_FLAME_COUNT } from '../constants/taxonomy.js';
+import { getMatchedFilters } from '../lib/matchedFilters.js';
 import '../styles/BookCard.css';
 
 const STATUS_LABEL = {
@@ -21,8 +22,20 @@ function Flames({ level }) {
   );
 }
 
-export default function BookCard({ book, onSelect }) {
-  const tropes = [...(book.romance_tropes || []), ...(book.plot_tropes || [])].slice(0, 3);
+export default function BookCard({ book, onSelect, filters }) {
+  const allTropes = [...(book.romance_tropes || []), ...(book.plot_tropes || [])];
+  const matched = filters ? getMatchedFilters(book, filters) : book.match_reasons || [];
+  const matchedKeys = new Set(matched.map((m) => m.key.replace(/^trope-/, '')));
+  // The hover overlay shows other tropes for general discovery — no need to
+  // repeat ones already pinned in the always-visible matched-filters row above.
+  const tropes = allTropes.filter((t) => !matchedKeys.has(t)).slice(0, 3);
+
+  // Hardcover has far more coverage than Google Books (thousands of ratings
+  // vs. often single digits) — prefer it whenever both are available.
+  const hasHardcover = book.hardcover_avg_rating != null;
+  const realRating = hasHardcover ? book.hardcover_avg_rating : book.avg_rating;
+  const realRatingCount = hasHardcover ? book.hardcover_ratings_count : book.ratings_count;
+  const realRatingSource = hasHardcover ? 'Hardcover' : 'Google Books';
 
   return (
     <button className="book-card" onClick={() => onSelect(book.id)}>
@@ -51,13 +64,29 @@ export default function BookCard({ book, onSelect }) {
       <div className="book-meta">
         <h3 className="book-title">{book.title}</h3>
         <p className="book-author">{book.author}</p>
+        {matched.length > 0 && (
+          <div className="matched-filters">
+            {matched.map((m) => (
+              <span key={m.key} className="matched-filter-chip">
+                {m.label}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="book-stats">
           <Flames level={book.spice_level} />
-          {book.overall_score != null && (
-            <span className="overall-score">
-              <span className="star">&#9733;</span> {book.overall_score.toFixed(1)}
-            </span>
-          )}
+          <div className="book-scores">
+            {realRating != null && (
+              <span className="google-rating" title={`${realRatingCount ?? 0} ratings on ${realRatingSource}`}>
+                <span className="star">&#9733;</span> {realRating.toFixed(1)}
+              </span>
+            )}
+            {book.overall_score != null && (
+              <span className="overall-score" title="Quality Profile score — average of the six synthesized dimensions below">
+                <span className="star">&#9734;</span> {book.overall_score.toFixed(1)}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </button>

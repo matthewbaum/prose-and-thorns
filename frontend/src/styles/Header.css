@@ -10,6 +10,12 @@
 
 .wordmark {
   text-align: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: inherit;
 }
 
 .wordmark h1 {
@@ -46,6 +52,42 @@
   font-size: 0.8rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+.header-nav {
+  position: absolute;
+  right: 24px;
+  top: 28px;
+  display: flex;
+  gap: 8px;
+}
+
+.nav-link {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.nav-link.active {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+@media (max-width: 900px) {
+  .header-nav {
+    top: auto;
+    bottom: 24px;
+    right: 20px;
+  }
 }
 
 .sidebar-toggle {

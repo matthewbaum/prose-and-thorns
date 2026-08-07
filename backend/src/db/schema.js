@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS books (
   next_release_date TEXT,
 
   series_status TEXT,
+  age_category TEXT,
+  publisher_type TEXT,
+  synopsis TEXT,
+  praise TEXT DEFAULT '[]',
   subgenre TEXT,
   romance_tropes TEXT DEFAULT '[]',
   plot_tropes TEXT DEFAULT '[]',
@@ -36,6 +40,11 @@ CREATE TABLE IF NOT EXISTS books (
 
   google_books_fetched_at TEXT,
   reddit_fetched_at TEXT,
+  hardcover_fetched_at TEXT,
+  hardcover_avg_rating REAL,
+  hardcover_ratings_count INTEGER,
+  hardcover_cover_url TEXT,
+  hardcover_url TEXT,
   tagged_at TEXT,
   quality_synthesized_at TEXT,
 
@@ -88,6 +97,13 @@ CREATE TABLE IF NOT EXISTS quality_profiles (
   character_depth_synthesis TEXT,
   character_depth_quote TEXT,
   character_depth_confidence TEXT,
+
+  prose_style TEXT,
+  prose_style_note TEXT,
+  grammar_flag TEXT,
+  grammar_note TEXT,
+  dialogue_flag TEXT,
+  dialogue_note TEXT,
 
   review_count_used INTEGER DEFAULT 0,
   overall_confidence TEXT,

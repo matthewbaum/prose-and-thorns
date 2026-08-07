@@ -120,6 +120,20 @@
   color: var(--text-muted);
 }
 
+.methodology-craft-flags {
+  margin: 0 0 12px;
+}
+
+.methodology-craft-flags li {
+  margin-bottom: 10px;
+}
+
+.methodology-craft-flag-note {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+}
+
 .methodology-disclaimer {
   margin-top: 18px;
   padding-top: 14px;

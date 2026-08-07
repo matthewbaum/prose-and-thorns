@@ -1,0 +1,31 @@
+.shelf {
+  margin-bottom: 36px;
+}
+
+.shelf-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+  margin: 0 0 14px;
+}
+
+.shelf-row {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+}
+
+.shelf-card {
+  flex: 0 0 auto;
+  width: 180px;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 640px) {
+  .shelf-card {
+    width: 150px;
+  }
+}

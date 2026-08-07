@@ -11,8 +11,12 @@ function splitParam(value) {
 function matchesSeriesLength(book, lengths) {
   if (lengths.length === 0) return true;
   const total = book.series_total;
+  // total == null means "we don't actually know" — that must not silently
+  // match the "1 book" bucket, or every book with unknown length looks like
+  // a standalone in the UI regardless of its real series length.
+  if (total == null) return false;
   return lengths.some((len) => {
-    if (len === '1') return total == null || total === 1;
+    if (len === '1') return total === 1;
     if (len === '2') return total === 2;
     if (len === '3') return total === 3;
     if (len === '4-5') return total != null && total >= 4 && total <= 5;
@@ -28,6 +32,8 @@ function matchesAny(list, selected) {
 
 export function applyFilters(books, query) {
   const seriesStatus = query.series_status && query.series_status !== 'any' ? query.series_status : null;
+  const ageCategory = query.age_category && query.age_category !== 'any' ? query.age_category : null;
+  const publisherType = query.publisher_type && query.publisher_type !== 'any' ? query.publisher_type : null;
   const seriesLength = splitParam(query.series_length);
   const rawSubgenre = splitParam(query.subgenre);
   const wantsLgbtq = rawSubgenre.includes('lgbtq');
@@ -47,6 +53,8 @@ export function applyFilters(books, query) {
 
   return books.filter((book) => {
     if (seriesStatus && book.series_status !== seriesStatus) return false;
+    if (ageCategory && book.age_category !== ageCategory) return false;
+    if (publisherType && book.publisher_type !== publisherType) return false;
     if (!matchesSeriesLength(book, seriesLength)) return false;
     if (subgenre.length > 0 && !subgenre.includes(book.subgenre)) return false;
     if (wantsLgbtq && book.lgbtq !== 'yes') return false;

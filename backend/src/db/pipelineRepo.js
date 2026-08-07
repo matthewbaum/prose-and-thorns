@@ -66,6 +66,34 @@ export function saveReviews(bookId, reviews) {
   markRedditFetched.run(bookId);
 }
 
+const markHardcoverFetched = db.prepare(
+  `UPDATE books SET
+    hardcover_fetched_at = datetime('now'),
+    hardcover_avg_rating = @avg_rating,
+    hardcover_ratings_count = @ratings_count,
+    hardcover_cover_url = @cover_url,
+    hardcover_url = @hardcover_url,
+    updated_at = datetime('now')
+  WHERE id = @id`
+);
+
+export function saveHardcoverReviews(bookId, { avgRating, ratingsCount, coverUrl, hardcoverUrl, reviews }) {
+  insertReviewsTx(
+    reviews.map((r) => ({ book_id: bookId, subreddit: null, permalink: null, ...r }))
+  );
+  markHardcoverFetched.run({
+    id: bookId,
+    avg_rating: avgRating,
+    ratings_count: ratingsCount,
+    cover_url: coverUrl ?? null,
+    hardcover_url: hardcoverUrl ?? null,
+  });
+}
+
+export function markHardcoverMissing(bookId) {
+  markHardcoverFetched.run({ id: bookId, avg_rating: null, ratings_count: null, cover_url: null, hardcover_url: null });
+}
+
 const selectReviewsForBook = db.prepare('SELECT * FROM reviews WHERE book_id = ? ORDER BY score DESC');
 
 export function getReviewsForBook(bookId) {
@@ -75,6 +103,13 @@ export function getReviewsForBook(bookId) {
 const updateTags = db.prepare(
   `UPDATE books SET
     series_status = @series_status,
+    age_category = @age_category,
+    publisher_type = @publisher_type,
+    synopsis = @synopsis,
+    praise = @praise,
+    series_position = @series_position,
+    series_total = @series_total,
+    series_complete = @series_complete,
     subgenre = @subgenre,
     romance_tropes = @romance_tropes,
     plot_tropes = @plot_tropes,
@@ -89,10 +124,24 @@ const updateTags = db.prepare(
   WHERE id = @id`
 );
 
+const COMPLETE_STATUSES = new Set(['standalone', 'series-complete', 'duology-complete']);
+const ONGOING_STATUSES = new Set(['series-ongoing', 'duology-ongoing']);
+
 export function saveTags(bookId, tags) {
+  let seriesComplete = null;
+  if (COMPLETE_STATUSES.has(tags.series_status)) seriesComplete = 1;
+  else if (ONGOING_STATUSES.has(tags.series_status)) seriesComplete = 0;
+
   updateTags.run({
     id: bookId,
     series_status: tags.series_status || null,
+    age_category: tags.age_category || null,
+    publisher_type: tags.publisher_type || null,
+    synopsis: tags.synopsis || null,
+    praise: JSON.stringify(tags.praise || []),
+    series_position: tags.series_position ?? null,
+    series_total: tags.series_total ?? null,
+    series_complete: seriesComplete,
     subgenre: tags.subgenre || null,
     romance_tropes: JSON.stringify(tags.romance_tropes || []),
     plot_tropes: JSON.stringify(tags.plot_tropes || []),
@@ -114,6 +163,7 @@ const upsertQualityProfile = db.prepare(
     pacing_quality_score, pacing_quality_synthesis, pacing_quality_quote, pacing_quality_confidence,
     emotional_payoff_score, emotional_payoff_synthesis, emotional_payoff_quote, emotional_payoff_confidence,
     character_depth_score, character_depth_synthesis, character_depth_quote, character_depth_confidence,
+    prose_style, prose_style_note, grammar_flag, grammar_note, dialogue_flag, dialogue_note,
     review_count_used, overall_confidence, updated_at
   ) VALUES (
     @book_id,
@@ -123,6 +173,7 @@ const upsertQualityProfile = db.prepare(
     @pacing_quality_score, @pacing_quality_synthesis, @pacing_quality_quote, @pacing_quality_confidence,
     @emotional_payoff_score, @emotional_payoff_synthesis, @emotional_payoff_quote, @emotional_payoff_confidence,
     @character_depth_score, @character_depth_synthesis, @character_depth_quote, @character_depth_confidence,
+    @prose_style, @prose_style_note, @grammar_flag, @grammar_note, @dialogue_flag, @dialogue_note,
     @review_count_used, @overall_confidence, datetime('now')
   )
   ON CONFLICT(book_id) DO UPDATE SET
@@ -150,6 +201,12 @@ const upsertQualityProfile = db.prepare(
     character_depth_synthesis = excluded.character_depth_synthesis,
     character_depth_quote = excluded.character_depth_quote,
     character_depth_confidence = excluded.character_depth_confidence,
+    prose_style = excluded.prose_style,
+    prose_style_note = excluded.prose_style_note,
+    grammar_flag = excluded.grammar_flag,
+    grammar_note = excluded.grammar_note,
+    dialogue_flag = excluded.dialogue_flag,
+    dialogue_note = excluded.dialogue_note,
     review_count_used = excluded.review_count_used,
     overall_confidence = excluded.overall_confidence,
     updated_at = datetime('now')`
@@ -173,6 +230,12 @@ export function saveQualityProfile(bookId, profile) {
     book_id: bookId,
     review_count_used: profile.review_count_used || 0,
     overall_confidence: profile.confidence || 'low',
+    prose_style: profile.writing_style?.style || null,
+    prose_style_note: profile.writing_style?.note || null,
+    grammar_flag: profile.grammar_technical?.flag || null,
+    grammar_note: profile.grammar_technical?.note || null,
+    dialogue_flag: profile.dialogue_realism?.flag || null,
+    dialogue_note: profile.dialogue_realism?.note || null,
   };
   for (const dim of dims) {
     const d = profile[dim] || {};

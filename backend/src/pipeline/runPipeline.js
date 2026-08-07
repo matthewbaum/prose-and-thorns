@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { SEED_BOOKS } from './seedList.js';
 import { fetchGoogleBooksData } from './googleBooks.js';
 import { fetchRedditReviews } from './reddit.js';
+import { fetchHardcoverReviews } from './hardcover.js';
 import { tagBook } from './claudeTagging.js';
 import { synthesizeQuality } from './claudeSynthesis.js';
 import {
@@ -9,6 +10,8 @@ import {
   saveGoogleBooksData,
   markGoogleBooksMissing,
   saveReviews,
+  saveHardcoverReviews,
+  markHardcoverMissing,
   getReviewsForBook,
   saveTags,
   saveQualityProfile,
@@ -22,8 +25,9 @@ const REDDIT_CONFIGURED = Boolean(
     process.env.REDDIT_USERNAME &&
     process.env.REDDIT_PASSWORD
 );
+const HARDCOVER_CONFIGURED = Boolean(process.env.HARDCOVER_API_TOKEN);
 
-async function processBook(seed) {
+export async function processBook(seed) {
   status.currentTitle = `${seed.title} — ${seed.author}`;
   log(`Processing "${seed.title}" by ${seed.author}`);
 
@@ -62,10 +66,33 @@ async function processBook(seed) {
 
   book = findOrCreateBook(seed.title, seed.author);
 
+  // Step 3b — Hardcover reviews (never call twice; skip cleanly if not configured)
+  if (!book.hardcover_fetched_at && HARDCOVER_CONFIGURED) {
+    try {
+      const hc = await fetchHardcoverReviews(displayTitle, displayAuthor, seed.title);
+      if (hc) {
+        saveHardcoverReviews(book.id, hc);
+      } else {
+        markHardcoverMissing(book.id);
+      }
+    } catch (err) {
+      log(`Hardcover fetch failed for "${displayTitle}": ${err.message}`);
+      status.errors.push({ title: seed.title, step: 'hardcover', message: err.message });
+    }
+    await sleep(RATE_LIMIT_DELAY_MS);
+  }
+
+  book = findOrCreateBook(seed.title, seed.author);
+
   // Step 4 — Claude trope tagging
   if (!book.tagged_at && book.description) {
     try {
-      const tags = await tagBook(book.description, book.editorial_review);
+      const tags = await tagBook({
+        title: displayTitle,
+        author: displayAuthor,
+        description: book.description,
+        editorialReview: book.editorial_review,
+      });
       if (tags) {
         saveTags(book.id, tags);
         if (tags.confidence === 'low') {
@@ -85,11 +112,17 @@ async function processBook(seed) {
   if (!book.quality_synthesized_at) {
     try {
       const reviews = getReviewsForBook(book.id);
+      // Prefer Hardcover's rating as the anchor when we have it — it's
+      // typically backed by orders of magnitude more ratings than Google
+      // Books', so it's a far more reliable prior for the model to reconcile
+      // the (smaller, potentially skewed) sampled review text against.
+      const anchorRating = book.hardcover_avg_rating ?? book.avg_rating;
+      const anchorRatingsCount = book.hardcover_avg_rating != null ? book.hardcover_ratings_count : book.ratings_count;
       const profile = await synthesizeQuality({
         title: displayTitle,
         author: displayAuthor,
-        avgRating: book.avg_rating,
-        ratingsCount: book.ratings_count,
+        avgRating: anchorRating,
+        ratingsCount: anchorRatingsCount,
         reviews,
       });
       if (profile) {

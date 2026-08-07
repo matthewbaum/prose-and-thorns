@@ -36,7 +36,30 @@ function buildQualityProfile(row) {
   profile.overall_score = count > 0 ? sum / count : null;
   profile.review_count_used = row.review_count_used || 0;
   profile.confidence = row.overall_confidence || 'low';
+
+  if (row.prose_style) {
+    profile.writing_style = { style: row.prose_style, note: row.prose_style_note || '' };
+  }
+  if (row.grammar_flag) {
+    profile.grammar_technical = { flag: row.grammar_flag, note: row.grammar_note || '' };
+  }
+  if (row.dialogue_flag) {
+    profile.dialogue_realism = { flag: row.dialogue_flag, note: row.dialogue_note || '' };
+  }
+
   return profile;
+}
+
+// Google Books IDs ending "ACAAJ" are metadata-only stub records with no
+// digitized content — their imageLinks.thumbnail resolves to a generic
+// "image not available" graphic, not real cover art, even though the URL
+// itself looks valid. Prefer Hardcover's cover (real edition art, and much
+// better matched overall) whenever we have it; only fall back to Google's
+// when Hardcover has nothing and Google's own ID isn't a known-bad stub.
+function resolveCoverUrl(row) {
+  if (row.hardcover_cover_url) return row.hardcover_cover_url;
+  const isStubRecord = row.google_books_id && row.google_books_id.endsWith('ACAAJ');
+  return isStubRecord ? null : row.cover_url || null;
 }
 
 function serializeBook(row) {
@@ -49,10 +72,15 @@ function serializeBook(row) {
     publication_date: row.publication_date || null,
     page_count: row.page_count || null,
     description: row.description || '',
-    cover_url: row.cover_url || null,
+    synopsis: row.synopsis || null,
+    praise: parseJsonArray(row.praise),
+    cover_url: resolveCoverUrl(row),
     google_books_link: row.google_books_link || null,
     avg_rating: row.avg_rating ?? null,
     ratings_count: row.ratings_count ?? null,
+    hardcover_avg_rating: row.hardcover_avg_rating ?? null,
+    hardcover_ratings_count: row.hardcover_ratings_count ?? null,
+    hardcover_url: row.hardcover_url || null,
     editorial_review: row.editorial_review || null,
 
     series_name: row.series_name || null,
@@ -62,6 +90,8 @@ function serializeBook(row) {
     next_release_date: row.next_release_date || null,
 
     series_status: row.series_status || null,
+    age_category: row.age_category || null,
+    publisher_type: row.publisher_type || null,
     subgenre: row.subgenre || null,
     romance_tropes: parseJsonArray(row.romance_tropes),
     plot_tropes: parseJsonArray(row.plot_tropes),
@@ -85,6 +115,7 @@ const SELECT_SQL = `
     qp.pacing_quality_score, qp.pacing_quality_synthesis, qp.pacing_quality_quote, qp.pacing_quality_confidence,
     qp.emotional_payoff_score, qp.emotional_payoff_synthesis, qp.emotional_payoff_quote, qp.emotional_payoff_confidence,
     qp.character_depth_score, qp.character_depth_synthesis, qp.character_depth_quote, qp.character_depth_confidence,
+    qp.prose_style, qp.prose_style_note, qp.grammar_flag, qp.grammar_note, qp.dialogue_flag, qp.dialogue_note,
     qp.review_count_used, qp.overall_confidence
   FROM books b
   LEFT JOIN quality_profiles qp ON qp.book_id = b.id

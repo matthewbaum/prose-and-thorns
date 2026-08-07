@@ -1,0 +1,179 @@
+.book-picker {
+  max-width: 520px;
+  margin: 0 auto 40px;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.book-picker-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.book-picker-input {
+  width: 100%;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+}
+
+.book-picker-input:hover,
+.book-picker-input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.book-picker-input:disabled {
+  opacity: 0.5;
+}
+
+.book-picker-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 20;
+  max-height: 280px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.book-picker-result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  text-align: left;
+}
+
+.book-picker-result:last-child {
+  border-bottom: none;
+}
+
+.book-picker-result:hover {
+  background: var(--accent-soft);
+}
+
+.book-picker-result-title {
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.book-picker-result-author {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.book-picker-result-empty {
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.book-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.book-picker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  padding: 4px 6px 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+}
+
+.book-picker-chip button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 2px 4px;
+}
+
+.book-picker-chip button:hover {
+  color: var(--text);
+}
+
+.book-picker-mode {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.book-picker-mode button {
+  background: var(--surface-raised);
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 14px;
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.book-picker-mode button:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
+.book-picker-mode button.active {
+  background: var(--accent-soft);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.book-picker-mode button:hover:not(.active) {
+  color: var(--text);
+}
+
+.book-picker-submit {
+  background: var(--accent);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.book-picker-submit:hover:not(:disabled) {
+  background: var(--accent-glow);
+  box-shadow: 0 0 20px var(--accent-soft);
+}
+
+.book-picker-submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.book-picker-max-note {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0;
+}
