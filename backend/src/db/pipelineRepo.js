@@ -145,10 +145,28 @@ const updateTags = db.prepare(
 const COMPLETE_STATUSES = new Set(['standalone', 'series-complete', 'duology-complete']);
 const ONGOING_STATUSES = new Set(['series-ongoing', 'duology-ongoing']);
 
+// "chosen-one" is defined in the romance-trope taxonomy but the model
+// repeatedly puts it in plot_tropes instead — verified recurring across
+// three separate full-catalog re-tag passes (4, then 11, then 12 books
+// each time, never the same books twice), not a one-off fluke. Since its
+// correct bucket is fixed and known, correct it at write time instead of
+// re-flagging and hand-fixing it after every future re-tag.
+function normalizeTropeBuckets(romanceTropes, plotTropes) {
+  const romance = new Set(romanceTropes);
+  const plot = plotTropes.filter((t) => t !== 'chosen-one');
+  if (plotTropes.includes('chosen-one')) romance.add('chosen-one');
+  return { romance: [...romance], plot };
+}
+
 export function saveTags(bookId, tags) {
   let seriesComplete = null;
   if (COMPLETE_STATUSES.has(tags.series_status)) seriesComplete = 1;
   else if (ONGOING_STATUSES.has(tags.series_status)) seriesComplete = 0;
+
+  const { romance: fixedRomanceTropes, plot: fixedPlotTropes } = normalizeTropeBuckets(
+    tags.romance_tropes || [],
+    tags.plot_tropes || []
+  );
 
   updateTags.run({
     id: bookId,
@@ -162,8 +180,8 @@ export function saveTags(bookId, tags) {
     series_complete: seriesComplete,
     series_name: tags.series_name || null,
     subgenre: tags.subgenre || null,
-    romance_tropes: JSON.stringify(tags.romance_tropes || []),
-    plot_tropes: JSON.stringify(tags.plot_tropes || []),
+    romance_tropes: JSON.stringify(fixedRomanceTropes),
+    plot_tropes: JSON.stringify(fixedPlotTropes),
     spice_level: tags.spice_level || null,
     darkness_level: tags.darkness_level || null,
     lgbtq: tags.lgbtq || 'unknown',

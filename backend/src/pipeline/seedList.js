@@ -140,4 +140,13 @@ export const SEED_BOOKS = [
   { title: 'For the Throne', author: 'Hannah Whitten' },
   { title: 'The Hurricane Wars', author: 'Thea Guanzon' },
   { title: 'Bloodmarked', author: 'Tracy Deonn' },
+  { title: 'Iron Widow', author: 'Xiran Jay Zhao' },
+  { title: 'Sorcery of Thorns', author: 'Margaret Rogerson' },
+  { title: 'Belladonna', author: 'Adalyn Grace' },
+  { title: 'The Bone Shard Daughter', author: 'Andrea Stewart' },
+  { title: 'A Deal with the Elf King', author: 'Elise Kova' },
+  // Already existed in the DB (id 250) but had drifted out of this file at
+  // some point, so it was silently excluded from every batch that loops
+  // over SEED_BOOKS rather than the DB directly — re-added so it's tracked.
+  { title: 'The Nightingale', author: 'Kristin Hannah' },
 ];
