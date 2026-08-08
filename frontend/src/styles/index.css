@@ -1,4 +1,13 @@
 :root {
+  /* This app is dark-only (no light mode toggle) — without this, browsers
+     render native form control chrome (the <select> dropdown arrow and,
+     in some browsers, its box shading) using light-mode defaults
+     regardless of the explicit dark background-color set on it, since
+     color-scheme — not background-color — is what browsers actually key
+     off for native widget chrome. Verified case: "Series Length" (still a
+     native <select>, unlike the custom-styled dropdown buttons elsewhere)
+     rendered with a jarring light background despite correct dark CSS. */
+  color-scheme: dark;
   --bg: #0a0a14;
   --surface: #13131f;
   --surface-raised: #191927;
