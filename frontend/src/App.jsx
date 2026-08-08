@@ -6,20 +6,21 @@ import DetailPanel from './components/DetailPanel.jsx';
 import HomePage from './components/HomePage.jsx';
 import AboutPage from './components/AboutPage.jsx';
 import { fetchBooks, fetchBook, fetchRecommendations } from './api.js';
+import { SORT_OPTIONS } from './constants/taxonomy.js';
 import './styles/App.css';
 
 const PAGE_SIZE = 24;
 
 const DEFAULT_FILTERS = {
-  series_status: 'any',
-  age_category: 'any',
-  publisher_type: 'any',
+  series_status: [],
+  age_category: [],
+  publisher_type: [],
   series_length: [],
   subgenre: [],
   romance_tropes: [],
   plot_tropes: [],
-  spice_min: '',
-  spice_max: '',
+  spice_level: [],
+  darkness_level: [],
   min_prose: 1,
   min_romance: 1,
   min_world_building: 1,
@@ -47,8 +48,18 @@ export default function App() {
   const [recommendMode, setRecommendMode] = useState('any');
   const [recommendNoCommonGround, setRecommendNoCommonGround] = useState(false);
 
-  const goHome = useCallback(() => setView('home'), []);
-  const goBrowse = useCallback(() => setView('browse'), []);
+  // "Home" and plain "Browse all" both mean a clean slate — neither should
+  // silently carry over filters left set from an earlier Quick Search or
+  // recommendation. Only actions that explicitly set filters (Quick Search,
+  // FilterPanel edits) should populate them.
+  const goHome = useCallback(() => {
+    setFilters(DEFAULT_FILTERS);
+    setView('home');
+  }, []);
+  const goBrowse = useCallback(() => {
+    setFilters(DEFAULT_FILTERS);
+    setView('browse');
+  }, []);
   const goAbout = useCallback(() => setView('about'), []);
 
   // Reset to page 1 whenever filters change or the browse view is entered.
@@ -233,6 +244,26 @@ export default function App() {
           />
           <main className="app-main">
             {error && <div className="error-banner">Couldn&apos;t load books: {error}</div>}
+            <div className="browse-header">
+              <button className="link-btn" onClick={goHome}>
+                &larr; Start over
+              </button>
+              <label className="sort-label" htmlFor="sort-select">
+                Sort by
+                <select
+                  id="sort-select"
+                  className="sort-select"
+                  value={filters.sort}
+                  onChange={(e) => updateFilters({ sort: e.target.value })}
+                >
+                  {SORT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <BookGrid
               books={books}
               loading={loading}
@@ -251,6 +282,7 @@ export default function App() {
         book={selectedBook}
         loading={detailLoading}
         onClose={() => setSelectedId(null)}
+        onSelectBook={(id) => setSelectedId(id)}
       />
     </div>
   );

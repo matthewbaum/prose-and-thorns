@@ -1,9 +1,14 @@
 import { getClaudeClient, CLAUDE_MODEL } from './claudeClient.js';
 import { extractJson } from './util.js';
 
-const MAX_REVIEW_CHARS = 8000 * 4; // ~8000 tokens, rough 4-chars-per-token heuristic
+// Bumped alongside PER_RATING_BUCKET (5->8 in hardcover.js, 25->40 reviews max)
+// so the larger sample doesn't just get silently cut off before reaching the
+// model — ~12,500 tokens, rough 4-chars-per-token heuristic.
+const MAX_REVIEW_CHARS = 12500 * 4;
 
-const SYNTHESIS_PROMPT = ({ title, author, rating, ratingsCount, reviewsText }) => `You are synthesizing reader reviews for a book recommendation tool. Based on the reviews below, score this book on each quality dimension and provide a one-sentence synthesis plus one representative quote (under 15 words, paraphrased not quoted verbatim) for each dimension.
+const SYNTHESIS_PROMPT = ({ title, author, rating, ratingsCount, reviewsText }) => `You are synthesizing reader reviews for a book recommendation tool. Based on the reviews below, score this book on each quality dimension and provide a one-sentence synthesis plus one representative quote for each dimension.
+
+The representative_quote MUST be a genuine excerpt copied directly from one of the reviews below — under 15 words, exact wording, not paraphrased and not invented. This app shows these quotes to users as evidence from real readers, and an automated check verifies each quote is an actual substring of the review text it's attributed to, so a paraphrase or invented line will be flagged and discarded. If no review has a clean, quotable phrase under 15 words for a dimension, pick the shortest exact excerpt that fits reasonably close to that length rather than inventing one — do not paraphrase to hit the length target.
 
 BOOK: ${title} by ${author}
 AGGREGATE READER RATING: ${rating ?? 'unknown'}/5 (from ${ratingsCount ?? 0} total ratings)
@@ -61,7 +66,13 @@ export async function synthesizeQuality({ title, author, avgRating, ratingsCount
   const anthropic = getClaudeClient();
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    max_tokens: 2048,
+    // Verified case: "Circe" (36 reviews, largest sample this catalog has
+    // used) hit stop_reason "max_tokens" with output_tokens_details showing
+    // the entire 2048 budget consumed by thinking tokens — zero left for
+    // the actual JSON, so the response was empty and synthesis silently
+    // failed. Budget generously so thinking overhead can never crowd out
+    // the answer.
+    max_tokens: 8192,
     messages: [
       {
         role: 'user',

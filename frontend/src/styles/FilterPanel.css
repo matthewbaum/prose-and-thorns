@@ -67,6 +67,22 @@
   border-top: none;
 }
 
+/* Mirrors .quick-search-select-quality in QuickSearch.css — same "this one's
+   different" gold treatment on both entry points, since quality scoring is
+   the app's actual differentiator, not just another categorical filter. */
+.filter-section-quality {
+  margin: 4px -10px 0;
+  padding: 10px 10px 12px;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+}
+
+.filter-section-quality .filter-section-header {
+  color: var(--gold);
+  font-weight: 700;
+}
+
 .filter-section-header-row {
   display: flex;
   align-items: center;
@@ -89,9 +105,11 @@
 }
 
 .chevron {
-  color: var(--text-muted);
+  color: var(--gold);
   transition: transform 0.15s ease;
-  font-size: 0.7rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .chevron.open {
@@ -228,24 +246,6 @@
 .slider-item input[type='range'] {
   width: 100%;
   accent-color: var(--accent);
-}
-
-.sort-label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--text);
-}
-
-.sort-select {
-  width: 100%;
-  background: var(--surface-raised);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 0.82rem;
 }
 
 .sidebar-scrim {

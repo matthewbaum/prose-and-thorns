@@ -17,6 +17,15 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
+// Without an explicit Cache-Control, Express's default ETag can still leave
+// browsers free to heuristically cache these responses — the catalog data
+// changes from pipeline runs independent of any client action, so API
+// responses should never be served stale from cache.
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
 app.use('/api/books', booksRouter);
 app.use('/api/seed', seedRouter);
 app.use('/api/shelves', shelvesRouter);

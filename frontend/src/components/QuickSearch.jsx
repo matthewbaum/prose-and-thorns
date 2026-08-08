@@ -8,9 +8,11 @@ import {
   ROMANCE_TROPES,
   PLOT_TROPES,
   SPICE_LEVELS,
+  DARKNESS_LEVELS,
   CONTENT_WARNINGS,
 } from '../constants/taxonomy.js';
 import ScoreMethodologyInfo from './ScoreMethodologyInfo.jsx';
+import MultiSelectDropdown from './MultiSelectDropdown.jsx';
 import '../styles/QuickSearch.css';
 
 const QUALITY_OPTIONS = [
@@ -18,94 +20,76 @@ const QUALITY_OPTIONS = [
   { value: '3', label: '3+ (Solid across the board)' },
   { value: '3.5', label: '3.5+ (Strong across the board)' },
   { value: '4', label: '4+ (Excellent across the board)' },
-  { value: '4.5', label: '4.5+ (Rare — near flawless)' },
+  { value: '4.5', label: '4.5+ (Rare — exceptional)' },
 ];
 
 export default function QuickSearch({ onSearch }) {
-  const [seriesStatus, setSeriesStatus] = useState('');
-  const [ageCategory, setAgeCategory] = useState('');
-  const [publisherType, setPublisherType] = useState('');
+  const [seriesStatus, setSeriesStatus] = useState([]);
+  const [ageCategory, setAgeCategory] = useState([]);
+  const [publisherType, setPublisherType] = useState([]);
   const [seriesLength, setSeriesLength] = useState('');
-  const [subgenre, setSubgenre] = useState('');
-  const [romanceTrope, setRomanceTrope] = useState('');
-  const [plotTrope, setPlotTrope] = useState('');
-  const [spice, setSpice] = useState('');
-  const [avoidWarning, setAvoidWarning] = useState('');
+  const [subgenre, setSubgenre] = useState([]);
+  const [romanceTropes, setRomanceTropes] = useState([]);
+  const [plotTropes, setPlotTropes] = useState([]);
+  const [spice, setSpice] = useState([]);
+  const [darkness, setDarkness] = useState([]);
+  const [avoidWarnings, setAvoidWarnings] = useState([]);
   const [quality, setQuality] = useState('');
 
   const handleSearch = () => {
     const patch = {};
-    if (seriesStatus) patch.series_status = seriesStatus;
-    if (ageCategory) patch.age_category = ageCategory;
-    if (publisherType) patch.publisher_type = publisherType;
+    if (seriesStatus.length > 0) patch.series_status = seriesStatus;
+    if (ageCategory.length > 0) patch.age_category = ageCategory;
+    if (publisherType.length > 0) patch.publisher_type = publisherType;
     if (seriesLength) patch.series_length = [seriesLength];
-    if (subgenre) patch.subgenre = [subgenre];
-    if (romanceTrope) patch.romance_tropes = [romanceTrope];
-    if (plotTrope) patch.plot_tropes = [plotTrope];
-    if (spice) {
-      patch.spice_min = spice;
-      patch.spice_max = spice;
-    }
-    if (avoidWarning) patch.exclude_warnings = [avoidWarning];
+    if (subgenre.length > 0) patch.subgenre = subgenre;
+    if (romanceTropes.length > 0) patch.romance_tropes = romanceTropes;
+    if (plotTropes.length > 0) patch.plot_tropes = plotTropes;
+    if (spice.length > 0) patch.spice_level = spice;
+    if (darkness.length > 0) patch.darkness_level = darkness;
+    if (avoidWarnings.length > 0) patch.exclude_warnings = avoidWarnings;
     if (quality) patch.min_overall = Number(quality);
     onSearch(patch);
   };
 
   const hasSelection =
-    seriesStatus ||
-    ageCategory ||
-    publisherType ||
+    seriesStatus.length > 0 ||
+    ageCategory.length > 0 ||
+    publisherType.length > 0 ||
     seriesLength ||
-    subgenre ||
-    romanceTrope ||
-    plotTrope ||
-    spice ||
-    avoidWarning ||
+    subgenre.length > 0 ||
+    romanceTropes.length > 0 ||
+    plotTropes.length > 0 ||
+    spice.length > 0 ||
+    darkness.length > 0 ||
+    avoidWarnings.length > 0 ||
     quality;
 
   return (
     <div className="quick-search">
-      <select
-        className="quick-search-select"
-        value={seriesStatus}
-        onChange={(e) => setSeriesStatus(e.target.value)}
-        aria-label="Series status"
-      >
-        <option value="">Any series status</option>
-        {SERIES_STATUS.filter((opt) => opt.value !== 'any').map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <MultiSelectDropdown
+        options={SERIES_STATUS.filter((opt) => opt.value !== 'any')}
+        selected={seriesStatus}
+        onChange={setSeriesStatus}
+        placeholder="Any series status"
+        ariaLabel="Series status"
+      />
 
-      <select
-        className="quick-search-select"
-        value={ageCategory}
-        onChange={(e) => setAgeCategory(e.target.value)}
-        aria-label="Age category"
-      >
-        <option value="">Any age category</option>
-        {AGE_CATEGORY.filter((opt) => opt.value !== 'any').map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <MultiSelectDropdown
+        options={AGE_CATEGORY.filter((opt) => opt.value !== 'any')}
+        selected={ageCategory}
+        onChange={setAgeCategory}
+        placeholder="Any age category"
+        ariaLabel="Age category"
+      />
 
-      <select
-        className="quick-search-select"
-        value={publisherType}
-        onChange={(e) => setPublisherType(e.target.value)}
-        aria-label="Publisher type"
-      >
-        <option value="">Any publisher type</option>
-        {PUBLISHER_TYPE.filter((opt) => opt.value !== 'any').map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <MultiSelectDropdown
+        options={PUBLISHER_TYPE.filter((opt) => opt.value !== 'any')}
+        selected={publisherType}
+        onChange={setPublisherType}
+        placeholder="Any publisher type"
+        ariaLabel="Publisher type"
+      />
 
       <select
         className="quick-search-select"
@@ -121,75 +105,54 @@ export default function QuickSearch({ onSearch }) {
         ))}
       </select>
 
-      <select
-        className="quick-search-select"
-        value={subgenre}
-        onChange={(e) => setSubgenre(e.target.value)}
-        aria-label="Subgenre"
-      >
-        <option value="">Any subgenre</option>
-        {SUBGENRE.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <MultiSelectDropdown
+        options={SUBGENRE}
+        selected={subgenre}
+        onChange={setSubgenre}
+        placeholder="Any subgenre"
+        ariaLabel="Subgenre"
+      />
 
-      <select
-        className="quick-search-select"
-        value={romanceTrope}
-        onChange={(e) => setRomanceTrope(e.target.value)}
-        aria-label="Romance trope"
-      >
-        <option value="">Any romance trope</option>
-        {ROMANCE_TROPES.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <MultiSelectDropdown
+        options={ROMANCE_TROPES}
+        selected={romanceTropes}
+        onChange={setRomanceTropes}
+        placeholder="Any romance trope"
+        ariaLabel="Romance trope"
+      />
 
-      <select
-        className="quick-search-select"
-        value={plotTrope}
-        onChange={(e) => setPlotTrope(e.target.value)}
-        aria-label="Plot trope"
-      >
-        <option value="">Any plot trope</option>
-        {PLOT_TROPES.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <MultiSelectDropdown
+        options={PLOT_TROPES}
+        selected={plotTropes}
+        onChange={setPlotTropes}
+        placeholder="Any plot trope"
+        ariaLabel="Plot trope"
+      />
 
-      <select
-        className="quick-search-select"
-        value={spice}
-        onChange={(e) => setSpice(e.target.value)}
-        aria-label="Spice level"
-      >
-        <option value="">Any spice</option>
-        {SPICE_LEVELS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <MultiSelectDropdown
+        options={SPICE_LEVELS}
+        selected={spice}
+        onChange={setSpice}
+        placeholder="Any spice"
+        ariaLabel="Spice level"
+      />
 
-      <select
-        className="quick-search-select"
-        value={avoidWarning}
-        onChange={(e) => setAvoidWarning(e.target.value)}
-        aria-label="Content warning to avoid"
-      >
-        <option value="">Nothing to avoid</option>
-        {CONTENT_WARNINGS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            Avoid: {opt.label}
-          </option>
-        ))}
-      </select>
+      <MultiSelectDropdown
+        options={DARKNESS_LEVELS}
+        selected={darkness}
+        onChange={setDarkness}
+        placeholder="Any darkness level"
+        ariaLabel="Darkness level"
+      />
+
+      <MultiSelectDropdown
+        options={CONTENT_WARNINGS}
+        selected={avoidWarnings}
+        onChange={setAvoidWarnings}
+        placeholder="Nothing to avoid"
+        prefixLabel="Avoid: "
+        ariaLabel="Content warnings to avoid"
+      />
 
       <div className="quick-search-quality-wrap">
         <select
@@ -204,7 +167,7 @@ export default function QuickSearch({ onSearch }) {
             </option>
           ))}
         </select>
-        <ScoreMethodologyInfo label="" />
+        <ScoreMethodologyInfo label="" scope="overall" />
       </div>
 
       <button type="button" className="quick-search-btn" onClick={handleSearch} disabled={!hasSelection}>

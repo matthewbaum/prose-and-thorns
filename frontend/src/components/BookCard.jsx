@@ -1,6 +1,7 @@
 import React from 'react';
 import { SPICE_FLAME_COUNT } from '../constants/taxonomy.js';
 import { getMatchedFilters } from '../lib/matchedFilters.js';
+import { tropeLabel } from '../lib/labels.js';
 import '../styles/BookCard.css';
 
 const STATUS_LABEL = {
@@ -55,7 +56,7 @@ export default function BookCard({ book, onSelect, filters }) {
           <div className="trope-overlay">
             {tropes.map((t) => (
               <span key={t} className="trope-chip">
-                {t.replace(/-/g, ' ')}
+                {tropeLabel(t)}
               </span>
             ))}
           </div>

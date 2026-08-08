@@ -17,6 +17,11 @@ export function findOrCreateBook(seedTitle, seedAuthor) {
   return selectBookById.get(info.lastInsertRowid);
 }
 
+// series_name/series_position are also written by the tagging stage (a more
+// reliable, LLM-extracted source vs. this stage's regex parse of the title
+// string) — COALESCE so re-running this stage alone (e.g. to retry a cover
+// match) can't silently blank out a better value tagging already set, since
+// re-running doesn't re-run tagging too unless tagged_at is separately reset.
 const updateGoogleBooksData = db.prepare(
   `UPDATE books SET
     google_books_id = @google_books_id,
@@ -31,8 +36,8 @@ const updateGoogleBooksData = db.prepare(
     avg_rating = @avg_rating,
     ratings_count = @ratings_count,
     editorial_review = @editorial_review,
-    series_name = @series_name,
-    series_position = @series_position,
+    series_name = COALESCE(@series_name, series_name),
+    series_position = COALESCE(@series_position, series_position),
     google_books_fetched_at = datetime('now'),
     updated_at = datetime('now')
   WHERE id = @id`
@@ -100,6 +105,17 @@ export function getReviewsForBook(bookId) {
   return selectReviewsForBook.all(bookId);
 }
 
+// series_position/series_total/series_name are COALESCE'd with the existing
+// DB value taking priority, not the freshly-tagged one — verified case: a
+// re-tag pass (e.g. to backfill a new field like darkness_level) reset
+// tagged_at for the whole catalog, and tagBook()'s per-book, independently
+// guessed series_total immediately re-introduced the exact
+// sibling-disagreement bug that a centralized, cross-checked backfill had
+// already fixed (Throne of Glass, Dark Olympus, etc. went right back to
+// disagreeing). These three fields are inherently ungrounded (the model's
+// own knowledge, not derived from this book's description), so once a
+// value is set — by any source — it should be sticky against a later
+// re-tag; only a dedicated backfill/correction script should change it.
 const updateTags = db.prepare(
   `UPDATE books SET
     series_status = @series_status,
@@ -107,13 +123,15 @@ const updateTags = db.prepare(
     publisher_type = @publisher_type,
     synopsis = @synopsis,
     praise = @praise,
-    series_position = @series_position,
-    series_total = @series_total,
+    series_position = COALESCE(series_position, @series_position),
+    series_total = COALESCE(series_total, @series_total),
     series_complete = @series_complete,
+    series_name = COALESCE(series_name, @series_name),
     subgenre = @subgenre,
     romance_tropes = @romance_tropes,
     plot_tropes = @plot_tropes,
     spice_level = @spice_level,
+    darkness_level = @darkness_level,
     lgbtq = @lgbtq,
     content_warnings = @content_warnings,
     emotional_tone = @emotional_tone,
@@ -142,10 +160,12 @@ export function saveTags(bookId, tags) {
     series_position: tags.series_position ?? null,
     series_total: tags.series_total ?? null,
     series_complete: seriesComplete,
+    series_name: tags.series_name || null,
     subgenre: tags.subgenre || null,
     romance_tropes: JSON.stringify(tags.romance_tropes || []),
     plot_tropes: JSON.stringify(tags.plot_tropes || []),
     spice_level: tags.spice_level || null,
+    darkness_level: tags.darkness_level || null,
     lgbtq: tags.lgbtq || 'unknown',
     content_warnings: JSON.stringify(tags.content_warnings || []),
     emotional_tone: tags.emotional_tone || null,

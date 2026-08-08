@@ -1,7 +1,6 @@
 import React from 'react';
 import CollapsibleSection from './CollapsibleSection.jsx';
 import CheckboxFilterSection from './CheckboxFilterSection.jsx';
-import RadioFilterSection from './RadioFilterSection.jsx';
 import ScoreMethodologyInfo from './ScoreMethodologyInfo.jsx';
 import {
   SERIES_STATUS,
@@ -12,9 +11,9 @@ import {
   ROMANCE_TROPES,
   PLOT_TROPES,
   SPICE_LEVELS,
+  DARKNESS_LEVELS,
   MIN_QUALITY_FILTERS,
   CONTENT_WARNINGS,
-  SORT_OPTIONS,
 } from '../constants/taxonomy.js';
 import '../styles/FilterPanel.css';
 
@@ -39,32 +38,39 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
           </div>
         </div>
 
-        <RadioFilterSection
+        <CheckboxFilterSection
           title="Series Status"
-          options={SERIES_STATUS}
+          defaultOpen={false}
+          options={SERIES_STATUS.filter((opt) => opt.value !== 'any')}
           selected={filters.series_status}
-          defaultValue="any"
-          onSelect={(value) => onChange({ series_status: value })}
+          onToggle={(value) =>
+            onChange({ series_status: toggleValue(filters.series_status, value) })
+          }
         />
 
-        <RadioFilterSection
+        <CheckboxFilterSection
           title="Age Category"
-          options={AGE_CATEGORY}
+          defaultOpen={false}
+          options={AGE_CATEGORY.filter((opt) => opt.value !== 'any')}
           selected={filters.age_category}
-          defaultValue="any"
-          onSelect={(value) => onChange({ age_category: value })}
+          onToggle={(value) =>
+            onChange({ age_category: toggleValue(filters.age_category, value) })
+          }
         />
 
-        <RadioFilterSection
+        <CheckboxFilterSection
           title="Publisher Type"
-          options={PUBLISHER_TYPE}
+          defaultOpen={false}
+          options={PUBLISHER_TYPE.filter((opt) => opt.value !== 'any')}
           selected={filters.publisher_type}
-          defaultValue="any"
-          onSelect={(value) => onChange({ publisher_type: value })}
+          onToggle={(value) =>
+            onChange({ publisher_type: toggleValue(filters.publisher_type, value) })
+          }
         />
 
         <CheckboxFilterSection
           title="Series Length"
+          defaultOpen={false}
           options={SERIES_LENGTH}
           selected={filters.series_length}
           onToggle={(value) =>
@@ -74,6 +80,7 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
 
         <CheckboxFilterSection
           title="Subgenre"
+          defaultOpen={false}
           options={SUBGENRE}
           selected={filters.subgenre}
           onToggle={(value) => onChange({ subgenre: toggleValue(filters.subgenre, value) })}
@@ -99,17 +106,26 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
           }
         />
 
-        <RadioFilterSection
+        <CheckboxFilterSection
           title="Spice Level"
-          options={[{ value: '', label: 'Any' }, ...SPICE_LEVELS]}
-          selected={filters.spice_min || ''}
-          defaultValue=""
-          onSelect={(value) => onChange({ spice_min: value, spice_max: value })}
+          defaultOpen={false}
+          options={SPICE_LEVELS}
+          selected={filters.spice_level}
+          onToggle={(value) => onChange({ spice_level: toggleValue(filters.spice_level, value) })}
+        />
+
+        <CheckboxFilterSection
+          title="Darkness Level"
+          defaultOpen={false}
+          options={DARKNESS_LEVELS}
+          selected={filters.darkness_level}
+          onToggle={(value) => onChange({ darkness_level: toggleValue(filters.darkness_level, value) })}
         />
 
         <CollapsibleSection
           title="Minimum Quality Score"
           defaultOpen={false}
+          className="filter-section-quality"
           headerExtra={<ScoreMethodologyInfo label="" />}
         >
           <div className="slider-list">
@@ -149,23 +165,6 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
           }
         />
 
-        <div className="filter-section">
-          <label className="sort-label" htmlFor="sort-select">
-            Sort Results By
-          </label>
-          <select
-            id="sort-select"
-            className="sort-select"
-            value={filters.sort}
-            onChange={(e) => onChange({ sort: e.target.value })}
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
       </aside>
     </>
   );

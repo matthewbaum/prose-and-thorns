@@ -87,6 +87,7 @@ function serializeBook(row) {
     series_position: row.series_position ?? null,
     series_total: row.series_total ?? null,
     series_complete: row.series_complete == null ? null : Boolean(row.series_complete),
+    series_titles: parseJsonArray(row.series_titles),
     next_release_date: row.next_release_date || null,
 
     series_status: row.series_status || null,
@@ -96,6 +97,7 @@ function serializeBook(row) {
     romance_tropes: parseJsonArray(row.romance_tropes),
     plot_tropes: parseJsonArray(row.plot_tropes),
     spice_level: row.spice_level || null,
+    darkness_level: row.darkness_level || null,
     lgbtq: row.lgbtq || 'unknown',
     content_warnings: parseJsonArray(row.content_warnings),
     emotional_tone: row.emotional_tone || null,
@@ -123,6 +125,13 @@ const SELECT_SQL = `
 
 const selectAllBooks = db.prepare(SELECT_SQL);
 const selectBookById = db.prepare(`${SELECT_SQL} WHERE b.id = ?`);
+const selectSeriesSiblings = db.prepare(`
+  SELECT id, title, seed_title, author, seed_author, series_position,
+    cover_url, hardcover_cover_url, google_books_id
+  FROM books
+  WHERE series_name = ? AND id != ?
+  ORDER BY series_position ASC
+`);
 
 export function getAllBooks() {
   return selectAllBooks.all().map(serializeBook);
@@ -130,5 +139,18 @@ export function getAllBooks() {
 
 export function getBookById(id) {
   const row = selectBookById.get(id);
-  return row ? serializeBook(row) : null;
+  if (!row) return null;
+  const book = serializeBook(row);
+
+  if (book.series_name) {
+    book.series_books = selectSeriesSiblings.all(book.series_name, id).map((sibling) => ({
+      id: sibling.id,
+      title: sibling.title || sibling.seed_title,
+      author: sibling.author || sibling.seed_author,
+      series_position: sibling.series_position ?? null,
+      cover_url: resolveCoverUrl(sibling),
+    }));
+  }
+
+  return book;
 }

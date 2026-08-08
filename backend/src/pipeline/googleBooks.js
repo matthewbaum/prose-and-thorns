@@ -17,8 +17,11 @@ function parseSeriesFromTitle(title) {
 // "Caraval" search top hit was "Finale", book 3 of the same series). Score
 // every returned candidate against the seed title instead of blindly taking
 // index 0.
-const WRONG_PRODUCT_PATTERN =
-  /\b(box set|boxed set|collection|bundle|deluxe|illustrated|omnibus|gift set|ebook collection)\b/i;
+// Exported so auditCatalog.js can flag any title that slipped through this
+// scoring despite the penalty (e.g. a low-scoring wrong-product candidate
+// that still won because every other candidate scored even lower).
+export const WRONG_PRODUCT_PATTERN =
+  /\b(box set|boxed set|\d+[- ]book set|collection|bundle|deluxe|illustrated|omnibus|gift set|ebook collection|free preview|sample|excerpt|first \d+ chapters|study guide|summary (?:&|and) analysis|special edition|collector's edition|anniversary edition|signed edition|signed stock)\b/i;
 
 function normalizeTitle(s) {
   return s
@@ -28,8 +31,9 @@ function normalizeTitle(s) {
     .trim();
 }
 
-function titleMatchScore(candidateTitle, seedTitle) {
-  const c = normalizeTitle(candidateTitle || '');
+function titleMatchScore(item, seedTitle) {
+  const info = item.volumeInfo || {};
+  const c = normalizeTitle(info.title || '');
   const s = normalizeTitle(seedTitle || '');
   if (!c || !s) return -Infinity;
 
@@ -43,13 +47,35 @@ function titleMatchScore(candidateTitle, seedTitle) {
   const overlap = [...sWords].filter((w) => cWords.has(w)).length;
   score += overlap / Math.max(sWords.size, 1);
 
-  if (WRONG_PRODUCT_PATTERN.test(candidateTitle || '')) score -= 5;
+  if (WRONG_PRODUCT_PATTERN.test(info.title || '')) score -= 5;
+  // Belt-and-suspenders on top of the langRestrict=en query param — a
+  // translated edition can share the exact same title as the English
+  // original, so it wouldn't otherwise lose any title-match points, and
+  // Google's own `language` tag is occasionally wrong (verified: an
+  // Indonesian "Circe" edition self-reported as "en").
+  if (info.language && info.language !== 'en') score -= 5;
+
+  // Popular titles are frequently republished/translated many times over,
+  // so several candidates often tie on title score alone (verified: Circe,
+  // Daughter of Smoke and Bone, and The Wrath and the Dawn all silently
+  // ended up on a metadata-only stub edition this way). Break ties toward
+  // whichever candidate can actually render a cover, since a tie that loses
+  // this way is worse than a tie that loses on nothing user-visible.
+  const isStubRecord = item.id && item.id.endsWith('ACAAJ');
+  if (isStubRecord) score -= 1;
+  if (info.imageLinks) score += 1;
 
   return score;
 }
 
 async function fetchVolumes(apiKey, q) {
-  const url = `${API_BASE}?q=${encodeURIComponent(q)}&maxResults=5&key=${apiKey}`;
+  // langRestrict filters at the API level — without it, a same-titled
+  // translated edition (e.g. an Indonesian "Circe") can outrank the English
+  // original if Google's own relevance ranking favors it (verified: this
+  // silently corrupted Circe's description/cover in this catalog). This
+  // whole catalog is English-language romantasy, so restricting here is
+  // always correct, not just a heuristic.
+  const url = `${API_BASE}?q=${encodeURIComponent(q)}&maxResults=5&langRestrict=en&key=${apiKey}`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Google Books API error ${res.status}: ${await res.text()}`);
@@ -85,7 +111,10 @@ async function searchVolumes(apiKey, structuredQuery, unstructuredQuery, seedTit
   if (allItems.length === 0) return null;
 
   const ranked = allItems
-    .map((item) => ({ item, score: titleMatchScore(item.volumeInfo?.title, seedTitle) }))
+    .map((item) => ({
+      item,
+      score: titleMatchScore(item, seedTitle),
+    }))
     .sort((a, b) => b.score - a.score);
 
   if (ranked[0].score < MIN_ACCEPTABLE_SCORE) return null;

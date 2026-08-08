@@ -1,4 +1,4 @@
-import { SPICE_ORDER, SORT_TO_DIMENSION } from '../constants.js';
+import { SORT_TO_DIMENSION } from '../constants.js';
 
 function splitParam(value) {
   if (!value) return [];
@@ -31,9 +31,9 @@ function matchesAny(list, selected) {
 }
 
 export function applyFilters(books, query) {
-  const seriesStatus = query.series_status && query.series_status !== 'any' ? query.series_status : null;
-  const ageCategory = query.age_category && query.age_category !== 'any' ? query.age_category : null;
-  const publisherType = query.publisher_type && query.publisher_type !== 'any' ? query.publisher_type : null;
+  const seriesStatus = splitParam(query.series_status);
+  const ageCategory = splitParam(query.age_category);
+  const publisherType = splitParam(query.publisher_type);
   const seriesLength = splitParam(query.series_length);
   const rawSubgenre = splitParam(query.subgenre);
   const wantsLgbtq = rawSubgenre.includes('lgbtq');
@@ -41,9 +41,11 @@ export function applyFilters(books, query) {
   const romanceTropes = splitParam(query.romance_tropes);
   const plotTropes = splitParam(query.plot_tropes);
   const excludeWarnings = splitParam(query.exclude_warnings);
-
-  const spiceMin = query.spice_min ? SPICE_ORDER.indexOf(query.spice_min) : -1;
-  const spiceMax = query.spice_max ? SPICE_ORDER.indexOf(query.spice_max) : -1;
+  // Not a min/max range: a reader might want "clean or high" without
+  // wanting everything in between, so selection is an arbitrary subset,
+  // same as every other checkbox filter — not a contiguous ordinal range.
+  const spiceLevels = splitParam(query.spice_level);
+  const darknessLevels = splitParam(query.darkness_level);
 
   const minProse = Number(query.min_prose || 1);
   const minRomance = Number(query.min_romance || 1);
@@ -52,19 +54,17 @@ export function applyFilters(books, query) {
   const minOverall = Number(query.min_overall || 1);
 
   return books.filter((book) => {
-    if (seriesStatus && book.series_status !== seriesStatus) return false;
-    if (ageCategory && book.age_category !== ageCategory) return false;
-    if (publisherType && book.publisher_type !== publisherType) return false;
+    if (seriesStatus.length > 0 && !seriesStatus.includes(book.series_status)) return false;
+    if (ageCategory.length > 0 && !ageCategory.includes(book.age_category)) return false;
+    if (publisherType.length > 0 && !publisherType.includes(book.publisher_type)) return false;
     if (!matchesSeriesLength(book, seriesLength)) return false;
     if (subgenre.length > 0 && !subgenre.includes(book.subgenre)) return false;
     if (wantsLgbtq && book.lgbtq !== 'yes') return false;
     if (!matchesAny(book.romance_tropes, romanceTropes)) return false;
     if (!matchesAny(book.plot_tropes, plotTropes)) return false;
 
-    if (spiceMin >= 0 && book.spice_level) {
-      const idx = SPICE_ORDER.indexOf(book.spice_level);
-      if (idx < spiceMin || idx > spiceMax) return false;
-    }
+    if (spiceLevels.length > 0 && !spiceLevels.includes(book.spice_level)) return false;
+    if (darknessLevels.length > 0 && !darknessLevels.includes(book.darkness_level)) return false;
 
     if (excludeWarnings.length > 0) {
       const hasExcluded = book.content_warnings.some((w) => excludeWarnings.includes(w));

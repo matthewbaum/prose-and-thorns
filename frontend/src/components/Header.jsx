@@ -17,10 +17,11 @@ export default function Header({ onToggleSidebar, resultCount, view, onNavigateH
       )}
 
       <button className="wordmark" onClick={onNavigateHome} type="button">
-        <h1>
-          Prose <span className="thorn-divider" aria-hidden="true">&#10047;</span> Thorns
-        </h1>
-        <p className="tagline">Find romantasy worth reading.</p>
+        <img className="logo-mark" src="/rose-logo.svg" alt="" aria-hidden="true" />
+        <span className="wordmark-text">
+          <h1>Prose &amp; Thorns</h1>
+          <p className="tagline">Find romantasy worth reading.</p>
+        </span>
       </button>
 
       <nav className="header-nav">

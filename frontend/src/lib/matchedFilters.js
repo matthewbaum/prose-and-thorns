@@ -3,11 +3,10 @@ import {
   AGE_CATEGORY,
   PUBLISHER_TYPE,
   SERIES_LENGTH,
-  SUBGENRE,
-  ROMANCE_TROPES,
-  PLOT_TROPES,
   SPICE_LEVELS,
+  DARKNESS_LEVELS,
 } from '../constants/taxonomy.js';
+import { SUBGENRE_LABEL, TROPE_LABEL } from './labels.js';
 
 function labelLookup(options) {
   return Object.fromEntries(options.map((o) => [o.value, o.label]));
@@ -16,9 +15,8 @@ function labelLookup(options) {
 const SERIES_STATUS_LABEL = labelLookup(SERIES_STATUS);
 const AGE_CATEGORY_LABEL = labelLookup(AGE_CATEGORY);
 const PUBLISHER_TYPE_LABEL = labelLookup(PUBLISHER_TYPE);
-const SUBGENRE_LABEL = labelLookup(SUBGENRE);
-const TROPE_LABEL = labelLookup([...ROMANCE_TROPES, ...PLOT_TROPES]);
 const SPICE_LABEL = labelLookup(SPICE_LEVELS);
+const DARKNESS_LABEL = labelLookup(DARKNESS_LEVELS);
 
 function seriesLengthBucket(total) {
   if (total == null) return null;
@@ -37,15 +35,15 @@ function seriesLengthBucket(total) {
 export function getMatchedFilters(book, filters) {
   const matches = [];
 
-  if (filters.series_status && filters.series_status !== 'any' && book.series_status === filters.series_status) {
+  if (filters.series_status?.length > 0 && book.series_status && filters.series_status.includes(book.series_status)) {
     matches.push({ key: `status-${book.series_status}`, label: SERIES_STATUS_LABEL[book.series_status] });
   }
 
-  if (filters.age_category && filters.age_category !== 'any' && book.age_category === filters.age_category) {
+  if (filters.age_category?.length > 0 && book.age_category && filters.age_category.includes(book.age_category)) {
     matches.push({ key: `age-${book.age_category}`, label: AGE_CATEGORY_LABEL[book.age_category] });
   }
 
-  if (filters.publisher_type && filters.publisher_type !== 'any' && book.publisher_type === filters.publisher_type) {
+  if (filters.publisher_type?.length > 0 && book.publisher_type && filters.publisher_type.includes(book.publisher_type)) {
     matches.push({ key: `publisher-${book.publisher_type}`, label: PUBLISHER_TYPE_LABEL[book.publisher_type] });
   }
 
@@ -64,8 +62,12 @@ export function getMatchedFilters(book, filters) {
     matches.push({ key: 'subgenre-lgbtq', label: 'LGBTQ+' });
   }
 
-  if (filters.spice_min && book.spice_level === filters.spice_min) {
+  if (filters.spice_level?.length > 0 && book.spice_level && filters.spice_level.includes(book.spice_level)) {
     matches.push({ key: `spice-${book.spice_level}`, label: SPICE_LABEL[book.spice_level] });
+  }
+
+  if (filters.darkness_level?.length > 0 && book.darkness_level && filters.darkness_level.includes(book.darkness_level)) {
+    matches.push({ key: `darkness-${book.darkness_level}`, label: DARKNESS_LABEL[book.darkness_level] });
   }
 
   const bookTropes = [...(book.romance_tropes || []), ...(book.plot_tropes || [])];

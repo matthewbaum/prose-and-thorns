@@ -22,7 +22,10 @@ import { SPICE_ORDER } from '../constants.js';
 // defeating the point of the stricter mode.
 
 function toLabel(value) {
-  return value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const titled = value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  // Title-casing turns the MMC/FMC trope acronyms into "Mmc"/"Fmc" — fix
+  // those back up rather than hardcoding a full label map on the backend.
+  return titled.replace(/\bMmc\b/g, 'MMC').replace(/\bFmc\b/g, 'FMC');
 }
 
 function mostCommon(values) {

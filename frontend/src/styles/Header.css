@@ -3,13 +3,16 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 28px 24px 22px;
+  padding: 34px 24px 30px;
   border-bottom: 1px solid var(--border);
   background: linear-gradient(180deg, #12101c 0%, rgba(10, 10, 20, 0) 100%);
 }
 
 .wordmark {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-align: left;
   background: none;
   border: none;
   cursor: pointer;
@@ -18,28 +21,30 @@
   color: inherit;
 }
 
+.logo-mark {
+  height: 100px;
+  width: auto;
+  filter: drop-shadow(0 0 10px var(--accent-soft));
+}
+
+.wordmark-text {
+  text-align: left;
+}
+
 .wordmark h1 {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 2.1rem;
+  font-size: 2.7rem;
   letter-spacing: 0.04em;
   margin: 0;
   color: var(--text);
   text-shadow: 0 0 24px var(--accent-soft);
 }
 
-.thorn-divider {
-  color: var(--gold);
-  font-size: 0.55em;
-  vertical-align: middle;
-  margin: 0 10px;
-  display: inline-block;
-}
-
 .tagline {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 1rem;
   letter-spacing: 0.02em;
   color: var(--text-muted);
   font-style: italic;
@@ -118,6 +123,10 @@
 
   .wordmark h1 {
     font-size: 1.5rem;
+  }
+
+  .logo-mark {
+    height: 40px;
   }
 
   .result-count {

@@ -41,6 +41,8 @@ export const SUBGENRE = [
   { value: 'epic-fantasy', label: 'Epic Fantasy' },
   { value: 'historical-fantasy', label: 'Historical Fantasy' },
   { value: 'dark-romance-fantasy', label: 'Dark Romance Fantasy' },
+  { value: 'gothic', label: 'Gothic' },
+  { value: 'dystopian', label: 'Dystopian' },
   { value: 'lgbtq', label: 'LGBTQ+ (any subgenre)' },
 ];
 
@@ -51,12 +53,15 @@ export const ROMANCE_TROPES = [
   { value: 'fated-mates', label: 'Fated Mates' },
   { value: 'forbidden-love', label: 'Forbidden Love' },
   { value: 'chosen-one', label: 'Chosen One' },
+  { value: 'fake-dating', label: 'Fake Dating' },
   { value: 'bodyguard-protector', label: 'Bodyguard / Protector' },
   { value: 'touch-her-and-die', label: 'Touch Her and Die' },
   { value: 'grumpy-sunshine', label: 'Grumpy / Sunshine' },
   { value: 'age-gap', label: 'Age Gap' },
+  { value: 'second-chance', label: 'Second Chance' },
   { value: 'morally-gray-mmc', label: 'Morally Gray MMC' },
   { value: 'reverse-harem', label: 'Reverse Harem' },
+  { value: 'banter', label: 'Banter' },
 ];
 
 export const PLOT_TROPES = [
@@ -67,6 +72,9 @@ export const PLOT_TROPES = [
   { value: 'war-military', label: 'War / Military Setting' },
   { value: 'revenge-plot', label: 'Revenge Plot' },
   { value: 'lost-heir-identity', label: 'Lost Heir / Hidden Identity' },
+  { value: 'tournament-competition', label: 'Tournament / Competition' },
+  { value: 'prophecy', label: 'Prophecy' },
+  { value: 'quest', label: 'Quest' },
 ];
 
 export const SPICE_LEVELS = [
@@ -75,6 +83,15 @@ export const SPICE_LEVELS = [
   { value: 'medium', label: 'Medium' },
   { value: 'high', label: 'High' },
   { value: 'very-high', label: 'Very High' },
+];
+
+// Separate axis from spice — content darkness (violence, trauma, bleakness)
+// independent of romantic content intensity.
+export const DARKNESS_LEVELS = [
+  { value: 'light', label: 'Light' },
+  { value: 'moderate', label: 'Moderate' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'very-dark', label: 'Very Dark' },
 ];
 
 export const QUALITY_DIMENSIONS = [
@@ -97,9 +114,12 @@ export const MIN_QUALITY_FILTERS = [
 export const CONTENT_WARNINGS = [
   { value: 'sexual-violence', label: 'Sexual violence' },
   { value: 'graphic-violence', label: 'Graphic violence' },
+  { value: 'torture', label: 'Torture' },
   { value: 'cliffhanger-ending', label: 'Cliffhanger ending' },
   { value: 'major-character-death', label: 'Major character death' },
   { value: 'child-abuse-trauma', label: 'Child abuse / trauma' },
+  { value: 'suicide-self-harm', label: 'Suicide / self-harm' },
+  { value: 'addiction', label: 'Addiction' },
 ];
 
 export const SORT_OPTIONS = [

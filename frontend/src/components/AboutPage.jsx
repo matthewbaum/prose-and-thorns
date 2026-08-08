@@ -13,7 +13,8 @@ export default function AboutPage({ onBrowseAll }) {
       <p>
         Every trope list and star rating can tell you what a book is about — enemies to lovers,
         dragon riders, spice level four — but almost none of them can tell you if it&apos;s
-        actually any good. And for me, that matters more than it probably should. I can&apos;t
+        actually any good, not without wading through a pile of reviews yourself to find out.
+        And for me, that matters. I can&apos;t
         stay immersed in a story if the prose is clunky, the dialogue is stilted, or the page is
         riddled with typos, no matter how much I like the trope.
       </p>

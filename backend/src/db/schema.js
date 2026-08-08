@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS books (
   series_position INTEGER,
   series_total INTEGER,
   series_complete INTEGER,
+  series_titles TEXT,
   next_release_date TEXT,
 
   series_status TEXT,
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS books (
   romance_tropes TEXT DEFAULT '[]',
   plot_tropes TEXT DEFAULT '[]',
   spice_level TEXT,
+  darkness_level TEXT,
   lgbtq TEXT,
   content_warnings TEXT DEFAULT '[]',
   emotional_tone TEXT,
@@ -52,6 +54,11 @@ CREATE TABLE IF NOT EXISTS books (
   updated_at TEXT DEFAULT (datetime('now'))
 );
 
+-- UNIQUE is on (book_id, source, author), not url: Hardcover reviews all
+-- share one book-level URL (no per-review deep link), so a url-based
+-- constraint let INSERT OR IGNORE silently drop every review after the
+-- first for a book. A reviewer only reviews a given book once per source,
+-- so author is the real natural key here.
 CREATE TABLE IF NOT EXISTS reviews (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
@@ -63,7 +70,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   url TEXT,
   permalink TEXT,
   fetched_at TEXT DEFAULT (datetime('now')),
-  UNIQUE(book_id, source, url)
+  UNIQUE(book_id, source, author)
 );
 
 CREATE TABLE IF NOT EXISTS quality_profiles (

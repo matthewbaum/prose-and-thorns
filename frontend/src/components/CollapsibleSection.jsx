@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
-export default function CollapsibleSection({ title, defaultOpen = true, badge, headerExtra, children }) {
+export default function CollapsibleSection({ title, defaultOpen = true, badge, headerExtra, children, className = '' }) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="filter-section">
+    <div className={`filter-section ${className}`.trim()}>
       <div className="filter-section-header-row">
         <button
           type="button"

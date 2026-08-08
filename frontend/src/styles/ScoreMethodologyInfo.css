@@ -82,7 +82,11 @@
   font-size: 0.86rem;
   line-height: 1.6;
   color: var(--text);
-  margin: 0 0 4px;
+  margin: 0 0 14px;
+}
+
+.methodology-modal p:last-child {
+  margin-bottom: 0;
 }
 
 .methodology-modal ul {

@@ -27,7 +27,7 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
   return (
     <div className="home-page">
       <div className="home-hero">
-        <h1 className="home-hero-title">Tell us what you&apos;re after. We&apos;ll find the best of it.</h1>
+        <h1 className="home-hero-title">Tell us what you love. We&apos;ll find your next read.</h1>
         <p className="home-hero-text">
           Filter by subgenre, spice level, series length, dozens of romance and plot tropes, and
           content warnings — then we rank the books that match what you&apos;re looking for by real

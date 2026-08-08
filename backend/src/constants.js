@@ -1,4 +1,5 @@
 export const SPICE_ORDER = ['clean', 'low', 'medium', 'high', 'very-high'];
+export const DARKNESS_ORDER = ['light', 'moderate', 'dark', 'very-dark'];
 
 export const QUALITY_DIMENSIONS = [
   'prose_quality',

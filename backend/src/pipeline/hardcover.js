@@ -1,7 +1,7 @@
 import { log, sleep, RATE_LIMIT_DELAY_MS } from './util.js';
 
 const API_URL = 'https://api.hardcover.app/v1/graphql';
-const PER_RATING_BUCKET = 5;
+const PER_RATING_BUCKET = 8;
 // Sorting purely by likes_count skews the sample toward witty, critical
 // outlier reviews — those get disproportionately liked regardless of how the
 // book is actually received. Querying each rating band separately (still
@@ -42,9 +42,22 @@ async function hardcoverQuery(query, variables) {
   return data.data;
 }
 
+// limit is >1 deliberately — some titles (verified: "Circe") are split across
+// many duplicate edition rows on Hardcover's side that all tie at
+// ratings_count 0, so "order by ratings_count, limit 1" can land on an
+// arbitrary one of the ties, including a stub with no cover image at all.
+// pickBestMatch below re-ranks the candidates client-side using cached_image
+// as a tiebreaker, which ratings_count alone can't provide when every
+// candidate ties.
+// limit is 30, not 8: verified case "Circe" has 15 duplicate entries that
+// all tie at ratings_count 0, in arbitrary Postgres tie order — the real
+// Madeline Miller edition (also ratings_count 0 in this exact-title query)
+// was sitting outside the top 8 and silently excluded before authorMatches
+// even got a chance to see it, producing a false "no match" for a book that
+// is very much on Hardcover.
 const FIND_BOOK_QUERY = `
   query FindBook($title: String!) {
-    books(where: { title: { _eq: $title } }, order_by: { ratings_count: desc }, limit: 1) {
+    books(where: { title: { _eq: $title } }, order_by: { ratings_count: desc }, limit: 30) {
       id
       title
       slug
@@ -52,9 +65,61 @@ const FIND_BOOK_QUERY = `
       ratings_count
       reviews_count
       cached_image
+      contributions {
+        author {
+          name
+        }
+      }
     }
   }
 `;
+
+function normalizeName(s) {
+  return (s || '')
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// A common, short title like "Circe" is shared by a dozen unrelated obscure
+// books on Hardcover (verified: 8 different "Circe" entries, none by
+// Madeline Miller, spanning random small-press/public-domain authors).
+// Without checking the author, a "pick the best image" tiebreaker can
+// confidently attach a totally unrelated book's cover — worse than no
+// cover at all. Only candidates whose contributor list shares a real name
+// token with the expected author are eligible.
+function authorMatches(candidate, expectedAuthor) {
+  const expected = new Set(normalizeName(expectedAuthor).split(' ').filter((w) => w.length > 2));
+  if (expected.size === 0) return true; // nothing to check against
+  const contributors = candidate.contributions || [];
+  if (contributors.length === 0) return false;
+  return contributors.some((c) => {
+    const nameWords = new Set(normalizeName(c.author?.name).split(' ').filter((w) => w.length > 2));
+    return [...expected].some((w) => nameWords.has(w));
+  });
+}
+
+function pickBestMatch(candidates, expectedAuthor) {
+  if (!candidates || candidates.length === 0) return null;
+  const eligible = candidates.filter((c) => authorMatches(c, expectedAuthor));
+  if (eligible.length === 0) return null;
+
+  const scored = eligible.map((c) => {
+    const image = c.cached_image || {};
+    const hasImage = Boolean(image.url);
+    const resolution = (image.width || 0) * (image.height || 0);
+    return { candidate: c, hasImage, resolution };
+  });
+  scored.sort((a, b) => {
+    if (b.candidate.ratings_count !== a.candidate.ratings_count) {
+      return b.candidate.ratings_count - a.candidate.ratings_count;
+    }
+    if (a.hasImage !== b.hasImage) return a.hasImage ? -1 : 1;
+    return b.resolution - a.resolution;
+  });
+  return scored[0].candidate;
+}
 
 const REVIEWS_BY_RATING_QUERY = `
   query BookReviewsByRating($bookId: Int!, $min: numeric!, $max: numeric!, $limit: Int!) {
@@ -99,7 +164,7 @@ export async function fetchHardcoverReviews(title, author, fallbackTitle) {
 
   for (const variant of candidates) {
     const data = await hardcoverQuery(FIND_BOOK_QUERY, { title: variant });
-    match = data.books?.[0];
+    match = pickBestMatch(data.books, author);
     if (match && match.ratings_count > 0) break;
     await sleep(RATE_LIMIT_DELAY_MS);
   }
