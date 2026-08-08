@@ -19,7 +19,12 @@
 .quick-search-select {
   background: var(--surface-raised);
   border: 1px solid var(--border);
-  color: var(--text);
+  /* Muted by default to match the placeholder-vs-selected contrast the
+     custom MultiSelectDropdown buttons use — a native <select> can't key
+     its own text color off "is the placeholder option showing" via CSS
+     alone, so .quick-search-select-has-value (applied in JS based on
+     whether a real value is selected) supplies the brighter state. */
+  color: var(--text-muted);
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -30,6 +35,10 @@
 
 .quick-search-select:hover {
   border-color: var(--accent);
+}
+
+.quick-search-select-has-value {
+  color: var(--text);
 }
 
 .quick-search-select-quality {

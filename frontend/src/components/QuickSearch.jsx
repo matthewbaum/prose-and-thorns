@@ -92,7 +92,7 @@ export default function QuickSearch({ onSearch }) {
       />
 
       <select
-        className="quick-search-select"
+        className={`quick-search-select${seriesLength ? ' quick-search-select-has-value' : ''}`}
         value={seriesLength}
         onChange={(e) => setSeriesLength(e.target.value)}
         aria-label="Series length"
