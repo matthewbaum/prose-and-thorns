@@ -236,6 +236,14 @@ function checkFetchIntegrity(books) {
     if (b.hardcover_ratings_count != null && b.hardcover_ratings_count > 0 && b.hardcover_ratings_count < THIN_REVIEW_COUNT_THRESHOLD) {
       flag('low', 'thin-hardcover-match', `#${b.id} "${b.title}": only ${b.hardcover_ratings_count} Hardcover ratings — verify this matched the right/canonical edition (worth checking for a title-variant mismatch, e.g. diacritics).`);
     }
+    // A ratings_count of exactly 0 is a stronger signal than "thin" — it
+    // usually means the match landed on an unrelated zero-rated duplicate
+    // edition while the real, populated edition exists under a slightly
+    // different title string (verified: "Babel" and "Circe" both did this).
+    // Previously excluded by "> 0" above, so this case was silently invisible.
+    if (b.hardcover_url && b.hardcover_ratings_count === 0) {
+      flag('medium', 'zero-rated-hardcover-match', `#${b.id} "${b.title}": matched Hardcover edition has 0 ratings — likely matched an unrelated duplicate stub instead of the real, populated edition.`);
+    }
     if (b.description && !b.tagged_at) {
       flag('medium', 'never-tagged', `#${b.id} "${b.title}": has a description but was never tagged (tagged_at is null).`);
     }

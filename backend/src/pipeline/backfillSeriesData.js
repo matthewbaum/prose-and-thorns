@@ -26,8 +26,13 @@ Rules:
 - series_total: the real total number of books in this series (published + confirmed upcoming). null if you genuinely don't know.
 - titles: the actual book titles in reading order, position 1 first. Include titles you're confident about even if you don't know the exact total — leave a gap as null in the array rather than guessing a title. Empty array if you don't know any of them.`;
 
+// COALESCE the total — a run that fails to recall series_total (returns
+// null) must not clobber an already-known-good value from an earlier run.
+// Verified case: a scoped re-run for missing series_titles silently wiped
+// series_total for "Bride" (3 -> null) and "The Knight and the Moth"
+// (2 -> null) this way before this guard existed.
 const updateSeriesData = db.prepare(`
-  UPDATE books SET series_total = ?, series_titles = ?, updated_at = datetime('now')
+  UPDATE books SET series_total = COALESCE(?, series_total), series_titles = ?, updated_at = datetime('now')
   WHERE series_name = ?
 `);
 
@@ -43,10 +48,21 @@ async function classify(seriesName, author) {
 }
 
 async function main() {
+  // Scoped to series missing titles, not the whole catalog — re-running this
+  // for every series would re-ask the model for series already filled in
+  // correctly and risk silently changing a good answer via non-determinism
+  // (the same regression pattern seen with trope re-tagging this session).
+  const onlyMissing = process.argv.includes('--only-missing-titles');
   const series = db
     .prepare(
-      `SELECT series_name, MIN(author) as author, COUNT(*) as book_count
-       FROM books WHERE series_name IS NOT NULL GROUP BY series_name`
+      onlyMissing
+        ? `SELECT series_name, MIN(author) as author, COUNT(*) as book_count
+           FROM books WHERE series_name IS NOT NULL
+           AND series_total > 1
+           AND (series_titles IS NULL OR series_titles = '' OR series_titles = '[]' OR series_titles = 'null')
+           GROUP BY series_name`
+        : `SELECT series_name, MIN(author) as author, COUNT(*) as book_count
+           FROM books WHERE series_name IS NOT NULL GROUP BY series_name`
     )
     .all();
 

@@ -153,8 +153,16 @@ const FIND_BOOK_QUERY = `
   }
 `;
 
+// Verified case: Hardcover's real "Circe" edition (2806 ratings) is titled
+// "Circé" — stripping accented letters as if they were punctuation (the old
+// behavior) turned that into "circ" instead of "circe", which then shared no
+// token with our plain "Circe" and was silently treated as a non-match.
+// NFD-normalize + strip combining marks first so "é" folds to "e" like any
+// other accented Latin letter would, instead of vanishing.
 function normalizeName(s) {
   return (s || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z\s]/g, ' ')
     .replace(/\s+/g, ' ')
@@ -177,6 +185,27 @@ function authorMatches(candidate, expectedAuthor) {
     const nameWords = new Set(normalizeName(c.author?.name).split(' ').filter((w) => w.length > 2));
     return [...expected].some((w) => nameWords.has(w));
   });
+}
+
+// Verified case: "Babel" — the real, 1965-rating Hardcover edition is
+// titled "Babel, or The Necessity of Violence: An Arcane History of the
+// Oxford Translators' Revolution" (capital "The" mid-subtitle). Our stored
+// title/seed title used lowercase "the" there, so the _eq exact-title query
+// (Hardcover's API blocks _ilike) never saw that edition at all — only a
+// pool of unrelated zero-rated duplicate stubs, and pickBestMatch correctly
+// but uselessly picked the "best" of a bad pool. Token-overlap comparison
+// (not exact string equality) is what titleMatchesFallback below needs to
+// recognize that edition as the real match once fetched a different way.
+function titleTokens(s) {
+  return new Set(normalizeName(s).split(' ').filter((w) => w.length > 2));
+}
+function titleMatchesFallback(candidateTitle, expectedTitle) {
+  const cand = titleTokens(candidateTitle);
+  const exp = titleTokens(expectedTitle);
+  if (cand.size === 0 || exp.size === 0) return false;
+  const [shorter, longer] = cand.size <= exp.size ? [cand, exp] : [exp, cand];
+  const overlap = [...shorter].filter((w) => longer.has(w)).length;
+  return overlap / shorter.size >= 0.6;
 }
 
 function pickBestMatch(candidates, expectedAuthor) {
@@ -231,6 +260,51 @@ function titleVariants(title) {
   return variants;
 }
 
+// _eq-only title variants can still all miss the real edition on a single
+// stray character (verified: "Babel" and "Circe" both landed on zero-rated
+// duplicate stubs this way — see titleMatchesFallback's comment). When every
+// title variant comes back at 0 ratings, search by author instead (Hardcover
+// blocks _ilike, so this is an _eq on the author's exact name, not fuzzy) and
+// pick the best title-token-overlap match from their whole bibliography.
+const FIND_BY_AUTHOR_QUERY = `
+  query FindByAuthor($author: String!) {
+    books(where: { contributions: { author: { name: { _eq: $author } } } }, order_by: { ratings_count: desc }, limit: 50) {
+      id
+      title
+      slug
+      rating
+      ratings_count
+      cached_image
+      contributions {
+        author {
+          name
+        }
+      }
+    }
+  }
+`;
+
+// Hardcover stores co-authors as separate contributor rows, so an _eq on a
+// combined "Author A, Author B" string (as co-authored seed/title data is
+// often formatted) matches nothing — verified case: "Zodiac Academy 1: The
+// Awakening" by "Caroline Peckham, Susanne Valenti" found zero candidates
+// until queried per individual author name.
+async function findByAuthorFallback(title, author) {
+  if (!author) return null;
+  const names = author
+    .split(/[,&]|(?:\band\b)/i)
+    .map((n) => n.trim())
+    .filter(Boolean);
+  for (const name of names.length > 0 ? names : [author]) {
+    const data = await hardcoverQuery(FIND_BY_AUTHOR_QUERY, { author: name });
+    const titleCandidates = (data.books || []).filter((c) => titleMatchesFallback(c.title, title));
+    const best = pickBestMatch(titleCandidates, author);
+    if (best) return best;
+    await sleep(HARDCOVER_DELAY_MS);
+  }
+  return null;
+}
+
 export async function fetchHardcoverReviews(title, author, fallbackTitle) {
   let match = null;
   const candidates = titleVariants(title);
@@ -246,6 +320,19 @@ export async function fetchHardcoverReviews(title, author, fallbackTitle) {
     match = pickBestMatch(data.books, author);
     if (match && match.ratings_count > 0) break;
     await sleep(HARDCOVER_DELAY_MS);
+  }
+
+  if (!match || match.ratings_count === 0) {
+    try {
+      await sleep(HARDCOVER_DELAY_MS);
+      const better = await findByAuthorFallback(fallbackTitle || title, author);
+      if (better && better.ratings_count > (match?.ratings_count ?? -1)) {
+        log(`Author-search fallback found a better Hardcover match for "${title}" (${better.ratings_count} ratings vs. ${match?.ratings_count ?? 'no match'})`);
+        match = better;
+      }
+    } catch (err) {
+      log(`Hardcover author-fallback failed for "${title}": ${err.message}`);
+    }
   }
 
   if (!match) {
