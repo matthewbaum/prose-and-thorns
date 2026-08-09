@@ -3,6 +3,7 @@ import QualityRadar from './QualityRadar.jsx';
 import QualityDimension from './QualityDimension.jsx';
 import ProseCraftFlags from './ProseCraftFlags.jsx';
 import ScoreMethodologyInfo from './ScoreMethodologyInfo.jsx';
+import SubmissionModal from './SubmissionModal.jsx';
 import { QUALITY_DIMENSIONS, SPICE_FLAME_COUNT, CONTENT_WARNINGS, PUBLISHER_TYPE, DARKNESS_LEVELS } from '../constants/taxonomy.js';
 import { tropeLabel, subgenreLabel } from '../lib/labels.js';
 import '../styles/DetailPanel.css';
@@ -27,9 +28,11 @@ function seriesLine(book) {
 
 export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
   const [descExpanded, setDescExpanded] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
 
   useEffect(() => {
     setDescExpanded(false);
+    setReviewOpen(false);
   }, [book?.id]);
 
   useEffect(() => {
@@ -157,6 +160,9 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                     {realRatingCount != null && ` (${realRatingCount.toLocaleString()} ratings)`}
                   </p>
                 )}
+                <button type="button" className="detail-write-review-btn" onClick={() => setReviewOpen(true)}>
+                  Write a review
+                </button>
               </div>
             </div>
 
@@ -364,6 +370,9 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
           </div>
         )}
       </aside>
+      {reviewOpen && book && (
+        <SubmissionModal type="review" initialBookTitle={book.title} onClose={() => setReviewOpen(false)} />
+      )}
     </>
   );
 }

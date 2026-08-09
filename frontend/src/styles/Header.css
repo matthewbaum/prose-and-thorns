@@ -4,7 +4,6 @@
   justify-content: center;
   position: relative;
   padding: 34px 24px 30px;
-  border-bottom: 1px solid var(--border);
   background: linear-gradient(180deg, #12101c 0%, rgba(10, 10, 20, 0) 100%);
 }
 
@@ -48,15 +47,6 @@
   letter-spacing: 0.02em;
   color: var(--text-muted);
   font-style: italic;
-}
-
-.result-count {
-  position: absolute;
-  right: 24px;
-  bottom: 22px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
 }
 
 .header-nav {
@@ -127,9 +117,5 @@
 
   .logo-mark {
     height: 40px;
-  }
-
-  .result-count {
-    display: none;
   }
 }

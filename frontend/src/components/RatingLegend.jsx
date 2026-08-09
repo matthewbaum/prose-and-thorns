@@ -7,14 +7,14 @@ export default function RatingLegend() {
 
   return (
     <>
-      <div className="rating-legend">
-        <button type="button" className="rating-legend-item" onClick={() => setOpen(true)}>
+      <button type="button" className="rating-legend" onClick={() => setOpen(true)}>
+        <span className="rating-legend-item">
           <span className="star filled">&#9733;</span> real reader rating
-        </button>
-        <button type="button" className="rating-legend-item" onClick={() => setOpen(true)}>
+        </span>
+        <span className="rating-legend-item">
           <span className="star outline">&#9734;</span> Quality Profile score
-        </button>
-      </div>
+        </span>
+      </button>
 
       {open &&
         createPortal(
@@ -31,7 +31,7 @@ export default function RatingLegend() {
               </button>
               <h2>Two different star ratings</h2>
 
-              <h3>
+              <h3 className="real-rating-heading">
                 <span className="star filled">&#9733;</span> Real reader rating
               </h3>
               <p>

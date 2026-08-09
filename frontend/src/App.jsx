@@ -5,8 +5,9 @@ import BookGrid from './components/BookGrid.jsx';
 import DetailPanel from './components/DetailPanel.jsx';
 import HomePage from './components/HomePage.jsx';
 import AboutPage from './components/AboutPage.jsx';
+import BookPicker from './components/BookPicker.jsx';
 import { fetchBooks, fetchBook, fetchRecommendations } from './api.js';
-import { SORT_OPTIONS } from './constants/taxonomy.js';
+import { SORT_OPTIONS, RECOMMEND_SORT_OPTIONS } from './constants/taxonomy.js';
 import './styles/App.css';
 
 const PAGE_SIZE = 24;
@@ -24,7 +25,9 @@ const DEFAULT_FILTERS = {
   min_prose: 1,
   min_romance: 1,
   min_world_building: 1,
+  min_pacing: 1,
   min_emotional_payoff: 1,
+  min_character_depth: 1,
   min_overall: 1,
   exclude_warnings: [],
   sort: 'best-match',
@@ -32,6 +35,16 @@ const DEFAULT_FILTERS = {
 
 export default function App() {
   const [view, setView] = useState('home');
+
+  // A SPA view switch doesn't reset scroll position the way a real page
+  // navigation would — verified case: submitting a search from partway
+  // down the Home page landed on Browse/Recommend still scrolled to that
+  // same position, so the result count in the header was off-screen above
+  // the fold until the reader scrolled up manually.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view]);
+
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [books, setBooks] = useState([]);
   const [total, setTotal] = useState(0);
@@ -47,6 +60,8 @@ export default function App() {
   const [recommendSeedIds, setRecommendSeedIds] = useState([]);
   const [recommendMode, setRecommendMode] = useState('any');
   const [recommendNoCommonGround, setRecommendNoCommonGround] = useState(false);
+  const [recommendCommonGround, setRecommendCommonGround] = useState([]);
+  const [recommendSort, setRecommendSort] = useState('match');
 
   // "Home" and plain "Browse all" both mean a clean slate — neither should
   // silently carry over filters left set from an earlier Quick Search or
@@ -54,6 +69,7 @@ export default function App() {
   // FilterPanel edits) should populate them.
   const goHome = useCallback(() => {
     setFilters(DEFAULT_FILTERS);
+    setRecommendSort('match');
     setView('home');
   }, []);
   const goBrowse = useCallback(() => {
@@ -131,24 +147,43 @@ export default function App() {
     setView('browse');
   }, []);
 
-  const runRecommend = useCallback((ids, mode) => {
+  const runRecommend = useCallback((ids, mode, sort = 'match') => {
     setView('recommend');
     setLoading(true);
     setError(null);
-    setRecommendSeedIds(ids);
     setRecommendMode(mode);
-    fetchRecommendations(ids, mode)
+    setRecommendSort(sort);
+    fetchRecommendations(ids, mode, sort)
       .then((data) => {
         setBooks(data.books || []);
         setTotal((data.books || []).length);
         setRecommendSeeds(data.seeds || []);
+        // Set together with recommendSeeds (same batch) rather than
+        // synchronously above — the BookPicker below remounts on this id
+        // list changing (via its `key`), and it reads recommendSeeds as its
+        // initial chip state on mount. Setting this before the fetch
+        // resolved caused the remount to fire a render early, off the
+        // still-stale recommendSeeds from the *previous* search, so the
+        // chips came up empty even though the right data arrived a moment
+        // later — useState's initial value is only ever read once.
+        setRecommendSeedIds(ids);
         setRecommendNoCommonGround(Boolean(data.noCommonGround));
+        setRecommendCommonGround(data.commonGround || []);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleRecommend = useCallback((ids, mode) => runRecommend(ids, mode), [runRecommend]);
+  // Editing seeds in place (see BookPicker below) should keep whatever sort
+  // the reader already picked, not silently reset to "Strongest match."
+  const handleRecommend = useCallback(
+    (ids, mode) => runRecommend(ids, mode, recommendSort),
+    [runRecommend, recommendSort]
+  );
+  const handleRecommendSortChange = useCallback(
+    (sort) => runRecommend(recommendSeedIds, recommendMode, sort),
+    [runRecommend, recommendSeedIds, recommendMode]
+  );
 
   const bodyLocked = useMemo(() => Boolean(selectedId) || sidebarOpen, [selectedId, sidebarOpen]);
 
@@ -162,7 +197,6 @@ export default function App() {
     <div className="app-shell">
       <Header
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
-        resultCount={total}
         view={view}
         onNavigateHome={goHome}
         onNavigateBrowse={goBrowse}
@@ -198,22 +232,53 @@ export default function App() {
               Start over
             </button>
           </div>
-          {recommendSeedIds.length > 1 && (
-            <div className="book-picker-mode recommend-mode-toggle">
-              <button
-                type="button"
-                className={recommendMode === 'any' ? 'active' : ''}
-                onClick={() => runRecommend(recommendSeedIds, 'any')}
-              >
-                Similar to any of these
-              </button>
-              <button
-                type="button"
-                className={recommendMode === 'all' ? 'active' : ''}
-                onClick={() => runRecommend(recommendSeedIds, 'all')}
-              >
-                Common to all of these
-              </button>
+          {/* Editable in place — add/remove a seed or flip any/all mode and
+              re-run without losing your picks. "Start over" above is now
+              only for a genuine clean slate, not the only way to tweak a
+              search. Keyed on the seed id list so picking an entirely new
+              set from Home (a fresh navigation into this view) remounts
+              with the new seeds instead of carrying over stale local
+              picker state from a previous recommend session. */}
+          <BookPicker
+            key={recommendSeedIds.join(',')}
+            initialSelected={recommendSeeds}
+            initialMode={recommendMode}
+            onRecommend={handleRecommend}
+            submitLabel="Update recommendations"
+          />
+          {recommendMode === 'all' && !recommendNoCommonGround && recommendCommonGround.length > 0 && (
+            <p className="common-ground-summary">
+              All picks share:{' '}
+              {recommendCommonGround.map((g, i) => (
+                <React.Fragment key={g.key}>
+                  {i > 0 && ', '}
+                  <strong>{g.label}</strong>
+                </React.Fragment>
+              ))}
+            </p>
+          )}
+          {!loading && books.length > 0 && (
+            <div className="recommend-sort-row">
+              <label className="sort-label" htmlFor="recommend-sort-select">
+                Sort by
+                <select
+                  id="recommend-sort-select"
+                  className="sort-select"
+                  value={recommendSort}
+                  onChange={(e) => handleRecommendSortChange(e.target.value)}
+                >
+                  {RECOMMEND_SORT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {total > 0 && (
+                <span className="result-count">
+                  {total} book{total === 1 ? '' : 's'}
+                </span>
+              )}
             </div>
           )}
           <BookGrid
@@ -221,6 +286,7 @@ export default function App() {
             loading={loading}
             onSelect={(id) => setSelectedId(id)}
             filters={null}
+            matchLabel={recommendMode === 'all' ? 'In common' : 'Matches on'}
             emptyTitle={
               recommendNoCommonGround
                 ? "Your picks don't share a tagged subgenre or trope in common."
@@ -248,21 +314,28 @@ export default function App() {
               <button className="link-btn" onClick={goHome}>
                 &larr; Start over
               </button>
-              <label className="sort-label" htmlFor="sort-select">
-                Sort by
-                <select
-                  id="sort-select"
-                  className="sort-select"
-                  value={filters.sort}
-                  onChange={(e) => updateFilters({ sort: e.target.value })}
-                >
-                  {SORT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div className="browse-header-sort-group">
+                <label className="sort-label" htmlFor="sort-select">
+                  Sort by
+                  <select
+                    id="sort-select"
+                    className="sort-select"
+                    value={filters.sort}
+                    onChange={(e) => updateFilters({ sort: e.target.value })}
+                  >
+                    {SORT_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {total > 0 && (
+                  <span className="result-count">
+                    {total} book{total === 1 ? '' : 's'}
+                  </span>
+                )}
+              </div>
             </div>
             <BookGrid
               books={books}

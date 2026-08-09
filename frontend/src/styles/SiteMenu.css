@@ -1,0 +1,75 @@
+.site-menu {
+  position: relative;
+}
+
+.site-menu-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 34px;
+  height: 30px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.site-menu-toggle:hover {
+  border-color: var(--accent);
+}
+
+.site-menu-toggle span {
+  width: 16px;
+  height: 2px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  margin: 0 auto;
+  transition: background 0.15s ease;
+}
+
+.site-menu-toggle:hover span {
+  background: var(--text);
+}
+
+.site-menu-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 170px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  z-index: 30;
+}
+
+.site-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.site-menu-item:last-child {
+  border-bottom: none;
+}
+
+.site-menu-item:hover {
+  background: var(--accent-soft);
+  color: var(--gold);
+}
+
+.site-menu-item.active {
+  color: var(--gold);
+  font-weight: 600;
+}

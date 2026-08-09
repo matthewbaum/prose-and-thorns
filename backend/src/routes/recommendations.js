@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getAllBooks } from '../db/booksRepo.js';
 import { getRecommendations } from '../lib/similarity.js';
+import { applySort } from '../lib/filterBooks.js';
 
 const router = Router();
 
@@ -27,12 +28,22 @@ router.get('/', (req, res) => {
   // matches first. Only honor an explicit ?limit= if the caller passes one.
   const limit = req.query.limit ? Math.min(Number(req.query.limit), 200) : Infinity;
   const mode = req.query.mode === 'all' ? 'all' : 'any';
-  const { books, noCommonGround } = getRecommendations(all, seeds, limit, mode);
+  const { books, noCommonGround, commonGround } = getRecommendations(all, seeds, limit, mode);
+
+  // 'match' (the default) keeps getRecommendations' own ranking — how well
+  // each book fits the seeds. Any other value re-orders the same matched
+  // set by a different signal (quality, popularity, etc.) without changing
+  // which books qualified in the first place.
+  const sort = req.query.sort;
+  const sortedBooks = sort && sort !== 'match' ? applySort(books, sort) : books;
 
   res.json({
-    books,
+    books: sortedBooks,
     mode,
     noCommonGround,
+    // Only meaningful in 'all' mode — the full basis of what the seeds
+    // share, not just the elements that cleared the matching bar.
+    commonGround: commonGround || [],
     seeds: seeds.map((s) => ({ id: s.id, title: s.title, author: s.author })),
   });
 });

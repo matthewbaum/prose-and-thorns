@@ -127,6 +127,43 @@ CREATE TABLE IF NOT EXISTS user_preferences (
   updated_at TEXT DEFAULT (datetime('now'))
 );
 
+-- One shared table for all three menu forms (contact / review / partnership)
+-- rather than three near-identical tables — they're all "someone submitted
+-- a message, an admin looks at it later," differing only in which optional
+-- fields are filled in. book_title is free text, not a books(id) foreign
+-- key: a reviewer describing a book they read shouldn't be blocked by
+-- fuzzy-matching it to the catalog at submission time.
+CREATE TABLE IF NOT EXISTS submissions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  type TEXT NOT NULL, -- 'contact' | 'review' | 'partnership'
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  message TEXT NOT NULL,
+  book_title TEXT, -- 'review' only
+  -- 'review' only, required, 1-5 — the reviewer's own holistic star
+  -- rating. Deliberately separate from the six dimension scores below and
+  -- NOT their average: this plays the same role as this app's ★ "real
+  -- reader rating" (an independent read) against its ☆ synthesized Quality
+  -- Profile score. A reader's overall feeling can genuinely diverge from
+  -- the average of the craft dimensions.
+  rating INTEGER,
+  -- 'review' only, 1-5 each, required together — matches this app's own
+  -- six-dimension quality profile rather than a single generic star, since
+  -- that's the whole point of the app. Everything else about a review
+  -- (subgenre, tropes, spice level, etc.) is derived from our own catalog
+  -- data, not asked of the reviewer.
+  prose_quality INTEGER,
+  romance_quality INTEGER,
+  world_building INTEGER,
+  pacing_quality INTEGER,
+  emotional_payoff INTEGER,
+  character_depth INTEGER,
+  channel_url TEXT, -- 'partnership' only
+  status TEXT NOT NULL DEFAULT 'new', -- 'new' | 'reviewed'
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_submissions_type ON submissions(type);
 CREATE INDEX IF NOT EXISTS idx_books_subgenre ON books(subgenre);
 CREATE INDEX IF NOT EXISTS idx_books_series_status ON books(series_status);
 CREATE INDEX IF NOT EXISTS idx_reviews_book_id ON reviews(book_id);

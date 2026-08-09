@@ -59,13 +59,47 @@
   margin: 0;
 }
 
+.common-ground-summary {
+  text-align: center;
+  max-width: 640px;
+  margin: 4px auto 24px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.recommend-sort-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 0 0 16px;
+}
+
+.browse-header-sort-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Bright and readable — this is information worth checking (especially now
+   that Sort exists next to it), not header chrome, so it no longer uses
+   the muted tone it had when it lived in the header corner. */
+.result-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.common-ground-summary strong {
+  color: var(--gold);
+  font-weight: 700;
+}
+
 .recommend-title em {
   color: var(--gold);
   font-style: normal;
-}
-
-.recommend-mode-toggle {
-  margin-bottom: 20px;
 }
 
 .browse-header {

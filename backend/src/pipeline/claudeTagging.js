@@ -27,7 +27,7 @@ export const SUBGENRE_VALUES = [
   'fae-high-fantasy',
   'dragon-riders',
   'vampire-dark-fantasy',
-  'witch-academy',
+  'magic-academy',
   'gods-mythology',
   'shifters-werewolves',
   'urban-fantasy',

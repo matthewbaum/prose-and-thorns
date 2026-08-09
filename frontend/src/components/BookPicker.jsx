@@ -4,12 +4,12 @@ import '../styles/BookPicker.css';
 
 const MAX_SEEDS = 5;
 
-export default function BookPicker({ onRecommend }) {
+export default function BookPicker({ onRecommend, initialSelected, initialMode, submitLabel }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [selected, setSelected] = useState([]);
-  const [mode, setMode] = useState('any');
+  const [selected, setSelected] = useState(initialSelected || []);
+  const [mode, setMode] = useState(initialMode || 'any');
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -109,7 +109,7 @@ export default function BookPicker({ onRecommend }) {
         disabled={selected.length === 0}
         onClick={() => onRecommend(selected.map((b) => b.id), mode)}
       >
-        Get recommendations
+        {submitLabel || 'Get recommendations'}
       </button>
       {selected.length >= MAX_SEEDS && (
         <p className="book-picker-max-note">Max {MAX_SEEDS} books — remove one to add another.</p>

@@ -1,7 +1,8 @@
 import React from 'react';
+import SiteMenu from './SiteMenu.jsx';
 import '../styles/Header.css';
 
-export default function Header({ onToggleSidebar, resultCount, view, onNavigateHome, onNavigateBrowse, onNavigateAbout }) {
+export default function Header({ onToggleSidebar, view, onNavigateHome, onNavigateBrowse, onNavigateAbout }) {
   return (
     <header className="site-header">
       {view === 'browse' && (
@@ -25,27 +26,20 @@ export default function Header({ onToggleSidebar, resultCount, view, onNavigateH
       </button>
 
       <nav className="header-nav">
-        <button
-          type="button"
-          className={`nav-link ${view === 'browse' ? 'active' : ''}`}
-          onClick={onNavigateBrowse}
-        >
-          Browse all
-        </button>
-        <button
-          type="button"
-          className={`nav-link ${view === 'about' ? 'active' : ''}`}
-          onClick={onNavigateAbout}
-        >
-          About
-        </button>
+        {/* Redundant with the hero's own "Browse all books" button on Home
+            — hidden there, but this is the only route back to Browse from
+            Recommend/About, so it stays everywhere else. */}
+        {view !== 'home' && (
+          <button
+            type="button"
+            className={`nav-link ${view === 'browse' ? 'active' : ''}`}
+            onClick={onNavigateBrowse}
+          >
+            Browse all
+          </button>
+        )}
+        <SiteMenu onNavigateAbout={onNavigateAbout} aboutActive={view === 'about'} />
       </nav>
-
-      {view === 'browse' && (
-        <div className="result-count">
-          {resultCount > 0 ? `${resultCount} book${resultCount === 1 ? '' : 's'}` : ''}
-        </div>
-      )}
     </header>
   );
 }

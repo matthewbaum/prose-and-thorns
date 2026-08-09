@@ -24,26 +24,62 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
     };
   }, []);
 
+  // An angled cluster of the top-quality covers gives the hero real visual
+  // weight instead of a wall of text/inputs — reuses the same "Highest
+  // quality scores" shelf that's also rendered in full further down (not a
+  // separate fetch), since a book worth putting in the cluster is also
+  // worth being in that shelf. Six, not four — more real catalog variety
+  // rather than blowing up the same handful of covers.
+  const heroCovers = (shelves[0]?.books || []).slice(0, 6);
+
   return (
     <div className="home-page">
       <div className="home-hero">
-        <h1 className="home-hero-title">Tell us what you love. We&apos;ll find your next read.</h1>
-        <p className="home-hero-text">
-          Filter by subgenre, spice level, series length, dozens of romance and plot tropes, and
-          content warnings — then we rank the books that match what you&apos;re looking for by real
-          quality scores (prose, romance, world-building, pacing, emotional payoff, character
-          depth), built from actual reader reviews, not a single star rating.
-        </p>
-        <button className="browse-all-btn" onClick={onBrowseAll}>
-          Browse all books
-        </button>
+        <div className="home-hero-atmosphere" aria-hidden="true" />
+        <div className="home-hero-copy">
+          <p className="home-hero-eyebrow">Six dimensions scored &middot; real reader reviews</p>
+          <h1 className="home-hero-title">
+            Not just what a book is about.
+            <br />
+            But whether it&apos;s <em>actually good.</em>
+          </h1>
+          <p className="home-hero-text">
+            Trope lists tell you what happens. We tell you if the writing holds up — scored from
+            real reviews, not hype.
+          </p>
+          <button className="browse-all-btn" onClick={onBrowseAll}>
+            Browse all books
+          </button>
+        </div>
+
+        {heroCovers.length > 0 && (
+          <div className="home-hero-covers">
+            {heroCovers.map((book, i) => (
+              <button
+                key={book.id}
+                type="button"
+                className={`home-hero-cover c${i + 1}`}
+                onClick={() => onSelectBook(book.id)}
+              >
+                <img src={book.cover_url} alt={book.title} />
+                {book.overall_score != null && (
+                  <span className="home-hero-cover-badge">☆ {book.overall_score.toFixed(1)}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      <p className="quick-search-label">Looking for something specific? Start here:</p>
-      <QuickSearch onSearch={onQuickSearch} />
+      <div className="home-primary-card">
+        <p className="quick-search-label">
+          Tell us a few books you already love — we&apos;ll recommend similar ones, ranked by
+          writing quality, not just shared tropes:
+        </p>
+        <BookPicker onRecommend={onRecommend} />
+      </div>
 
-      <p className="quick-search-label">Or tell us a few books you already love:</p>
-      <BookPicker onRecommend={onRecommend} />
+      <QuickSearch onSearch={onQuickSearch} />
 
       {loading ? (
         <p className="home-loading">Loading shelves&hellip;</p>

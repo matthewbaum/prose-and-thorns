@@ -23,9 +23,15 @@ function Flames({ level }) {
   );
 }
 
-export default function BookCard({ book, onSelect, filters }) {
+export default function BookCard({ book, onSelect, filters, matchLabel }) {
   const allTropes = [...(book.romance_tropes || []), ...(book.plot_tropes || [])];
   const matched = filters ? getMatchedFilters(book, filters) : book.match_reasons || [];
+  // On recommend results, matched chips explain *why* this book was picked —
+  // that reasoning isn't self-evident the way active-filter chips are on
+  // the browse page (there the reader just set those filters themselves),
+  // so it needs its own label rather than looking like plain trope tags.
+  const isRecommendMatch = !filters && matched.length > 0;
+  const recommendLabel = matchLabel || 'Matches on';
   const matchedKeys = new Set(matched.map((m) => m.key.replace(/^trope-/, '')));
   // The hover overlay shows other tropes for general discovery — no need to
   // repeat ones already pinned in the always-visible matched-filters row above.
@@ -67,6 +73,7 @@ export default function BookCard({ book, onSelect, filters }) {
         <p className="book-author">{book.author}</p>
         {matched.length > 0 && (
           <div className="matched-filters">
+            {isRecommendMatch && <span className="matched-filters-label">{recommendLabel}</span>}
             {matched.map((m) => (
               <span key={m.key} className="matched-filter-chip">
                 {m.label}

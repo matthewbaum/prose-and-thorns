@@ -123,8 +123,17 @@
 .matched-filters {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 4px;
   margin: 0 0 8px;
+}
+
+.matched-filters-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-right: 2px;
 }
 
 .matched-filter-chip {

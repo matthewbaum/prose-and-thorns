@@ -34,7 +34,7 @@ export const SUBGENRE = [
   { value: 'fae-high-fantasy', label: 'Fae / High Fantasy' },
   { value: 'dragon-riders', label: 'Dragon Riders' },
   { value: 'vampire-dark-fantasy', label: 'Vampire / Dark Fantasy' },
-  { value: 'witch-academy', label: 'Witch / Magic Academy' },
+  { value: 'magic-academy', label: 'Academy / War College' },
   { value: 'gods-mythology', label: 'Gods & Mythology' },
   { value: 'shifters-werewolves', label: 'Shifters / Werewolves' },
   { value: 'urban-fantasy', label: 'Urban Fantasy' },
@@ -107,7 +107,9 @@ export const MIN_QUALITY_FILTERS = [
   { key: 'min_prose', label: 'Prose quality' },
   { key: 'min_romance', label: 'Romance quality' },
   { key: 'min_world_building', label: 'World-building' },
+  { key: 'min_pacing', label: 'Pacing' },
   { key: 'min_emotional_payoff', label: 'Emotional payoff' },
+  { key: 'min_character_depth', label: 'Character depth' },
   { key: 'min_overall', label: 'Overall' },
 ];
 
@@ -124,12 +126,26 @@ export const CONTENT_WARNINGS = [
 
 export const SORT_OPTIONS = [
   { value: 'best-match', label: 'Best match' },
+  { value: 'overall_score', label: 'Overall quality' },
   { value: 'prose_quality', label: 'Prose quality' },
   { value: 'romance_quality', label: 'Romance quality' },
   { value: 'world_building', label: 'World-building' },
+  { value: 'pacing_quality', label: 'Pacing' },
   { value: 'emotional_payoff', label: 'Emotional payoff' },
+  { value: 'character_depth', label: 'Character depth' },
   { value: 'most-reviewed', label: 'Most reviewed (confidence)' },
   { value: 'newest', label: 'Newest' },
+  { value: 'complete-first', label: 'Complete series first' },
+];
+
+// Same underlying sort engine as SORT_OPTIONS (backend reuses applySort for
+// every value here except 'match', which is the recommendation algorithm's
+// own ranking) — 'best-match' doesn't apply in a recommend context since
+// there's no active filter set to rank relevance against, so 'match' is
+// substituted in as the default, equivalent option.
+export const RECOMMEND_SORT_OPTIONS = [
+  { value: 'match', label: 'Strongest match' },
+  ...SORT_OPTIONS.filter((o) => o.value !== 'best-match'),
 ];
 
 export const SPICE_FLAME_COUNT = {

@@ -1,23 +1,164 @@
 .home-hero {
-  text-align: center;
-  padding: 12px 0 40px;
-  max-width: 640px;
-  margin: 0 auto;
+  position: relative;
+  display: grid;
+  /* Text column is capped, not 1fr — verified case: on a wide viewport,
+     1fr let the text column balloon far past its actual content width
+     (the copy itself wraps at ~46ch), leaving a large empty gap between
+     the text and the fixed-width art column sitting at the far right of
+     that oversized column. Capping it pulls the art back in next to the
+     text instead. Still no outer max-width/centering on the hero itself,
+     so the left edge stays flush with the header/shelves above and below. */
+  grid-template-columns: minmax(0, 720px) 460px;
+  gap: 48px;
+  align-items: center;
+  padding: 20px 0 56px;
+}
+
+.home-hero-atmosphere {
+  position: absolute;
+  inset: -20px -5vw;
+  z-index: 0;
+  pointer-events: none;
+  /* Pushed down and given a much longer transparent falloff than before —
+     the glow now ramps in gradually starting well below the header instead
+     of reaching near-full intensity right at that boundary, which read as
+     a hard seam against the plain header above it. */
+  background:
+    radial-gradient(ellipse 760px 520px at 12% 20%, var(--accent-soft), transparent 78%),
+    radial-gradient(ellipse 560px 460px at 100% 30%, #c9a84c14, transparent 75%);
+}
+
+.home-hero-copy {
+  position: relative;
+  z-index: 1;
+  text-align: left;
+}
+
+.home-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 18px;
+}
+
+.home-hero-eyebrow::before {
+  content: '';
+  width: 20px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.6;
 }
 
 .home-hero-title {
   font-family: var(--font-display);
-  font-size: 1.6rem;
+  font-size: clamp(1.7rem, 2.7vw, 2.35rem);
   color: var(--text);
   margin: 0 0 14px;
   line-height: 1.3;
 }
 
+.home-hero-title em {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--gold);
+}
+
 .home-hero-text {
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   line-height: 1.6;
-  margin: 0 0 20px;
+  margin: 0 0 22px;
+  max-width: 52ch;
+}
+
+.home-hero-covers {
+  position: relative;
+  z-index: 1;
+  /* Two staggered rows of three (6 covers total) rather than 4 larger
+     ones — fills the wider column with more real catalog variety instead
+     of blowing up the same books. Tall enough to contain the deepest
+     cover (c5, bottom edge ~465px) plus its badge and clearance before
+     the primary card below. */
+  height: 480px;
+}
+
+.home-hero-cover {
+  position: absolute;
+  width: 150px;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.home-hero-cover img {
+  width: 100%;
+  display: block;
+  border-radius: 6px;
+}
+
+.home-hero-cover:hover {
+  transform: translateY(-5px) scale(1.03) !important;
+  box-shadow: 0 20px 44px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--accent-glow);
+  z-index: 6;
+}
+
+.home-hero-cover.c1 { top: 0px;   left: 0px;   transform: rotate(-6deg); z-index: 1; }
+.home-hero-cover.c2 { top: 25px;  left: 140px; transform: rotate(3deg);  z-index: 2; }
+.home-hero-cover.c3 { top: 0px;   left: 280px; transform: rotate(-4deg); z-index: 1; }
+.home-hero-cover.c4 { top: 205px; left: 30px;  transform: rotate(5deg);  z-index: 3; }
+.home-hero-cover.c5 { top: 230px; left: 170px; transform: rotate(-3deg); z-index: 4; }
+.home-hero-cover.c6 { top: 200px; left: 305px; transform: rotate(6deg);  z-index: 3; }
+
+.home-hero-cover-badge {
+  position: absolute;
+  bottom: -9px;
+  left: 8px;
+  background: var(--bg);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+@media (max-width: 900px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .home-hero-copy { text-align: center; }
+  .home-hero-text { margin-left: auto; margin-right: auto; }
+  .home-hero-covers {
+    max-width: 320px;
+    height: 340px;
+    margin: 0 auto;
+    width: 100%;
+    transform: scale(0.72);
+    transform-origin: top center;
+  }
+}
+
+.home-primary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 4px);
+  max-width: 640px;
+  margin: 0 auto 28px;
+  padding: 22px 24px 24px;
+}
+
+.home-primary-card .quick-search-label {
+  margin: 0 0 14px;
 }
 
 .browse-all-btn {

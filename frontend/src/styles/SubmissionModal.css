@@ -1,0 +1,168 @@
+/* Scrim/modal shell matches ScoreMethodologyInfo.css's pattern (same
+   surface/border/shadow/z-index language as the rest of the app's modals)
+   — only the form-field styling below is new. */
+.submission-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 10, 0.75);
+  backdrop-filter: blur(2px);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: submissionFadeIn 0.15s ease;
+}
+
+.submission-modal {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 460px;
+  width: 100%;
+  max-height: 86vh;
+  overflow-y: auto;
+  padding: 28px 26px 26px;
+  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.6), 0 0 40px var(--accent-soft);
+}
+
+.submission-modal h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--gold);
+  margin: 0 0 18px;
+  padding-right: 24px;
+}
+
+.submission-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.submission-close:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.submission-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+
+.submission-dimensions-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+}
+
+.submission-dimension-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+  margin: 0 0 16px;
+}
+
+.submission-dimension-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.submission-dimension-field select {
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .submission-dimension-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.submission-field input,
+.submission-field select,
+.submission-field textarea,
+.submission-dimension-field select {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 11px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.submission-field input:focus,
+.submission-field select:focus,
+.submission-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.submission-submit {
+  width: 100%;
+  background: var(--accent);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 11px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submission-submit:hover:not(:disabled) {
+  background: var(--accent-glow);
+  box-shadow: 0 0 20px var(--accent-soft);
+}
+
+.submission-submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.submission-error {
+  color: #f0b7c9;
+  font-size: 0.8rem;
+  margin: 0 0 14px;
+}
+
+.submission-done h2 {
+  color: var(--gold);
+}
+
+.submission-done p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0 0 20px;
+}
+
+@keyframes submissionFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

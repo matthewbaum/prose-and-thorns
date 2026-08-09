@@ -1,19 +1,29 @@
+/* No margin here — .quick-search-wrap's flex `gap` already spaces every
+   direct child uniformly. A margin here on top of that gap was doubling
+   the space specifically after this label (verified case: ~28px gap
+   before the quality dropdown instead of the intended ~14px). */
 .quick-search-label {
   text-align: center;
   color: var(--text-muted);
   font-size: 0.82rem;
   letter-spacing: 0.02em;
-  margin: 0 0 14px;
+  margin: 0;
 }
 
-.quick-search {
+.quick-search-wrap {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
   margin: 0 auto 40px;
-  max-width: 1320px;
+  max-width: 640px;
   padding: 0 16px;
+}
+
+.quick-search-quality-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .quick-search-select {
@@ -42,6 +52,11 @@
 }
 
 .quick-search-select-quality {
+  /* Filled, not just outlined — matches the gold + accent-soft language
+     already used for quality chips elsewhere in this row, so the quality
+     control reads as the row's featured element rather than one dropdown
+     among equals with a different-colored border. */
+  background: var(--accent-soft);
   border-color: var(--gold);
   color: var(--gold);
   font-weight: 600;
@@ -54,43 +69,243 @@
 .quick-search-quality-wrap {
   display: flex;
   align-items: center;
-  gap: 4px;
-  flex: 1 1 155px;
-  min-width: 155px;
-  max-width: 240px;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+  max-width: 560px;
 }
 
 .quick-search-quality-wrap .quick-search-select-quality {
-  flex: 1;
-  min-width: 0;
+  /* Wide enough that the longest real option ("3.5+ (Strong across the
+     board)") doesn't clip — verified case: the old 155-240px cap truncated
+     even "Any quality" to "Any qu…". */
+  flex: 1 1 170px;
+  min-width: 150px;
   max-width: none;
 }
 
-.quick-search-btn {
-  background: var(--accent);
-  color: var(--text);
+.quick-search-quality-add {
+  background: none;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: inherit;
   font-weight: 600;
-  font-size: 0.85rem;
-  padding: 10px 22px;
-  border: none;
+  font-size: 0.78rem;
+  padding: 9px 14px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
-.quick-search-btn:hover:not(:disabled) {
-  background: var(--accent-glow);
-  box-shadow: 0 0 20px var(--accent-soft);
+.quick-search-quality-add:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent-glow);
 }
 
-.quick-search-btn:disabled {
-  opacity: 0.5;
+.quick-search-quality-add:disabled {
+  opacity: 0.4;
   cursor: default;
 }
 
+.quick-search-quality-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.quick-search-quality-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-soft);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-weight: 600;
+  padding: 4px 6px 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+}
+
+.quick-search-quality-chip button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 2px 4px;
+}
+
+.quick-search-quality-chip button:hover {
+  color: var(--text);
+}
+
+.quick-search-quality-reset {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.76rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.quick-search-quality-reset:hover {
+  color: var(--text);
+}
+
+.quick-search-category-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.quick-search-category-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 9px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-search-category-btn:hover {
+  border-color: var(--accent-glow);
+}
+
+.quick-search-category-btn.open {
+  background: var(--accent-soft);
+  border-color: var(--accent-glow);
+}
+
+.chevron-small {
+  font-size: 1.05rem;
+  line-height: 1;
+  opacity: 0.9;
+  transition: transform 0.2s ease;
+}
+
+.quick-search-category-btn.open .chevron-small {
+  transform: rotate(180deg);
+}
+
+.quick-search-find-btn {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 9px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-search-find-btn:hover {
+  border-color: var(--accent-glow);
+  background: var(--accent-soft);
+}
+
+/* One shared child of quick-search-wrap (see JSX comment) so its four
+   always-mounted collapse rows don't each claim their own flex `gap` slot
+   while collapsed. Spacing between/around actually-open panels comes from
+   margin on .expanded below, not from the parent gap. */
+.quick-search-panels {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Always mounted, animated open/closed via max-height so closing a panel is
+   a visible collapse rather than an instant unmount (see QuickSearch.jsx's
+   CategoryPanel comment). max-height rather than the grid-template-rows
+   0fr/1fr trick — the latter computed to a stuck 0px here since these
+   panels are themselves flex items (of .quick-search-panels), and a grid
+   item's intrinsic auto-sizing via 1fr didn't resolve against content
+   height in that context. 900px comfortably covers every panel's tallest
+   real content (the 5-group "more filters" panel) with room to spare. */
+.quick-search-panel-collapse {
+  max-height: 0;
+  overflow: hidden;
+  width: 100%;
+  transition: max-height 0.3s ease, margin 0.25s ease;
+}
+
+.quick-search-panel-collapse.expanded {
+  max-height: 900px;
+  margin-top: 14px;
+}
+
+.quick-search-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.quick-search-panel-label {
+  flex-basis: 100%;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin: 6px 0 2px;
+}
+
+.quick-search-panel-label:first-child {
+  margin-top: 0;
+}
+
+.quick-search-pill {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-search-pill:hover {
+  border-color: var(--accent-glow);
+  color: var(--text);
+}
+
+.quick-search-pill.selected {
+  background: var(--accent-soft);
+  border-color: var(--accent-glow);
+  color: var(--text);
+}
+
+.quick-search-hint {
+  margin: 2px 0 0;
+}
+
 @media (max-width: 640px) {
-  .quick-search {
-    flex-direction: column;
-    align-items: stretch;
+  .quick-search-find-btn {
+    flex: 1 1 100%;
   }
 }

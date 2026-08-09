@@ -36,6 +36,14 @@ export function searchBooks(query) {
   return request(`/books/search?q=${encodeURIComponent(query)}`);
 }
 
-export function fetchRecommendations(ids, mode = 'any') {
-  return request(`/recommendations?ids=${ids.join(',')}&mode=${mode}`);
+export function fetchRecommendations(ids, mode = 'any', sort = 'match') {
+  return request(`/recommendations?ids=${ids.join(',')}&mode=${mode}&sort=${sort}`);
+}
+
+export function submitInquiry(data) {
+  return request('/submissions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
 }

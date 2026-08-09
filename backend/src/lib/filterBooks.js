@@ -1,4 +1,4 @@
-import { SORT_TO_DIMENSION } from '../constants.js';
+import { SORT_TO_DIMENSION, MIN_FILTER_TO_DIMENSION, COMPLETE_SERIES_STATUSES } from '../constants.js';
 
 function splitParam(value) {
   if (!value) return [];
@@ -47,10 +47,15 @@ export function applyFilters(books, query) {
   const spiceLevels = splitParam(query.spice_level);
   const darknessLevels = splitParam(query.darkness_level);
 
-  const minProse = Number(query.min_prose || 1);
-  const minRomance = Number(query.min_romance || 1);
-  const minWorldBuilding = Number(query.min_world_building || 1);
-  const minEmotionalPayoff = Number(query.min_emotional_payoff || 1);
+  // Driven by MIN_FILTER_TO_DIMENSION so all six dimensions stay filterable
+  // by construction — verified case: pacing and character depth were fully
+  // scored and stored for every book already, but had no min_* query param
+  // wired up here at all, so they silently couldn't be filtered on despite
+  // the data being complete.
+  const minDimensionFilters = Object.entries(MIN_FILTER_TO_DIMENSION).map(([param, dimension]) => ({
+    dimension,
+    min: Number(query[param] || 1),
+  }));
   const minOverall = Number(query.min_overall || 1);
 
   return books.filter((book) => {
@@ -72,10 +77,9 @@ export function applyFilters(books, query) {
     }
 
     const qp = book.quality_profile;
-    if (minProse > 1 && (!qp || qp.prose_quality.score < minProse)) return false;
-    if (minRomance > 1 && (!qp || qp.romance_quality.score < minRomance)) return false;
-    if (minWorldBuilding > 1 && (!qp || qp.world_building.score < minWorldBuilding)) return false;
-    if (minEmotionalPayoff > 1 && (!qp || qp.emotional_payoff.score < minEmotionalPayoff)) return false;
+    for (const { dimension, min } of minDimensionFilters) {
+      if (min > 1 && (!qp || qp[dimension].score < min)) return false;
+    }
     if (minOverall > 1 && (!qp || qp.overall_score == null || qp.overall_score < minOverall)) return false;
 
     return true;
@@ -92,10 +96,21 @@ export function applySort(books, sort) {
       const bScore = b.quality_profile?.[dimension]?.score ?? -1;
       return bScore - aScore;
     });
+  } else if (sort === 'overall_score') {
+    // Pure overall-quality sort, no ratings-count tiebreak — distinct from
+    // best-match, which folds in review volume as a secondary signal.
+    sorted.sort((a, b) => (b.overall_score ?? -1) - (a.overall_score ?? -1));
   } else if (sort === 'most-reviewed') {
     sorted.sort((a, b) => (b.quality_profile?.review_count_used ?? 0) - (a.quality_profile?.review_count_used ?? 0));
   } else if (sort === 'newest') {
     sorted.sort((a, b) => (b.publication_date || '').localeCompare(a.publication_date || ''));
+  } else if (sort === 'complete-first') {
+    // A stable partition, not a full reorder — Array.sort is stable (ES2019+),
+    // so books within "complete" and within "ongoing" keep whatever relative
+    // order they arrived in (match strength, quality, etc.), just split into
+    // two groups rather than interleaved.
+    const isComplete = (b) => COMPLETE_SERIES_STATUSES.includes(b.series_status);
+    sorted.sort((a, b) => Number(isComplete(b)) - Number(isComplete(a)));
   } else {
     // best-match: prefer higher overall quality score, fall back to Google Books rating volume
     sorted.sort((a, b) => {

@@ -8,6 +8,7 @@ export default function BookGrid({
   loading,
   onSelect,
   filters,
+  matchLabel,
   emptyTitle = 'No books match these filters yet.',
   emptySub = 'Try loosening a filter or two.',
 }) {
@@ -35,7 +36,7 @@ export default function BookGrid({
       <RatingLegend />
       <div className="book-grid">
         {books.map((book) => (
-          <BookCard key={book.id} book={book} onSelect={onSelect} filters={filters} />
+          <BookCard key={book.id} book={book} onSelect={onSelect} filters={filters} matchLabel={matchLabel} />
         ))}
       </div>
     </>

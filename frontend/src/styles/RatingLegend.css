@@ -1,33 +1,31 @@
 .rating-legend {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 18px;
   margin: 0 0 18px;
+  padding: 3px 10px;
   font-size: 0.76rem;
+  font-family: inherit;
   color: var(--text-muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.rating-legend:hover,
+.rating-legend:focus-visible {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--surface-raised);
+  outline: none;
 }
 
 .rating-legend-item {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: none;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  font-size: inherit;
-  font-family: inherit;
-  padding: 3px 8px;
-  margin: -3px -8px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.rating-legend-item:hover,
-.rating-legend-item:focus-visible {
-  color: var(--text);
-  border-color: var(--border);
-  background: var(--surface-raised);
-  outline: none;
 }
 
 .rating-legend .star {
@@ -40,4 +38,14 @@
 
 .rating-legend .star.outline {
   color: var(--text-muted);
+}
+
+/* Matches .google-rating on book cards, where the real reader rating is
+   shown in gold — the "Quality Profile score" heading stays the default
+   muted color, matching .overall-score there, so gold consistently means
+   "the real rating," not both concepts at once. More specific than
+   .methodology-modal h3 (2 classes + element vs. 1 class + element) so it
+   wins without needing !important. */
+.methodology-modal h3.real-rating-heading {
+  color: var(--gold);
 }

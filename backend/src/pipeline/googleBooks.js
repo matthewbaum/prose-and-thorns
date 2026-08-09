@@ -20,8 +20,13 @@ function parseSeriesFromTitle(title) {
 // Exported so auditCatalog.js can flag any title that slipped through this
 // scoring despite the penalty (e.g. a low-scoring wrong-product candidate
 // that still won because every other candidate scored even lower).
+// "trilogy"/"duology" added after two more slipped through this way (verified
+// cases: "Kingdom of the Wicked Complete Trilogy" and "The Six of Crows
+// Duology" both matched as book 1 of their series instead of the standalone
+// single-book edition) — the original list caught "box set"/"omnibus"/etc.
+// but missed this specific bundle-naming convention entirely.
 export const WRONG_PRODUCT_PATTERN =
-  /\b(box set|boxed set|\d+[- ]book set|collection|bundle|deluxe|illustrated|omnibus|gift set|ebook collection|free preview|sample|excerpt|first \d+ chapters|study guide|summary (?:&|and) analysis|special edition|collector's edition|anniversary edition|signed edition|signed stock)\b/i;
+  /\b(box set|boxed set|\d+[- ]book set|collection|bundle|deluxe|illustrated|omnibus|gift set|ebook collection|free preview|sample|excerpt|first \d+ chapters|study guide|summary (?:&|and) analysis|special edition|collector's edition|anniversary edition|signed edition|signed stock|trilogy|duology)\b/i;
 
 function normalizeTitle(s) {
   return s

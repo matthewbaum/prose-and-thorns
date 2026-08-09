@@ -20,6 +20,13 @@ import { SPICE_ORDER } from '../constants.js';
 // meaningless, and without weighting it dominates scoring and makes 'all'
 // mode's intersection collapse to whatever generic trope everything has,
 // defeating the point of the stricter mode.
+//
+// Tried raw-overlap gating instead (require 2+ shared tropes, ignore
+// rarity) — reverted: it opened "all" mode to ~90% of the catalog for
+// genre-dense picks (Fourth Wing / ACOTAR / Strange the Dreamer matched
+// 130/145 books), because tropes this common co-occur by base rate alone.
+// Rarity-gating is back; match_reasons (surfaced in the UI) is the answer
+// to "why did these match," not loosening the gate.
 
 function toLabel(value) {
   const titled = value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -65,12 +72,17 @@ function buildTropeWeights(allBooks) {
 // shared trope (candidates only have one, so it's the closest thing to a
 // primary category) — weight it fixed-high rather than by rarity.
 const SUBGENRE_MATCH_WEIGHT = 4;
-// A trope at this weight corresponds to roughly <=40% catalog frequency —
-// the gate below requires at least one shared element this specific, rather
-// than letting several individually-generic tropes add up to "in common."
-// Summing would let e.g. two ~65%-frequency tropes together clear the bar,
-// which defeats the point of the stricter mode (see similarity.js header).
-const MIN_ALL_MODE_GROUND_WEIGHT = 1.1;
+// A trope at this weight corresponds to roughly <=58% catalog frequency —
+// loosened from the original <=40% cutoff (weight 1.1) after that proved
+// too strict for a genre this trope-dense (verified case: Fourth Wing /
+// ACOTAR / Strange the Dreamer's most-specific shared trope sits at ~67%
+// frequency and was getting zeroed out). Tuning history: 0.55 proved too
+// loose (95/145 books matched), 0.9 flipped the verified case back to zero
+// results; 0.8 is the current middle ground. Still excludes the truly
+// universal tags from single-handedly counting as "in common" — the gate
+// below still requires at least one shared element at least this specific,
+// rather than several individually-generic tropes summing up.
+const MIN_ALL_MODE_GROUND_WEIGHT = 0.8;
 
 function scoreCandidateAny(candidate, seeds, tropeWeight) {
   let score = 0;
@@ -194,13 +206,25 @@ export function getRecommendations(allBooks, seeds, limit = Infinity, mode = 'an
     if (groundWeight < MIN_ALL_MODE_GROUND_WEIGHT) {
       return { books: [], noCommonGround: true };
     }
+    // The full basis of what the seeds actually share — not just the
+    // elements that cleared the matching bar. Surfaced to the UI so a
+    // reader can see up front *why* this set of results exists, rather
+    // than having to infer it from each individual book's reason chips.
+    const commonGround = [
+      ...(intersections.commonSubgenre
+        ? [{ key: `subgenre-${intersections.commonSubgenre}`, label: toLabel(intersections.commonSubgenre) }]
+        : []),
+      ...[...intersections.commonTropes]
+        .sort((a, b) => tropeWeight(b) - tropeWeight(a))
+        .map((t) => ({ key: `trope-${t}`, label: toLabel(t) })),
+    ];
     const books = candidates
       .map((candidate) => ({ candidate, ...scoreCandidateAll(candidate, intersections, tropeWeight) }))
       .filter((r) => r.matched)
       .sort((a, b) => b.score - a.score)
       .slice(0, limit)
       .map((r) => ({ ...r.candidate, match_reasons: r.reasons }));
-    return { books, noCommonGround: false };
+    return { books, noCommonGround: false, commonGround };
   }
 
   const books = candidates
