@@ -10,6 +10,16 @@
   margin: 0;
 }
 
+/* Signals this section carries more weight than the other generic labels
+   here ("or narrow by subgenre..." etc.) — the quality-bar dropdowns
+   themselves are already gold/filled, but the label introducing them was
+   plain muted text like everything else, giving no visual cue that this
+   is one of the app's more distinctive features. */
+.quick-search-quality-label {
+  color: var(--gold);
+  font-weight: 600;
+}
+
 .quick-search-wrap {
   display: flex;
   flex-direction: column;

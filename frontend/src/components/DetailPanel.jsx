@@ -99,8 +99,13 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
           url: `https://www.amazon.com/s?k=${encodeURIComponent(`${book.title} ${book.author}`)}&i=stripbooks`,
         },
         {
+          // Verified case: B&N retired the old /s/{query} search path (it
+          // now 404s to a bare "Not Found" page) in favor of /search?q= —
+          // broken for every book in the catalog, not just this one, since
+          // it's a shared template. Confirmed the new path against B&N's
+          // own live search form action, not guessed.
           label: 'Barnes & Noble',
-          url: `https://www.barnesandnoble.com/s/${encodeURIComponent(`${book.title} ${book.author}`)}`,
+          url: `https://www.barnesandnoble.com/search?q=${encodeURIComponent(`${book.title} ${book.author}`)}`,
         },
         {
           label: 'Google Books',

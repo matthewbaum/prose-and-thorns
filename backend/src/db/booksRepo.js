@@ -123,7 +123,25 @@ const SELECT_SQL = `
   LEFT JOIN quality_profiles qp ON qp.book_id = b.id
 `;
 
-const selectAllBooks = db.prepare(SELECT_SQL);
+// Excludes books with zero rating/review substance anywhere (no Google
+// Books rating, no Hardcover rating, no scraped reviews) from every
+// listing surface — browse, search, shelves, and recommendation
+// candidates. Verified case: newly-added sequels for not-yet-released or
+// just-released books (e.g. "Seven and the Swift", pub. 2027) showed up as
+// blank, ratingless cards. Deliberately automatic rather than a one-time
+// manual removal — a book naturally starts appearing again on its own,
+// with no code change needed, the moment real review data exists for it
+// (whether that's from a review scrape after release, or a wrong-product
+// match getting corrected and re-fetched).
+const NO_SUBSTANCE_CLAUSE = `
+  NOT (
+    b.avg_rating IS NULL
+    AND b.hardcover_avg_rating IS NULL
+    AND NOT EXISTS (SELECT 1 FROM reviews r WHERE r.book_id = b.id)
+  )
+`;
+
+const selectAllBooks = db.prepare(`${SELECT_SQL} WHERE ${NO_SUBSTANCE_CLAUSE}`);
 const selectBookById = db.prepare(`${SELECT_SQL} WHERE b.id = ?`);
 const selectSeriesSiblings = db.prepare(`
   SELECT id, title, seed_title, author, seed_author, series_position,

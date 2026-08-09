@@ -19,6 +19,8 @@ const COPY = {
   },
   partnership: {
     title: 'Partner with us',
+    description:
+      "Prose & Thorns is built around a simple idea: readers deserve to know not just what a book is about, but whether it's actually worth their time. We're looking to connect with BookTok, Bookstagram, and BookTube creators, as well as book bloggers and podcasters, who care about reading quality as much as tropes — to hear your ideas, get your feedback, and explore what working together might look like.\n\nIf that sounds interesting, we'd love to hear from you.",
     messageLabel: 'Tell us about your audience',
     messagePlaceholder: 'Who do you reach, and what did you have in mind?',
     submitLabel: 'Send inquiry',
@@ -113,6 +115,22 @@ export default function SubmissionModal({ type, onClose, initialBookTitle }) {
         ) : (
           <form onSubmit={handleSubmit}>
             <h2>{title}</h2>
+
+            {copy.description && (
+              <p className="submission-description">
+                {copy.description.split('\n\n').map((para, i) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && (
+                      <>
+                        <br />
+                        <br />
+                      </>
+                    )}
+                    {para}
+                  </React.Fragment>
+                ))}
+              </p>
+            )}
 
             <label className="submission-field">
               Name

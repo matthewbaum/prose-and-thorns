@@ -35,6 +35,13 @@
   padding-right: 24px;
 }
 
+.submission-description {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0 0 20px;
+}
+
 .submission-close {
   position: absolute;
   top: 14px;

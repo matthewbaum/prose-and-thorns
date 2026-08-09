@@ -51,8 +51,24 @@ function parseJsonArraySafe(text) {
 // array entry has already dropped those wrapping quote marks, so a
 // canonicalize-only normalization still fails to match and produces a
 // false "possibly fabricated" flag on a genuinely verbatim extraction.
-function normalizeText(s) {
+// Google Books description/editorial_review text is raw HTML with entities
+// (&amp;, &#39;, &quot;) while the model's extracted praise/quote text is
+// plain decoded text — an entity-blind comparison flags genuinely verbatim
+// extractions as "possibly fabricated" (verified case: "Quicksilver"'s
+// praise entry matches editorial_review exactly except "&" vs "&amp;").
+function decodeEntities(s) {
   return (s || '')
+    .replace(/&amp;/g, '&')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ');
+}
+
+function normalizeText(s) {
+  return decodeEntities(s || '')
     .toLowerCase()
     .replace(/[‘’]/g, "'")
     .replace(/[“”]/g, '"')
@@ -264,6 +280,39 @@ function checkDuplicateTitles(books) {
   }
 }
 
+// Verified case: The Midnight Library, The Song of Achilles, and The Name
+// of the Wind (all pre-existing seed picks, general fantasy/literary
+// fiction rather than romance-forward) were dominating the "Trending now"
+// homepage shelf, which sorts by raw popularity with no genre-relevance
+// filter — mainstream crossover titles structurally out-rank niche
+// romantasy on pure rating volume. Their romance_tropes counts (1, 2, 3)
+// were clearly separated from genuinely romantasy titles like Fourth Wing
+// (7) and ACOTAR (6), so a low count is a real, cheap signal — not proof
+// a book doesn't belong in the catalog (some slow-burn romantasy is
+// thin on explicit trope tags), but worth a human glance before it
+// surfaces on a popularity-sorted shelf.
+const LOW_ROMANCE_TROPE_THRESHOLD = 2;
+
+function checkGenreFit(books) {
+  for (const b of books) {
+    if (!b.title || !b.romance_tropes) continue;
+    let tropes;
+    try {
+      tropes = JSON.parse(b.romance_tropes);
+    } catch {
+      continue;
+    }
+    if (!Array.isArray(tropes)) continue;
+    if (tropes.length <= LOW_ROMANCE_TROPE_THRESHOLD) {
+      flag(
+        'low',
+        'thin-romance-content',
+        `#${b.id} "${b.title}": only ${tropes.length} romance trope(s) tagged (spice: ${b.spice_level || 'unset'}) — verify this is genuinely romance-forward before it surfaces on a popularity-sorted shelf.`
+      );
+    }
+  }
+}
+
 function checkMissingSynthesis(books) {
   const bookIds = books.filter((b) => !b.quality_synthesized_at).map((b) => b.id);
   if (bookIds.length === 0) return;
@@ -366,6 +415,7 @@ function run() {
   checkSeriesConsistency(books);
   checkFetchIntegrity(books);
   checkDuplicateTitles(books);
+  checkGenreFit(books);
   checkMissingSynthesis(books);
   checkQuoteGrounding(books);
   checkPraiseGrounding(books);
