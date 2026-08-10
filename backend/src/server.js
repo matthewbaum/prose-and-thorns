@@ -50,6 +50,10 @@ app.get('/api/_debug', (req, res) => {
     dbFileMtime: stat.mtime,
     bookCountRaw: bookCount,
     hasStarlightHeir: hasStarlightHeir > 0,
+    railwayGitCommitSha: process.env.RAILWAY_GIT_COMMIT_SHA || null,
+    railwayGitBranch: process.env.RAILWAY_GIT_BRANCH || null,
+    railwayDeploymentId: process.env.RAILWAY_DEPLOYMENT_ID || null,
+    railwayReplicaId: process.env.RAILWAY_REPLICA_ID || null,
   });
 });
 
