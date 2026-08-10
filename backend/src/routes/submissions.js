@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { createSubmission } from '../db/submissionsRepo.js';
 import { getBookById } from '../db/booksRepo.js';
+import { notifyNewSubmission } from '../lib/notify.js';
 import { QUALITY_DIMENSIONS, CORRECTION_CATEGORIES } from '../constants.js';
 
 const router = Router();
@@ -95,7 +96,7 @@ router.post('/', (req, res) => {
 
   const channelUrl = type === 'partnership' ? trimmedString(body.channel_url, MAX_LEN.channel_url) : null;
 
-  const id = createSubmission({
+  const submission = {
     type,
     name,
     email,
@@ -106,7 +107,13 @@ router.post('/', (req, res) => {
     rating,
     ...dimensionScores,
     channel_url: channelUrl,
-  });
+  };
+  const id = createSubmission(submission);
+
+  // Fire-and-forget — notifyNewSubmission catches its own errors, and a
+  // slow/failed notification email shouldn't delay or fail the submission
+  // response, since the submission itself already saved successfully.
+  notifyNewSubmission(submission);
 
   res.status(201).json({ id });
 });

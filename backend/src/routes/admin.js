@@ -52,7 +52,18 @@ function loadFindings() {
     )
     .all();
 
-  return { auditFindings, reports };
+  // contact/review/partnership all land in the same submissions table but
+  // were never surfaced anywhere before this — they'd silently sit in the
+  // DB with zero visibility short of querying it directly.
+  const messages = db
+    .prepare(
+      `SELECT id, type, name, email, message, book_title, rating, channel_url, status, created_at
+       FROM submissions WHERE type IN ('contact', 'review', 'partnership') AND status = 'new'
+       ORDER BY created_at DESC`
+    )
+    .all();
+
+  return { auditFindings, reports, messages };
 }
 
 router.get('/findings', (req, res) => {
@@ -65,6 +76,7 @@ function escapeHtml(s) {
 }
 
 const SEVERITY_LABEL = { high: 'High', medium: 'Medium', low: 'Low' };
+const TYPE_LABEL = { contact: 'Contact', review: 'Review', partnership: 'Partnership' };
 
 function findingRow(f) {
   return `
@@ -82,7 +94,7 @@ function findingRow(f) {
 // "check the admin findings" doesn't require a specific browser.
 router.get('/dashboard', (req, res) => {
   if (!checkPassword(req, res)) return;
-  const { auditFindings, reports } = loadFindings();
+  const { auditFindings, reports, messages } = loadFindings();
   const password = escapeHtml(req.query.password || '');
 
   const needsFix = auditFindings.filter((f) => f.disposition === 'needs-fix');
@@ -97,6 +109,25 @@ router.get('/dashboard', (req, res) => {
       <td>${r.book_id ? `#${r.book_id} ${escapeHtml(r.book_title)}` : '—'}</td>
       <td>${escapeHtml(r.message)}</td>
       <td>${escapeHtml(r.name)} &lt;${escapeHtml(r.email)}&gt;</td>
+    </tr>`
+    )
+    .join('');
+
+  const messageRows = messages
+    .map(
+      (m) => `
+    <tr>
+      <td>${escapeHtml(m.created_at)}</td>
+      <td><span class="badge badge-type">${TYPE_LABEL[m.type] || m.type}</span></td>
+      <td>${escapeHtml(m.name)}<br><span class="muted">${escapeHtml(m.email)}</span></td>
+      <td>${
+        m.type === 'review'
+          ? `${escapeHtml(m.book_title)}${m.rating ? ` — ${m.rating}/5` : ''}`
+          : m.type === 'partnership' && m.channel_url
+            ? escapeHtml(m.channel_url)
+            : '—'
+      }</td>
+      <td style="white-space:pre-wrap;">${escapeHtml(m.message)}</td>
     </tr>`
     )
     .join('');
@@ -128,7 +159,7 @@ router.get('/dashboard', (req, res) => {
 <html>
 <head>
 <meta charset="utf-8">
-<title>Prose &amp; Thorns — Catalog Findings</title>
+<title>Prose &amp; Thorns — Admin</title>
 <style>
   body { font-family: -apple-system, system-ui, sans-serif; background: #0d0b14; color: #e8e3f0; margin: 0; padding: 32px; }
   h1 { font-size: 1.4rem; margin: 0 0 4px; }
@@ -144,9 +175,11 @@ router.get('/dashboard', (req, res) => {
   .badge-high { background: #4a1d24; color: #f0a3ae; }
   .badge-medium { background: #4a3a1d; color: #e0b96a; }
   .badge-low { background: #1d2f4a; color: #8fb6e8; }
+  .badge-type { background: #2a2438; color: #b9a9e0; }
   .empty { color: #6b6280; font-style: italic; padding: 12px 0; }
   .refresh { color: #9d94b3; font-size: 0.78rem; }
   .refresh a { color: #d4b981; }
+  .muted { color: #6b6280; font-size: 0.78rem; }
   .accepted-section { margin-top: 8px; opacity: 0.85; }
   .accepted-section summary { cursor: pointer; color: #9d94b3; font-size: 0.85rem; padding: 8px 0; }
   .accepted-section .note { color: #6b6280; font-style: italic; }
@@ -154,10 +187,17 @@ router.get('/dashboard', (req, res) => {
 </style>
 </head>
 <body>
-  <h1>Catalog Findings</h1>
-  <p class="subtitle">${needsFix.length} need${needsFix.length === 1 ? 's' : ''} attention &middot; ${accepted.length} reviewed, no action needed &middot; ${reports.length} reader report(s) &middot;
+  <h1>Prose &amp; Thorns — Admin</h1>
+  <p class="subtitle">${messages.length} message(s) &middot; ${reports.length} reader report(s) &middot; ${needsFix.length} finding${needsFix.length === 1 ? '' : 's'} need attention &middot; ${accepted.length} reviewed, no action needed &middot;
     <span class="refresh"><a href="?password=${password}">refresh</a></span>
   </p>
+
+  <h2>Messages (${messages.length})</h2>
+  ${
+    messages.length === 0
+      ? '<p class="empty">No new messages.</p>'
+      : `<table><thead><tr><th>Received</th><th>Type</th><th>From</th><th>Details</th><th>Message</th></tr></thead><tbody>${messageRows}</tbody></table>`
+  }
 
   <h2>Reader Reports (${reports.length})</h2>
   ${
