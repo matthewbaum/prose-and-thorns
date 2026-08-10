@@ -9,7 +9,7 @@ import seedRouter from './routes/seed.js';
 import shelvesRouter from './routes/shelves.js';
 import recommendationsRouter from './routes/recommendations.js';
 import submissionsRouter from './routes/submissions.js';
-import './db/index.js'; // ensures schema is created on boot
+import db from './db/index.js'; // ensures schema is created on boot
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -35,6 +35,22 @@ app.use('/api/submissions', submissionsRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
+});
+
+// TEMPORARY — deploy diagnostic, to be removed once the stale-deploy
+// investigation is resolved. Reports what's actually on disk in the
+// running container, independent of any app-level query logic.
+app.get('/api/_debug', (req, res) => {
+  const dbPath = path.join(__dirname, '..', 'data', 'prose-and-thorns.sqlite');
+  const stat = fs.statSync(dbPath);
+  const bookCount = db.prepare('SELECT COUNT(*) as n FROM books').get().n;
+  const hasStarlightHeir = db.prepare("SELECT COUNT(*) as n FROM books WHERE seed_title = 'The Starlight Heir'").get().n;
+  res.json({
+    dbFileSizeBytes: stat.size,
+    dbFileMtime: stat.mtime,
+    bookCountRaw: bookCount,
+    hasStarlightHeir: hasStarlightHeir > 0,
+  });
 });
 
 // In production, the frontend is built into ../../frontend/dist and served
