@@ -291,10 +291,6 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                       <span className="confidence-dot confidence-low" /> Low — under 5 reviews found,
                       rough signal only
                     </li>
-                    <li>
-                      <span className="confidence-dot confidence-editorial" /> AI editorial — no reader
-                      reviews yet, AI-generated estimate
-                    </li>
                   </ul>
                   <div className="radar-wrap">
                     <QualityRadar profile={quality} />
@@ -308,22 +304,11 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                     ))}
                   </div>
                   <p className="review-source-note">
-                    {quality.confidence === 'editorial' ? (
-                      <>
-                        This quality profile is an AI-generated editorial assessment based on this
-                        book&apos;s well-established critical and reader reputation — not synthesized
-                        from specific review text. It will be replaced with real reader-review
-                        synthesis once that data source is available.
-                      </>
-                    ) : (
-                      <>
-                        Quality profile synthesized from {quality.review_count_used ?? 0} real reader
-                        reviews (Hardcover and review blogs), weighed against the book&apos;s aggregate
-                        rating shown above.
-                        {quality.confidence === 'low' && (
-                          <> Limited review volume — treat these scores as a rough signal, not a verdict.</>
-                        )}
-                      </>
+                    Quality profile synthesized from {quality.review_count_used ?? 0} real reader
+                    reviews (Hardcover and review blogs), weighed against the book&apos;s aggregate
+                    rating shown above.
+                    {quality.confidence === 'low' && (
+                      <> Limited review volume — treat these scores as a rough signal, not a verdict.</>
                     )}
                   </p>
                   {book.hardcover_url && (

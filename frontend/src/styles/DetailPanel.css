@@ -450,10 +450,6 @@
   background: #d99568;
 }
 
-.confidence-dot.confidence-editorial {
-  background: #94a9d9;
-}
-
 .radar-wrap {
   display: flex;
   justify-content: center;
@@ -593,11 +589,6 @@
 .craft-flag-concern {
   border-color: #8f5a3f;
   color: #d99568;
-}
-
-.confidence-editorial {
-  border-color: #5a6f9e;
-  color: #94a9d9;
 }
 
 .quality-missing {
