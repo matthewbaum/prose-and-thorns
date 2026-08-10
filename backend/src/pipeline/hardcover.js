@@ -266,6 +266,19 @@ function titleVariants(title) {
 // title variant comes back at 0 ratings, search by author instead (Hardcover
 // blocks _ilike, so this is an _eq on the author's exact name, not fuzzy) and
 // pick the best title-token-overlap match from their whole bibliography.
+//
+// This author fallback has the same _eq fragility one level up: verified
+// case "The Adventures of Amina al-Sirafi" — our stored author is
+// "Shannon Chakraborty" (her real name), but Hardcover lists her by pen
+// name "S. A. Chakraborty", so this exact-match query returns nothing and
+// the book silently fell back to a 0-rated non-match despite a real,
+// correctly-matched Hardcover page existing with 444 ratings. authorMatches()
+// already tolerates this via last-name token overlap once candidates are in
+// hand, but this query never produces candidates to filter in the first
+// place when the full author string doesn't match verbatim. A real fix
+// needs either a last-name-only variant of this query, or a broader search
+// entry point than exact-string author/title matching allows — not
+// something patched in passing; scope it as its own task.
 const FIND_BY_AUTHOR_QUERY = `
   query FindByAuthor($author: String!) {
     books(where: { contributions: { author: { name: { _eq: $author } } } }, order_by: { ratings_count: desc }, limit: 50) {
