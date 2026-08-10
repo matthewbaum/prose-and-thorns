@@ -1,3 +1,5 @@
+import { qualityFiltersToPatch } from './components/QualityFilterPicker.jsx';
+
 const BASE = '/api';
 
 async function request(path, options) {
@@ -36,8 +38,10 @@ export function searchBooks(query) {
   return request(`/books/search?q=${encodeURIComponent(query)}`);
 }
 
-export function fetchRecommendations(ids, mode = 'any', sort = 'match') {
-  return request(`/recommendations?ids=${ids.join(',')}&mode=${mode}&sort=${sort}`);
+export function fetchRecommendations(ids, mode = 'any', sort = 'match', qualityFilters = []) {
+  const params = new URLSearchParams({ ids: ids.join(','), mode, sort });
+  Object.entries(qualityFiltersToPatch(qualityFilters)).forEach(([key, value]) => params.set(key, value));
+  return request(`/recommendations?${params.toString()}`);
 }
 
 export function submitInquiry(data) {

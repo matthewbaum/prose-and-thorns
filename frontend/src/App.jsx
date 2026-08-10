@@ -6,6 +6,7 @@ import DetailPanel from './components/DetailPanel.jsx';
 import HomePage from './components/HomePage.jsx';
 import AboutPage from './components/AboutPage.jsx';
 import BookPicker from './components/BookPicker.jsx';
+import QualityFilterPicker from './components/QualityFilterPicker.jsx';
 import { fetchBooks, fetchBook, fetchRecommendations } from './api.js';
 import { SORT_OPTIONS, RECOMMEND_SORT_OPTIONS } from './constants/taxonomy.js';
 import './styles/App.css';
@@ -62,6 +63,7 @@ export default function App() {
   const [recommendNoCommonGround, setRecommendNoCommonGround] = useState(false);
   const [recommendCommonGround, setRecommendCommonGround] = useState([]);
   const [recommendSort, setRecommendSort] = useState('match');
+  const [recommendQualityFilters, setRecommendQualityFilters] = useState([]);
 
   // "Home" and plain "Browse all" both mean a clean slate — neither should
   // silently carry over filters left set from an earlier Quick Search or
@@ -70,6 +72,7 @@ export default function App() {
   const goHome = useCallback(() => {
     setFilters(DEFAULT_FILTERS);
     setRecommendSort('match');
+    setRecommendQualityFilters([]);
     setView('home');
   }, []);
   const goBrowse = useCallback(() => {
@@ -147,13 +150,14 @@ export default function App() {
     setView('browse');
   }, []);
 
-  const runRecommend = useCallback((ids, mode, sort = 'match') => {
+  const runRecommend = useCallback((ids, mode, sort = 'match', qualityFilters = []) => {
     setView('recommend');
     setLoading(true);
     setError(null);
     setRecommendMode(mode);
     setRecommendSort(sort);
-    fetchRecommendations(ids, mode, sort)
+    setRecommendQualityFilters(qualityFilters);
+    fetchRecommendations(ids, mode, sort, qualityFilters)
       .then((data) => {
         setBooks(data.books || []);
         setTotal((data.books || []).length);
@@ -175,14 +179,24 @@ export default function App() {
   }, []);
 
   // Editing seeds in place (see BookPicker below) should keep whatever sort
-  // the reader already picked, not silently reset to "Strongest match."
+  // and quality filters the reader already picked, not silently reset them.
+  // A fresh search from Home has no prior quality filters (that control
+  // only lives on this results page), so recommendQualityFilters is
+  // correctly [] the first time through.
   const handleRecommend = useCallback(
-    (ids, mode) => runRecommend(ids, mode, recommendSort),
-    [runRecommend, recommendSort]
+    (ids, mode) => runRecommend(ids, mode, recommendSort, recommendQualityFilters),
+    [runRecommend, recommendSort, recommendQualityFilters]
   );
   const handleRecommendSortChange = useCallback(
-    (sort) => runRecommend(recommendSeedIds, recommendMode, sort),
-    [runRecommend, recommendSeedIds, recommendMode]
+    (sort) => runRecommend(recommendSeedIds, recommendMode, sort, recommendQualityFilters),
+    [runRecommend, recommendSeedIds, recommendMode, recommendQualityFilters]
+  );
+  // Same instant-apply pattern as the any/all mode toggle — a quality
+  // filter that only staged until some other click applied it would read
+  // as broken the same way the mode toggle did.
+  const handleRecommendQualityChange = useCallback(
+    (qualityFilters) => runRecommend(recommendSeedIds, recommendMode, recommendSort, qualityFilters),
+    [runRecommend, recommendSeedIds, recommendMode, recommendSort]
   );
 
   const bodyLocked = useMemo(() => Boolean(selectedId) || sidebarOpen, [selectedId, sidebarOpen]);
@@ -245,6 +259,11 @@ export default function App() {
             initialMode={recommendMode}
             onRecommend={handleRecommend}
             submitLabel="Update recommendations"
+          />
+          <QualityFilterPicker
+            value={recommendQualityFilters}
+            onChange={handleRecommendQualityChange}
+            label="Only want matches that clear a quality bar? Set your minimum:"
           />
           {recommendMode === 'all' && !recommendNoCommonGround && recommendCommonGround.length > 0 && (
             <p className="common-ground-summary">

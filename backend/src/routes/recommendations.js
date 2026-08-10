@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getAllBooks } from '../db/booksRepo.js';
 import { getRecommendations } from '../lib/similarity.js';
-import { applySort } from '../lib/filterBooks.js';
+import { applyFilters, applySort } from '../lib/filterBooks.js';
 
 const router = Router();
 
@@ -30,12 +30,19 @@ router.get('/', (req, res) => {
   const mode = req.query.mode === 'all' ? 'all' : 'any';
   const { books, noCommonGround, commonGround } = getRecommendations(all, seeds, limit, mode);
 
+  // Reuses the same min-quality filtering the browse endpoint uses — a
+  // reader can require, say, Pacing 4+ on top of an already-seeded
+  // recommend search. applyFilters also handles subgenre/trope/etc params,
+  // which this page doesn't currently send, but there's no reason to
+  // block them at the route level if that ever changes.
+  const filteredBooks = applyFilters(books, req.query);
+
   // 'match' (the default) keeps getRecommendations' own ranking — how well
   // each book fits the seeds. Any other value re-orders the same matched
   // set by a different signal (quality, popularity, etc.) without changing
   // which books qualified in the first place.
   const sort = req.query.sort;
-  const sortedBooks = sort && sort !== 'match' ? applySort(books, sort) : books;
+  const sortedBooks = sort && sort !== 'match' ? applySort(filteredBooks, sort) : filteredBooks;
 
   res.json({
     books: sortedBooks,
