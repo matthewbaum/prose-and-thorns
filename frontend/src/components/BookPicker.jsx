@@ -87,7 +87,16 @@ export default function BookPicker({ onRecommend, initialSelected, initialMode, 
           <button
             type="button"
             className={mode === 'any' ? 'active' : ''}
-            onClick={() => setMode('any')}
+            onClick={() => {
+              setMode('any');
+              // Every other filter control in this app applies the moment
+              // you click it — a mode toggle that only *stages* a choice
+              // until a separate "Update recommendations" click reads as
+              // broken ("I clicked it and nothing happened"). Re-running
+              // immediately (once there's already a submitted search to
+              // update) matches that instant-apply expectation.
+              if (initialSelected && initialSelected.length > 0) onRecommend(selected.map((b) => b.id), 'any');
+            }}
             aria-pressed={mode === 'any'}
           >
             Similar to any of these
@@ -95,7 +104,10 @@ export default function BookPicker({ onRecommend, initialSelected, initialMode, 
           <button
             type="button"
             className={mode === 'all' ? 'active' : ''}
-            onClick={() => setMode('all')}
+            onClick={() => {
+              setMode('all');
+              if (initialSelected && initialSelected.length > 0) onRecommend(selected.map((b) => b.id), 'all');
+            }}
             aria-pressed={mode === 'all'}
           >
             Common to all of these
