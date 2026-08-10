@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { createSubmission } from '../db/submissionsRepo.js';
-import { QUALITY_DIMENSIONS } from '../constants.js';
+import { getBookById } from '../db/booksRepo.js';
+import { QUALITY_DIMENSIONS, CORRECTION_CATEGORIES } from '../constants.js';
 
 const router = Router();
 
-const VALID_TYPES = ['contact', 'review', 'partnership'];
+const VALID_TYPES = ['contact', 'review', 'partnership', 'correction'];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Generous but not unbounded — this is a contact form, not a document
 // upload; caps protect the DB from a pathological or scripted submission.
@@ -37,10 +38,28 @@ router.post('/', (req, res) => {
     return;
   }
 
-  const bookTitle = type === 'review' ? trimmedString(body.book_title, MAX_LEN.book_title) : null;
+  const bookTitle =
+    type === 'review' || type === 'correction' ? trimmedString(body.book_title, MAX_LEN.book_title) : null;
   if (type === 'review' && !bookTitle) {
     res.status(400).json({ error: 'book_title is required for review submissions' });
     return;
+  }
+
+  // 'correction' is opened from a specific book's detail page, so book_id
+  // comes from the app itself, not a text field a reader typed — reject
+  // anything that isn't a real catalog row rather than silently storing an
+  // orphaned reference.
+  let bookId = null;
+  if (type === 'correction') {
+    bookId = Number.isInteger(body.book_id) ? body.book_id : null;
+    if (!bookId || !getBookById(bookId)) {
+      res.status(400).json({ error: 'book_id must reference an existing book' });
+      return;
+    }
+    if (!CORRECTION_CATEGORIES.includes(body.category)) {
+      res.status(400).json({ error: `category must be one of: ${CORRECTION_CATEGORIES.join(', ')}` });
+      return;
+    }
   }
 
   // A reviewer rates the same six dimensions this app scores everything by
@@ -82,6 +101,8 @@ router.post('/', (req, res) => {
     email,
     message,
     book_title: bookTitle,
+    book_id: bookId,
+    category: type === 'correction' ? body.category : null,
     rating,
     ...dimensionScores,
     channel_url: channelUrl,

@@ -4,6 +4,17 @@ import { submitInquiry } from '../api.js';
 import { QUALITY_DIMENSIONS } from '../constants/taxonomy.js';
 import '../styles/SubmissionModal.css';
 
+// Coarse triage buckets, not an exhaustive taxonomy — 'other' covers
+// anything that doesn't fit so a reader is never blocked from reporting
+// something real just because it doesn't match a category.
+export const CORRECTION_CATEGORIES = [
+  { value: 'wrong-cover', label: 'Wrong cover image' },
+  { value: 'wrong-quality-score', label: 'Quality score / review seems off' },
+  { value: 'wrong-series-info', label: 'Wrong series info (order, count, etc.)' },
+  { value: 'wrong-author', label: 'Wrong author or edition' },
+  { value: 'other', label: 'Something else' },
+];
+
 const COPY = {
   contact: {
     title: 'Get in touch',
@@ -25,11 +36,19 @@ const COPY = {
     messagePlaceholder: 'Who do you reach, and what did you have in mind?',
     submitLabel: 'Send inquiry',
   },
+  correction: {
+    title: 'Report an error',
+    messageLabel: 'What did you notice?',
+    messagePlaceholder: 'The more specific, the faster we can fix it.',
+    submitLabel: 'Send report',
+  },
 };
 
-// initialBookTitle: set when opened from a specific book's detail panel —
-// the title is then fixed (not re-typed) since the context is unambiguous.
-export default function SubmissionModal({ type, onClose, initialBookTitle }) {
+// initialBookTitle/initialBookId: set when opened from a specific book's
+// detail panel — the title is then fixed (not re-typed) since the context
+// is unambiguous. 'correction' needs the real book_id (not just title text)
+// so a report resolves back to an exact catalog row.
+export default function SubmissionModal({ type, onClose, initialBookTitle, initialBookId }) {
   const copy = COPY[type];
   const bookTitleLocked = Boolean(initialBookTitle);
   const [name, setName] = useState('');
@@ -45,6 +64,7 @@ export default function SubmissionModal({ type, onClose, initialBookTitle }) {
   // One score per dimension this app itself scores everything by.
   const [dimensionScores, setDimensionScores] = useState({});
   const [channelUrl, setChannelUrl] = useState('');
+  const [category, setCategory] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [done, setDone] = useState(false);
@@ -57,6 +77,7 @@ export default function SubmissionModal({ type, onClose, initialBookTitle }) {
     email.trim() &&
     message.trim() &&
     (type !== 'review' || (bookTitle.trim() && rating)) &&
+    (type !== 'correction' || category) &&
     allDimensionsScored;
 
   const handleSubmit = (e) => {
@@ -75,7 +96,9 @@ export default function SubmissionModal({ type, onClose, initialBookTitle }) {
       name: name.trim(),
       email: email.trim(),
       message: message.trim(),
-      book_title: type === 'review' ? bookTitle.trim() : undefined,
+      book_title: type === 'review' || type === 'correction' ? bookTitle.trim() : undefined,
+      book_id: type === 'correction' ? initialBookId : undefined,
+      category: type === 'correction' ? category : undefined,
       rating: type === 'review' ? Number(rating) : undefined,
       ...dimensionPayload,
       channel_url: type === 'partnership' ? channelUrl.trim() || undefined : undefined,
@@ -85,7 +108,11 @@ export default function SubmissionModal({ type, onClose, initialBookTitle }) {
       .finally(() => setSubmitting(false));
   };
 
-  const title = bookTitleLocked ? `Review "${initialBookTitle}"` : copy.title;
+  const title = bookTitleLocked
+    ? type === 'correction'
+      ? `Report an error: "${initialBookTitle}"`
+      : `Review "${initialBookTitle}"`
+    : copy.title;
 
   return createPortal(
     <div className="submission-scrim" onClick={onClose}>
@@ -107,6 +134,7 @@ export default function SubmissionModal({ type, onClose, initialBookTitle }) {
               {type === 'contact' && "We've got your message and will get back to you soon."}
               {type === 'review' && "Your review has been submitted for review before it's posted."}
               {type === 'partnership' && "We'll take a look and follow up if it's a fit."}
+              {type === 'correction' && "Thanks for the catch — we'll look into it."}
             </p>
             <button type="button" className="submission-submit" onClick={onClose}>
               Close
@@ -197,6 +225,22 @@ export default function SubmissionModal({ type, onClose, initialBookTitle }) {
                   ))}
                 </div>
               </>
+            )}
+
+            {type === 'correction' && (
+              <label className="submission-field">
+                What's wrong?
+                <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+                  <option value="" disabled>
+                    Select
+                  </option>
+                  {CORRECTION_CATEGORIES.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
             )}
 
             {type === 'partnership' && (

@@ -18,6 +18,8 @@ import {
 } from '../db/pipelineRepo.js';
 import { sleep, RATE_LIMIT_DELAY_MS, log } from './util.js';
 import { status, resetStatus, finishStatus } from './status.js';
+import { runAudit } from './auditCatalog.js';
+import db from '../db/index.js';
 
 const REDDIT_CONFIGURED = Boolean(
   process.env.REDDIT_CLIENT_ID &&
@@ -164,6 +166,20 @@ export async function runPipeline() {
 
   finishStatus();
   log(`Pipeline finished. ${status.total - status.errors.length}/${status.total} processed cleanly.`);
+
+  log('Running catalog audit...');
+  runAudit();
+
+  // WAL mode means writes from this whole run sit in prose-and-thorns.sqlite-wal
+  // until checkpointed — .gitignore excludes that file as transient, so a
+  // commit made without this step can silently miss everything just written
+  // (verified case: an entire session's catalog changes never left the WAL,
+  // so what got pushed was hours stale despite every local check looking
+  // correct). Checkpointing automatically here means a batch is always safe
+  // to commit immediately after `npm run seed` finishes.
+  db.pragma('wal_checkpoint(TRUNCATE)');
+  log('WAL checkpointed.');
+
   return status;
 }
 

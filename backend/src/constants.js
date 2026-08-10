@@ -4,6 +4,17 @@ export const DARKNESS_ORDER = ['light', 'moderate', 'dark', 'very-dark'];
 // still ongoing is excluded regardless of how many books are already out.
 export const COMPLETE_SERIES_STATUSES = ['standalone', 'series-complete', 'duology-complete'];
 
+// 'correction' submission categories — coarse triage buckets, not an
+// exhaustive taxonomy, so a reader reporting something that doesn't fit any
+// of them still has 'other' rather than being blocked.
+export const CORRECTION_CATEGORIES = [
+  'wrong-cover',
+  'wrong-quality-score',
+  'wrong-series-info',
+  'wrong-author',
+  'other',
+];
+
 export const QUALITY_DIMENSIONS = [
   'prose_quality',
   'romance_quality',

@@ -9,6 +9,7 @@ import seedRouter from './routes/seed.js';
 import shelvesRouter from './routes/shelves.js';
 import recommendationsRouter from './routes/recommendations.js';
 import submissionsRouter from './routes/submissions.js';
+import adminRouter from './routes/admin.js';
 import './db/index.js'; // ensures schema is created on boot
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -32,6 +33,7 @@ app.use('/api/seed', seedRouter);
 app.use('/api/shelves', shelvesRouter);
 app.use('/api/recommendations', recommendationsRouter);
 app.use('/api/submissions', submissionsRouter);
+app.use('/api/admin', adminRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });

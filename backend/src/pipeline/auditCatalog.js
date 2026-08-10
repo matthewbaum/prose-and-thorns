@@ -22,16 +22,23 @@ import {
   DARKNESS_LEVELS,
 } from '../../../frontend/src/constants/taxonomy.js';
 
-// Read-only report tool. Never writes to the DB, never auto-fixes anything —
-// ambiguous findings (a thin review count, an author mismatch that might be
-// a legitimate co-author) need a human judgment call, matching this
-// project's existing "flag rather than silently decide" pattern.
+// Never auto-fixes catalog data — ambiguous findings (a thin review count,
+// an author mismatch that might be a legitimate co-author) need a human
+// judgment call, matching this project's existing "flag rather than
+// silently decide" pattern. It does persist its own findings (see
+// audit_findings below) so a run's results survive after the terminal
+// closes and are queryable via /api/admin/findings, instead of being
+// print-only output a human has to be watching to catch.
 
 const THIN_REVIEW_COUNT_THRESHOLD = 10;
 
 const findings = { high: [], medium: [], low: [] };
-function flag(severity, category, message) {
-  findings[severity].push({ category, message });
+// bookId is optional — plenty of findings (taxonomy drift, cross-catalog
+// duplicates) aren't about one specific row. Passed through when the
+// caller has a single book in scope so persisted findings can link back to
+// it (see persistFindings below).
+function flag(severity, category, message, bookId = null) {
+  findings[severity].push({ category, message, bookId });
 }
 
 function parseJsonArraySafe(text) {
@@ -155,7 +162,7 @@ function checkPerRowTaxonomyValidity(books) {
     for (const [field, allowed] of Object.entries(ALL_TAXONOMY)) {
       const value = b[field];
       if (value != null && value !== '' && !allowed.includes(value)) {
-        flag('high', 'invalid-tag-value', `#${b.id} "${b.title || b.seed_title}": ${field} = "${value}" is not in the allowed taxonomy — likely a hallucinated tag value.`);
+        flag('high', 'invalid-tag-value', `#${b.id} "${b.title || b.seed_title}": ${field} = "${value}" is not in the allowed taxonomy — likely a hallucinated tag value.`, b.id);
       }
     }
     for (const [field, allowed] of Object.entries(ARRAY_TAXONOMY)) {
@@ -163,7 +170,7 @@ function checkPerRowTaxonomyValidity(books) {
       if (!ok) continue; // reported separately by checkMalformedJson
       for (const v of value) {
         if (!allowed.includes(v)) {
-          flag('high', 'invalid-tag-value', `#${b.id} "${b.title || b.seed_title}": ${field} contains "${v}", not in the allowed taxonomy — likely a hallucinated tag value.`);
+          flag('high', 'invalid-tag-value', `#${b.id} "${b.title || b.seed_title}": ${field} contains "${v}", not in the allowed taxonomy — likely a hallucinated tag value.`, b.id);
         }
       }
     }
@@ -177,7 +184,7 @@ function checkMalformedJson(books) {
       if (!raw) continue;
       const { ok } = parseJsonArraySafe(raw);
       if (!ok) {
-        flag('high', 'malformed-json', `#${b.id} "${b.title || b.seed_title}": ${col} is not valid JSON array — "${raw.slice(0, 80)}"`);
+        flag('high', 'malformed-json', `#${b.id} "${b.title || b.seed_title}": ${col} is not valid JSON array — "${raw.slice(0, 80)}"`, b.id);
       }
     }
   }
@@ -208,7 +215,8 @@ function checkSeriesConsistency(books) {
         flag(
           'high',
           'series-position-duplicate',
-          `Series "${seriesName}": position ${s.series_position} used by both #${seenPositions.get(s.series_position)} and #${s.id} ("${s.title}")`
+          `Series "${seriesName}": position ${s.series_position} used by both #${seenPositions.get(s.series_position)} and #${s.id} ("${s.title}")`,
+          s.id
         );
       } else {
         seenPositions.set(s.series_position, s.id);
@@ -219,7 +227,7 @@ function checkSeriesConsistency(books) {
       // negative or that exceed the series total.
       const total = s.series_total;
       if (total != null && (s.series_position < 0 || s.series_position > total)) {
-        flag('medium', 'series-position-out-of-range', `#${s.id} "${s.title}": series_position ${s.series_position} is outside [0, ${total}]`);
+        flag('medium', 'series-position-out-of-range', `#${s.id} "${s.title}": series_position ${s.series_position} is outside [0, ${total}]`, s.id);
       }
     }
   }
@@ -229,28 +237,28 @@ function checkSeriesConsistency(books) {
 function checkFetchIntegrity(books) {
   for (const b of books) {
     if (b.google_books_fetched_at && (!b.title || !b.author)) {
-      flag('high', 'broken-row', `#${b.id} (seed "${b.seed_title}" by ${b.seed_author}): google_books_fetched_at is set but title/author is still null — fetch silently produced nothing.`);
+      flag('high', 'broken-row', `#${b.id} (seed "${b.seed_title}" by ${b.seed_author}): google_books_fetched_at is set but title/author is still null — fetch silently produced nothing.`, b.id);
     }
     const isStub = b.google_books_id && b.google_books_id.endsWith('ACAAJ');
     if (isStub && !b.hardcover_cover_url) {
-      flag('medium', 'stub-cover', `#${b.id} "${b.title}": google_books_id ${b.google_books_id} is an ACAAJ stub (no real cover) with no Hardcover cover fallback.`);
+      flag('medium', 'stub-cover', `#${b.id} "${b.title}": google_books_id ${b.google_books_id} is an ACAAJ stub (no real cover) with no Hardcover cover fallback.`, b.id);
     }
     if (b.title && WRONG_PRODUCT_PATTERN.test(b.title)) {
-      flag('high', 'wrong-product-title', `#${b.id}: title "${b.title}" matches the wrong-product pattern (box set / special edition / sample / etc.) — likely matched the wrong Google Books edition.`);
+      flag('high', 'wrong-product-title', `#${b.id}: title "${b.title}" matches the wrong-product pattern (box set / special edition / sample / etc.) — likely matched the wrong Google Books edition.`, b.id);
     }
     if (!b.cover_url && !b.hardcover_cover_url) {
-      flag('medium', 'no-cover-art', `#${b.id} "${b.title}": no cover art from either Google Books or Hardcover.`);
+      flag('medium', 'no-cover-art', `#${b.id} "${b.title}": no cover art from either Google Books or Hardcover.`, b.id);
     }
     if (b.seed_author && b.author) {
       const seedTokens = new Set(normalizeTokens(b.seed_author));
       const authorTokens = new Set(normalizeTokens(b.author));
       const overlap = [...seedTokens].some((t) => authorTokens.has(t));
       if (!overlap && seedTokens.size > 0) {
-        flag('medium', 'author-mismatch', `#${b.id} "${b.title}": author "${b.author}" shares no name with seed_author "${b.seed_author}" — verify this is the right book/edition.`);
+        flag('medium', 'author-mismatch', `#${b.id} "${b.title}": author "${b.author}" shares no name with seed_author "${b.seed_author}" — verify this is the right book/edition.`, b.id);
       }
     }
     if (b.hardcover_ratings_count != null && b.hardcover_ratings_count > 0 && b.hardcover_ratings_count < THIN_REVIEW_COUNT_THRESHOLD) {
-      flag('low', 'thin-hardcover-match', `#${b.id} "${b.title}": only ${b.hardcover_ratings_count} Hardcover ratings — verify this matched the right/canonical edition (worth checking for a title-variant mismatch, e.g. diacritics).`);
+      flag('low', 'thin-hardcover-match', `#${b.id} "${b.title}": only ${b.hardcover_ratings_count} Hardcover ratings — verify this matched the right/canonical edition (worth checking for a title-variant mismatch, e.g. diacritics).`, b.id);
     }
     // A ratings_count of exactly 0 is a stronger signal than "thin" — it
     // usually means the match landed on an unrelated zero-rated duplicate
@@ -258,10 +266,10 @@ function checkFetchIntegrity(books) {
     // different title string (verified: "Babel" and "Circe" both did this).
     // Previously excluded by "> 0" above, so this case was silently invisible.
     if (b.hardcover_url && b.hardcover_ratings_count === 0) {
-      flag('medium', 'zero-rated-hardcover-match', `#${b.id} "${b.title}": matched Hardcover edition has 0 ratings — likely matched an unrelated duplicate stub instead of the real, populated edition.`);
+      flag('medium', 'zero-rated-hardcover-match', `#${b.id} "${b.title}": matched Hardcover edition has 0 ratings — likely matched an unrelated duplicate stub instead of the real, populated edition.`, b.id);
     }
     if (b.description && !b.tagged_at) {
-      flag('medium', 'never-tagged', `#${b.id} "${b.title}": has a description but was never tagged (tagged_at is null).`);
+      flag('medium', 'never-tagged', `#${b.id} "${b.title}": has a description but was never tagged (tagged_at is null).`, b.id);
     }
   }
 }
@@ -307,7 +315,8 @@ function checkGenreFit(books) {
       flag(
         'low',
         'thin-romance-content',
-        `#${b.id} "${b.title}": only ${tropes.length} romance trope(s) tagged (spice: ${b.spice_level || 'unset'}) — verify this is genuinely romance-forward before it surfaces on a popularity-sorted shelf.`
+        `#${b.id} "${b.title}": only ${tropes.length} romance trope(s) tagged (spice: ${b.spice_level || 'unset'}) — verify this is genuinely romance-forward before it surfaces on a popularity-sorted shelf.`,
+        b.id
       );
     }
   }
@@ -325,7 +334,7 @@ function checkMissingSynthesis(books) {
     if (b.quality_synthesized_at) continue;
     const n = countByBook.get(b.id) || 0;
     if (n > 0) {
-      flag('medium', 'missing-synthesis', `#${b.id} "${b.title}": has ${n} reviews but quality_synthesized_at is null — synthesis silently never completed (likely a past API error).`);
+      flag('medium', 'missing-synthesis', `#${b.id} "${b.title}": has ${n} reviews but quality_synthesized_at is null — synthesis silently never completed (likely a past API error).`, b.id);
     }
   }
 }
@@ -359,7 +368,8 @@ function checkQuoteGrounding(books) {
         flag(
           'high',
           'ungrounded-quote',
-          `#${b.id} "${b.title}": ${dim} representative_quote "${quote}" is not a substring of any stored review — possibly paraphrased or fabricated, not a real excerpt.`
+          `#${b.id} "${b.title}": ${dim} representative_quote "${quote}" is not a substring of any stored review — possibly paraphrased or fabricated, not a real excerpt.`,
+          b.id
         );
       }
     }
@@ -378,7 +388,8 @@ function checkPraiseGrounding(books) {
         flag(
           'medium',
           'ungrounded-praise',
-          `#${b.id} "${b.title}": praise entry "${quote}" is not found verbatim in description/editorial_review — TAG_PROMPT requires praise to be extracted verbatim, so this may be invented.`
+          `#${b.id} "${b.title}": praise entry "${quote}" is not found verbatim in description/editorial_review — TAG_PROMPT requires praise to be extracted verbatim, so this may be invented.`,
+          b.id
         );
       }
     }
@@ -407,7 +418,25 @@ function printReport() {
   console.log(`\n${total === 0 ? 'Clean — no findings.' : `TOTAL: ${total} finding(s) (${findings.high.length} high, ${findings.medium.length} medium, ${findings.low.length} low)`}`);
 }
 
-function run() {
+// Each run replaces the prior snapshot rather than accumulating duplicate
+// rows for the same catalog state — 'resolved' findings from a genuinely
+// fixed issue are meant to disappear, not pile up as stale noise, and an
+// admin viewing /api/admin/findings should see "what's wrong right now,"
+// not a growing history of every run ever made.
+const insertFinding = db.prepare(
+  `INSERT INTO audit_findings (severity, category, message, book_id) VALUES (@severity, @category, @message, @bookId)`
+);
+function persistFindings() {
+  db.prepare(`DELETE FROM audit_findings`).run();
+  const insertMany = db.transaction(() => {
+    for (const severity of ['high', 'medium', 'low']) {
+      for (const f of findings[severity]) insertFinding.run({ ...f, severity });
+    }
+  });
+  insertMany();
+}
+
+export function runAudit() {
   checkTaxonomyDrift();
   const books = db.prepare('SELECT * FROM books').all();
   checkPerRowTaxonomyValidity(books);
@@ -419,7 +448,11 @@ function run() {
   checkMissingSynthesis(books);
   checkQuoteGrounding(books);
   checkPraiseGrounding(books);
+  persistFindings();
   printReport();
 }
 
-run();
+// Allow running directly: `npm run audit`
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runAudit();
+}

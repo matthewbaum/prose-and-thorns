@@ -29,10 +29,12 @@ function seriesLine(book) {
 export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
   const [descExpanded, setDescExpanded] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [correctionOpen, setCorrectionOpen] = useState(false);
 
   useEffect(() => {
     setDescExpanded(false);
     setReviewOpen(false);
+    setCorrectionOpen(false);
   }, [book?.id]);
 
   useEffect(() => {
@@ -321,6 +323,13 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                       Read the actual reviews on Hardcover &rarr;
                     </a>
                   )}
+                  <button
+                    type="button"
+                    className="report-error-link"
+                    onClick={() => setCorrectionOpen(true)}
+                  >
+                    Something look wrong here? Let us know.
+                  </button>
                 </>
               ) : (
                 <p className="quality-missing">
@@ -362,6 +371,14 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
       </aside>
       {reviewOpen && book && (
         <SubmissionModal type="review" initialBookTitle={book.title} onClose={() => setReviewOpen(false)} />
+      )}
+      {correctionOpen && book && (
+        <SubmissionModal
+          type="correction"
+          initialBookTitle={book.title}
+          initialBookId={book.id}
+          onClose={() => setCorrectionOpen(false)}
+        />
       )}
     </>
   );

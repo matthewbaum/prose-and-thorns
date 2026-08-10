@@ -135,11 +135,19 @@ CREATE TABLE IF NOT EXISTS user_preferences (
 -- fuzzy-matching it to the catalog at submission time.
 CREATE TABLE IF NOT EXISTS submissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  type TEXT NOT NULL, -- 'contact' | 'review' | 'partnership'
+  type TEXT NOT NULL, -- 'contact' | 'review' | 'partnership' | 'correction'
   name TEXT NOT NULL,
   email TEXT NOT NULL,
   message TEXT NOT NULL,
-  book_title TEXT, -- 'review' only
+  book_title TEXT, -- 'review' and 'correction'
+  -- 'correction' only — the actual catalog row being flagged. Unlike
+  -- book_title (free text a reviewer types), this is set from the book the
+  -- reader was actually looking at, so a report can be resolved back to a
+  -- specific row without any fuzzy title matching.
+  book_id INTEGER REFERENCES books(id),
+  -- 'correction' only — coarse category so reports can be triaged by kind
+  -- without reading every message first.
+  category TEXT,
   -- 'review' only, required, 1-5 — the reviewer's own holistic star
   -- rating. Deliberately separate from the six dimension scores below and
   -- NOT their average: this plays the same role as this app's ★ "real
@@ -167,4 +175,19 @@ CREATE INDEX IF NOT EXISTS idx_submissions_type ON submissions(type);
 CREATE INDEX IF NOT EXISTS idx_books_subgenre ON books(subgenre);
 CREATE INDEX IF NOT EXISTS idx_books_series_status ON books(series_status);
 CREATE INDEX IF NOT EXISTS idx_reviews_book_id ON reviews(book_id);
+
+-- auditCatalog.js's findings, persisted instead of console-only — each run
+-- replaces the prior snapshot (see auditCatalog.js) rather than
+-- accumulating duplicates across repeated runs of the same catalog state.
+CREATE TABLE IF NOT EXISTS audit_findings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  severity TEXT NOT NULL, -- 'high' | 'medium' | 'low'
+  category TEXT NOT NULL, -- e.g. 'ungrounded-quote', 'wrong-product-match'
+  message TEXT NOT NULL,
+  book_id INTEGER REFERENCES books(id), -- set when a finding is about one specific book
+  status TEXT NOT NULL DEFAULT 'open', -- 'open' | 'resolved'
+  run_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_findings_status ON audit_findings(status);
 `;
