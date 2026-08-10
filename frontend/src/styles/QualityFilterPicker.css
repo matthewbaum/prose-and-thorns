@@ -66,6 +66,31 @@
   max-width: none;
 }
 
+.quick-search-quality-field {
+  /* Without a visible label here, "Overall" next to "Any quality" reads as
+     two unrelated dropdowns rather than "pick a dimension, then its bar" —
+     the aria-label on the <select> only reaches screen readers. */
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 170px;
+  min-width: 150px;
+}
+
+.quick-search-quality-field .quick-search-select-quality {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.quick-search-quality-microlabel {
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-left: 2px;
+}
+
 .quick-search-quality-add {
   background: none;
   border: 1px solid var(--gold);

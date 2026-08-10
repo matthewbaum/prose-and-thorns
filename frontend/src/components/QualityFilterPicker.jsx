@@ -67,33 +67,39 @@ export default function QualityFilterPicker({ value, onChange, label }) {
       </p>
       <div className="quick-search-quality-row">
         <div className="quick-search-quality-wrap">
-          <select
-            className="quick-search-select quick-search-select-quality"
-            value={pendingDimension}
-            onChange={(e) => {
-              setPendingDimension(e.target.value);
-              setPendingTier('');
-            }}
-            aria-label="Quality dimension"
-          >
-            {QUALITY_DIMENSION_OPTIONS.map((dim) => (
-              <option key={dim.key} value={dim.key}>
-                {dim.label}
-              </option>
-            ))}
-          </select>
-          <select
-            className="quick-search-select quick-search-select-quality"
-            value={pendingTier}
-            onChange={(e) => setPendingTier(e.target.value)}
-            aria-label="Minimum tier"
-          >
-            {TIER_VALUES.map((v) => (
-              <option key={v} value={v}>
-                {pendingDimension === 'overall' ? OVERALL_TIER_LABELS[v] : v === '' ? 'Any' : `${v}+`}
-              </option>
-            ))}
-          </select>
+          <div className="quick-search-quality-field">
+            <span className="quick-search-quality-microlabel">Dimension</span>
+            <select
+              className="quick-search-select quick-search-select-quality"
+              value={pendingDimension}
+              onChange={(e) => {
+                setPendingDimension(e.target.value);
+                setPendingTier('');
+              }}
+              aria-label="Quality dimension"
+            >
+              {QUALITY_DIMENSION_OPTIONS.map((dim) => (
+                <option key={dim.key} value={dim.key}>
+                  {dim.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="quick-search-quality-field">
+            <span className="quick-search-quality-microlabel">Minimum score</span>
+            <select
+              className="quick-search-select quick-search-select-quality"
+              value={pendingTier}
+              onChange={(e) => setPendingTier(e.target.value)}
+              aria-label="Minimum tier"
+            >
+              {TIER_VALUES.map((v) => (
+                <option key={v} value={v}>
+                  {pendingDimension === 'overall' ? OVERALL_TIER_LABELS[v] : v === '' ? 'Any' : `${v}+`}
+                </option>
+              ))}
+            </select>
+          </div>
           <button
             type="button"
             className="quick-search-quality-add"
