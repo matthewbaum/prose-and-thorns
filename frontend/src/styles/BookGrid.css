@@ -1,11 +1,13 @@
 .book-grid {
   display: grid;
-  /* 165px comfortably fits 5 columns in the ~900px browse-page content
-     width (sidebar open, 1280px viewport) — title/author wrap fine at this
-     width since neither is line-clamped; the one thing worth eyeballing
-     after a change here is the bottom stats row (flames + two ratings),
-     the only non-wrapping element on the card. */
-  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  /* A flat 165px minimum only sets a floor — auto-fill keeps adding columns
+     as long as they clear it, so a wide viewport (or sidebar closed) packs
+     in 6+, not 5. max(165px, one-fifth-of-container) makes the effective
+     minimum scale up with the container, so a 6th column never fits: cards
+     just grow wider on big screens instead. Below ~897px content width
+     (5 * 165px + 4 * 18px gaps) the 165px floor takes over and auto-fill
+     drops to fewer columns for mobile, same as before. */
+  grid-template-columns: repeat(auto-fill, minmax(max(165px, calc((100% - 4 * 18px) / 5)), 1fr));
   gap: 18px;
 }
 
