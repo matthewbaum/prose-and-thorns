@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { searchBooks } from '../api.js';
 import '../styles/BookPicker.css';
 
-const MAX_SEEDS = 5;
-
 export default function BookPicker({ onRecommend, initialSelected, initialMode, submitLabel }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -28,7 +26,7 @@ export default function BookPicker({ onRecommend, initialSelected, initialMode, 
   }, [query]);
 
   const addBook = (book) => {
-    if (selected.some((b) => b.id === book.id) || selected.length >= MAX_SEEDS) return;
+    if (selected.some((b) => b.id === book.id)) return;
     setSelected((prev) => [...prev, book]);
     setQuery('');
     setResults([]);
@@ -50,7 +48,6 @@ export default function BookPicker({ onRecommend, initialSelected, initialMode, 
           placeholder="Search for a book you like…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          disabled={selected.length >= MAX_SEEDS}
         />
         {query.trim().length >= 2 && (
           <div className="book-picker-results">
@@ -123,9 +120,6 @@ export default function BookPicker({ onRecommend, initialSelected, initialMode, 
       >
         {submitLabel || 'Get recommendations'}
       </button>
-      {selected.length >= MAX_SEEDS && (
-        <p className="book-picker-max-note">Max {MAX_SEEDS} books — remove one to add another.</p>
-      )}
     </div>
   );
 }
