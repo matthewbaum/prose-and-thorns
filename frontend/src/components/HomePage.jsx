@@ -73,8 +73,8 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
 
       <div className="home-primary-card">
         <p className="quick-search-label">
-          Tell us a few books you already love — we&apos;ll recommend similar ones, ranked by
-          writing quality, not just shared tropes:
+          Tell us a few books you already love — we&apos;ll find similar ones, and you can filter
+          them by quality once you see the matches:
         </p>
         <BookPicker onRecommend={onRecommend} />
       </div>
