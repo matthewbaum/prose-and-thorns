@@ -1,6 +1,11 @@
 .book-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  /* 165px comfortably fits 5 columns in the ~900px browse-page content
+     width (sidebar open, 1280px viewport) — title/author wrap fine at this
+     width since neither is line-clamped; the one thing worth eyeballing
+     after a change here is the bottom stats row (flames + two ratings),
+     the only non-wrapping element on the card. */
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
   gap: 18px;
 }
 
