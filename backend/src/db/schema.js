@@ -190,4 +190,25 @@ CREATE TABLE IF NOT EXISTS audit_findings (
 );
 
 CREATE INDEX IF NOT EXISTS idx_audit_findings_status ON audit_findings(status);
+
+-- A hand-reviewed disposition, kept separate from audit_findings because
+-- that table is fully wiped and rebuilt on every run (see persistFindings
+-- in auditCatalog.js) — a category like "thin-romance-content" that's
+-- been reviewed once and judged not-a-bug needs that verdict to survive
+-- the next 300 re-runs, not get silently reset to "unreviewed" every time
+-- the catalog grows. book_id NULL means the disposition applies to the
+-- whole category (e.g. "thin-romance-content is by design, see shelf
+-- filter"); a specific book_id overrides the category-wide default for
+-- that one row (e.g. "this particular zero-rated match is a confirmed
+-- Google Books dead end, but don't assume every future one is").
+CREATE TABLE IF NOT EXISTS finding_dispositions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  category TEXT NOT NULL,
+  book_id INTEGER REFERENCES books(id),
+  disposition TEXT NOT NULL, -- 'needs-fix' | 'accepted'
+  note TEXT,
+  set_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_finding_dispositions_category ON finding_dispositions(category);
 `;

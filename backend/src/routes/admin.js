@@ -22,12 +22,26 @@ function checkPassword(req, res) {
   return true;
 }
 
+// Dispositions live in a separate table that survives audit_findings being
+// wiped and rebuilt every run (see auditCatalog.js) — a category reviewed
+// once as "not a bug" needs to stay reviewed, not get silently reset to
+// unreviewed on the next `npm run seed`. A finding's disposition prefers a
+// specific-book override over the category-wide default, and falls back
+// to 'needs-fix' when nothing has ever reviewed it.
 function loadFindings() {
   const auditFindings = db
     .prepare(
-      `SELECT id, 'audit' as source, severity, category, message, book_id, status, run_at as created_at
-       FROM audit_findings WHERE status = 'open' ORDER BY
-       CASE severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END, run_at DESC`
+      `SELECT af.id, 'audit' as source, af.severity, af.category, af.message, af.book_id, af.status,
+         af.run_at as created_at,
+         COALESCE(specific.disposition, general.disposition, 'needs-fix') as disposition,
+         COALESCE(specific.note, general.note) as disposition_note
+       FROM audit_findings af
+       LEFT JOIN finding_dispositions specific
+         ON specific.category = af.category AND specific.book_id = af.book_id
+       LEFT JOIN finding_dispositions general
+         ON general.category = af.category AND general.book_id IS NULL
+       WHERE af.status = 'open'
+       ORDER BY CASE af.severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END, af.run_at DESC`
     )
     .all();
 
@@ -52,6 +66,16 @@ function escapeHtml(s) {
 
 const SEVERITY_LABEL = { high: 'High', medium: 'Medium', low: 'Low' };
 
+function findingRow(f) {
+  return `
+    <tr>
+      <td><span class="badge badge-${f.severity}">${SEVERITY_LABEL[f.severity]}</span></td>
+      <td>${escapeHtml(f.category)}</td>
+      <td>${f.book_id ? `#${f.book_id}` : '—'}</td>
+      <td>${escapeHtml(f.message)}</td>
+    </tr>`;
+}
+
 // Raw JSON at /findings only renders readably in browsers with a built-in
 // JSON viewer (Chrome/Firefox) — Safari just dumps it as an unformatted
 // wall of text. This is the same data, rendered as an actual page, so
@@ -61,8 +85,8 @@ router.get('/dashboard', (req, res) => {
   const { auditFindings, reports } = loadFindings();
   const password = escapeHtml(req.query.password || '');
 
-  const bySeverity = { high: [], medium: [], low: [] };
-  for (const f of auditFindings) bySeverity[f.severity]?.push(f);
+  const needsFix = auditFindings.filter((f) => f.disposition === 'needs-fix');
+  const accepted = auditFindings.filter((f) => f.disposition === 'accepted');
 
   const reportRows = reports
     .map(
@@ -77,28 +101,27 @@ router.get('/dashboard', (req, res) => {
     )
     .join('');
 
-  const severitySections = ['high', 'medium', 'low']
-    .map((sev) => {
-      const items = bySeverity[sev];
-      if (items.length === 0) return '';
-      const rows = items
-        .map(
-          (f) => `
-    <tr>
-      <td><span class="badge badge-${sev}">${SEVERITY_LABEL[sev]}</span></td>
-      <td>${escapeHtml(f.category)}</td>
-      <td>${f.book_id ? `#${f.book_id}` : '—'}</td>
-      <td>${escapeHtml(f.message)}</td>
-    </tr>`
-        )
-        .join('');
-      return `
-  <h2>${SEVERITY_LABEL[sev]} (${items.length})</h2>
-  <table>
-    <thead><tr><th>Severity</th><th>Category</th><th>Book</th><th>Message</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
-    })
+  const needsFixRows = needsFix.map(findingRow).join('');
+
+  // Accepted findings are grouped by category with the review note shown
+  // once per group, not repeated per row — the point of this section is
+  // "here's what we already decided and why," a record, not a worklist.
+  const acceptedByCategory = new Map();
+  for (const f of accepted) {
+    if (!acceptedByCategory.has(f.category)) acceptedByCategory.set(f.category, { note: f.disposition_note, items: [] });
+    acceptedByCategory.get(f.category).items.push(f);
+  }
+  const acceptedGroups = [...acceptedByCategory.entries()]
+    .map(
+      ([category, { note, items }]) => `
+    <details>
+      <summary>${escapeHtml(category)} (${items.length})${note ? ` — <span class="note">${escapeHtml(note)}</span>` : ''}</summary>
+      <table>
+        <thead><tr><th>Severity</th><th>Category</th><th>Book</th><th>Message</th></tr></thead>
+        <tbody>${items.map(findingRow).join('')}</tbody>
+      </table>
+    </details>`
+    )
     .join('');
 
   res.send(`<!doctype html>
@@ -111,6 +134,8 @@ router.get('/dashboard', (req, res) => {
   h1 { font-size: 1.4rem; margin: 0 0 4px; }
   .subtitle { color: #9d94b3; font-size: 0.9rem; margin: 0 0 28px; }
   h2 { font-size: 1.05rem; margin: 28px 0 10px; color: #d4b981; }
+  h2.section-needs-fix { color: #f0a3ae; }
+  h2.section-accepted { color: #7d7590; font-size: 0.95rem; margin-top: 40px; }
   table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 8px; }
   th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #2a2438; vertical-align: top; }
   th { color: #9d94b3; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -122,11 +147,15 @@ router.get('/dashboard', (req, res) => {
   .empty { color: #6b6280; font-style: italic; padding: 12px 0; }
   .refresh { color: #9d94b3; font-size: 0.78rem; }
   .refresh a { color: #d4b981; }
+  .accepted-section { margin-top: 8px; opacity: 0.85; }
+  .accepted-section summary { cursor: pointer; color: #9d94b3; font-size: 0.85rem; padding: 8px 0; }
+  .accepted-section .note { color: #6b6280; font-style: italic; }
+  details { border-top: 1px solid #221d2e; }
 </style>
 </head>
 <body>
   <h1>Catalog Findings</h1>
-  <p class="subtitle">${auditFindings.length} open audit finding(s) &middot; ${reports.length} reader report(s) &middot;
+  <p class="subtitle">${needsFix.length} need${needsFix.length === 1 ? 's' : ''} attention &middot; ${accepted.length} reviewed, no action needed &middot; ${reports.length} reader report(s) &middot;
     <span class="refresh"><a href="?password=${password}">refresh</a></span>
   </p>
 
@@ -137,7 +166,17 @@ router.get('/dashboard', (req, res) => {
       : `<table><thead><tr><th>Reported</th><th>Category</th><th>Book</th><th>Message</th><th>Reporter</th></tr></thead><tbody>${reportRows}</tbody></table>`
   }
 
-  ${severitySections || '<p class="empty">No open audit findings.</p>'}
+  <h2 class="section-needs-fix">Needs Attention (${needsFix.length})</h2>
+  ${
+    needsFix.length === 0
+      ? '<p class="empty">Nothing outstanding.</p>'
+      : `<table><thead><tr><th>Severity</th><th>Category</th><th>Book</th><th>Message</th></tr></thead><tbody>${needsFixRows}</tbody></table>`
+  }
+
+  <h2 class="section-accepted">Reviewed — No Action Needed (${accepted.length})</h2>
+  <div class="accepted-section">
+    ${accepted.length === 0 ? '<p class="empty">Nothing reviewed yet.</p>' : acceptedGroups}
+  </div>
 </body>
 </html>`);
 });
