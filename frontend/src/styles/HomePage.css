@@ -213,7 +213,20 @@
 }
 
 .home-primary-card {
-  background: var(--surface);
+  /* position:relative (no z-index needed) is required, not decorative —
+     .home-hero is itself position:relative, which makes its entire
+     subtree a "positioned" paint category that renders in front of any
+     position:static sibling regardless of DOM order. Without this, the
+     rose watermark (inside .home-hero, 900px tall, genuinely overflows
+     down into this card's vertical space) paints ON TOP of this card's
+     background rather than behind it, at whatever the watermark's own
+     opacity happens to be — uncontrolled by anything here.
+     Semi-transparent background (not fully opaque var(--surface)) is
+     deliberate: the rose bleeding through was liked, just wanted less
+     of it than the accidental full-strength version above gave — this
+     is a tunable amount instead of an all-or-nothing stacking quirk. */
+  position: relative;
+  background: rgba(19, 19, 31, 0.6);
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) + 4px);
   max-width: 640px;
