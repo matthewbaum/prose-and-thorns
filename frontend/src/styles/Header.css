@@ -95,7 +95,8 @@
   .header-nav {
     position: static;
     width: 100%;
-    justify-content: center;
+    justify-content: flex-end;
+    padding-right: 4px;
   }
 }
 
