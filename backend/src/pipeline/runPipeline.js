@@ -5,6 +5,7 @@ import { fetchRedditReviews } from './reddit.js';
 import { fetchHardcoverReviews } from './hardcover.js';
 import { tagBook } from './claudeTagging.js';
 import { synthesizeQuality } from './claudeSynthesis.js';
+import { verifySeedTitle } from './seedVerification.js';
 import {
   findOrCreateBook,
   saveGoogleBooksData,
@@ -15,6 +16,7 @@ import {
   getReviewsForBook,
   saveTags,
   saveQualityProfile,
+  saveSeedVerification,
 } from '../db/pipelineRepo.js';
 import { sleep, RATE_LIMIT_DELAY_MS, log } from './util.js';
 import { status, resetStatus, finishStatus } from './status.js';
@@ -34,6 +36,26 @@ export async function processBook(seed) {
   log(`Processing "${seed.title}" by ${seed.author}`);
 
   let book = findOrCreateBook(seed.title, seed.author);
+
+  // Step 1 — verify the seed itself is a real book (never call twice; runs
+  // before Google Books so a hallucinated title gets flagged instead of
+  // silently matching an unrelated real book under a fake identity). A
+  // failure here is logged but never blocks ingestion — a false "doesn't
+  // exist" from this check is a worse outcome than letting a real,
+  // low-web-presence book through with a flag for a human to clear.
+  if (!book.seed_verified_at) {
+    try {
+      const verification = await verifySeedTitle(seed.title, seed.author);
+      saveSeedVerification(book.id, verification);
+      if (!verification.exists || verification.confidence === 'low') {
+        log(`Seed verification flagged "${seed.title}" by ${seed.author}: ${verification.note}`);
+      }
+    } catch (err) {
+      log(`Seed verification failed for "${seed.title}": ${err.message}`);
+      status.errors.push({ title: seed.title, step: 'seed_verification', message: err.message });
+    }
+    await sleep(RATE_LIMIT_DELAY_MS);
+  }
 
   // Step 2 — Google Books (never call twice)
   if (!book.google_books_fetched_at) {

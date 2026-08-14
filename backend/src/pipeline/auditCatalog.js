@@ -288,6 +288,17 @@ function checkFetchIntegrity(books) {
     if (!b.title && !b.author && (b.hardcover_url || b.hardcover_ratings_count != null)) {
       flag('high', 'unverified-hardcover-match', `#${b.id} (seed "${b.seed_title}" by ${b.seed_author}): Google Books never identified this book (title/author null) but Hardcover matched something anyway (${b.hardcover_url || 'no url'}) — this match can't be verified against anything and may belong to an unrelated book.`, b.id);
     }
+    // seedVerification.js runs a live-web-search Claude check once per new
+    // seed, before Google Books — this surfaces whatever it found. exists
+    // === 0 is a strong signal (the seed itself may be fabricated, the
+    // root cause of every case in the 2026-08-14 hallucination sweep);
+    // confidence === 'low' with exists === 1 is weaker (a real but
+    // thin-web-presence title) and stays 'medium' rather than 'high'.
+    if (b.seed_verification_exists === 0) {
+      flag('high', 'seed-not-verified', `#${b.id} (seed "${b.seed_title}" by ${b.seed_author}): seed verification found no evidence this book exists — ${b.seed_verification_note || 'no note'}`, b.id);
+    } else if (b.seed_verification_confidence === 'low') {
+      flag('medium', 'seed-not-verified', `#${b.id} (seed "${b.seed_title}" by ${b.seed_author}): seed verification was low-confidence — ${b.seed_verification_note || 'no note'}`, b.id);
+    }
     if (b.hardcover_ratings_count != null && b.hardcover_ratings_count > 0 && b.hardcover_ratings_count < THIN_REVIEW_COUNT_THRESHOLD) {
       flag('low', 'thin-hardcover-match', `#${b.id} "${b.title}": only ${b.hardcover_ratings_count} Hardcover ratings — verify this matched the right/canonical edition (worth checking for a title-variant mismatch, e.g. diacritics).`, b.id);
     }

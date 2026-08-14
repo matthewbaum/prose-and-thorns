@@ -47,6 +47,20 @@ export function saveGoogleBooksData(bookId, data) {
   updateGoogleBooksData.run({ ...data, id: bookId });
 }
 
+const updateSeedVerification = db.prepare(
+  `UPDATE books SET
+    seed_verified_at = datetime('now'),
+    seed_verification_exists = @exists_flag,
+    seed_verification_confidence = @confidence,
+    seed_verification_note = @note,
+    updated_at = datetime('now')
+  WHERE id = @id`
+);
+
+export function saveSeedVerification(bookId, { exists, confidence, note }) {
+  updateSeedVerification.run({ id: bookId, exists_flag: exists ? 1 : 0, confidence: confidence ?? null, note: note ?? null });
+}
+
 const markGoogleBooksMissingStmt = db.prepare(
   `UPDATE books SET google_books_fetched_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`
 );

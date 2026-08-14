@@ -50,6 +50,19 @@ CREATE TABLE IF NOT EXISTS books (
   tagged_at TEXT,
   quality_synthesized_at TEXT,
 
+  -- Runs once per never-before-seen seed_title/seed_author pair, before the
+  -- Google Books fetch (see seedVerification.js) — a Claude call with live
+  -- web search asking "does this book genuinely exist by this author,"
+  -- the same check that had to be done by hand across 126 authors to find
+  -- 6 hallucinated seed titles that had sat undetected in this catalog.
+  -- seed_verification_exists is nullable tri-state (NULL = not yet
+  -- checked), not boolean-with-a-default, so a not-yet-verified legacy row
+  -- is distinguishable from one that was actually checked and confirmed.
+  seed_verified_at TEXT,
+  seed_verification_exists INTEGER,
+  seed_verification_confidence TEXT, -- 'high' | 'medium' | 'low'
+  seed_verification_note TEXT,
+
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );
