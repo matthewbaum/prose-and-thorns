@@ -151,11 +151,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 2px;
   font-size: 0.8rem;
 }
 
 .flames {
   letter-spacing: 1px;
+  /* Without this, a cramped row (narrow mobile cards) wraps the flame
+     emoji sequence like ordinary text, splitting it mid-icon instead of
+     moving the whole group to its own line via .book-stats's flex-wrap. */
+  white-space: nowrap;
 }
 
 .flames-clean {
