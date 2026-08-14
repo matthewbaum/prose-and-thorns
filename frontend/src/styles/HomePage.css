@@ -1,5 +1,21 @@
 .home-hero {
   position: relative;
+  /* z-index:0 (not just position:relative) is required for the
+     rose-watermark-bleeds-into-.home-primary-card effect to render
+     reliably cross-browser. position:relative alone does NOT establish
+     a new stacking context — so without an explicit z-index here, the
+     paint order of the rose watermark (a descendant) versus
+     .home-primary-card (a separate sibling) falls back to CSS's
+     implicit "positioned vs non-positioned" category rules, which
+     produced inconsistent results across browser engines (confirmed:
+     looked right in this session's Chromium-based browser tool, showed
+     as the card fully opaque — rose invisible — in real-device Safari).
+     An explicit z-index here plus z-index:1 on .home-primary-card
+     makes both elements establish their own real stacking contexts, so
+     the comparison is a simple, unambiguous z-index one instead of
+     depending on default category rules that engines apparently don't
+     all resolve identically for this shape of markup. */
+  z-index: 0;
   display: grid;
   /* Text column is capped, not 1fr, for the same reason as the art column
      below: an unbounded track balloons past its content's real width.
@@ -232,19 +248,23 @@
 }
 
 .home-primary-card {
-  /* position:relative (no z-index needed) is required, not decorative —
-     .home-hero is itself position:relative, which makes its entire
-     subtree a "positioned" paint category that renders in front of any
-     position:static sibling regardless of DOM order. Without this, the
-     rose watermark (inside .home-hero, 900px tall, genuinely overflows
-     down into this card's vertical space) paints ON TOP of this card's
-     background rather than behind it, at whatever the watermark's own
-     opacity happens to be — uncontrolled by anything here.
-     Semi-transparent background (not fully opaque var(--surface)) is
-     deliberate: the rose bleeding through was liked, just wanted less
-     of it than the accidental full-strength version above gave — this
-     is a tunable amount instead of an all-or-nothing stacking quirk. */
+  /* position:relative + explicit z-index:1 (matching .home-hero's
+     z-index:0) is required, not decorative. First attempt used
+     position:relative alone, relying on the default "positioned vs
+     non-positioned" paint-order category rules — rendered correctly in
+     this session's Chromium-based browser tool, but on real-device
+     Safari the card showed fully opaque (rose invisible behind it),
+     meaning that engine resolved the implicit category comparison
+     differently for this shape of markup. Explicit z-index values on
+     both sides make both elements establish real stacking contexts, so
+     the comparison is a plain z-index one — unambiguous, not
+     engine-dependent. Semi-transparent background (not fully opaque
+     var(--surface)) is deliberate: the rose bleeding through was
+     liked, just wanted less of it than an early accidental
+     full-strength version gave — a tunable amount, not an
+     all-or-nothing stacking quirk. */
   position: relative;
+  z-index: 1;
   background: rgba(19, 19, 31, 0.6);
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) + 4px);
