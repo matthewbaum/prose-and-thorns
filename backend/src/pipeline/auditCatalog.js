@@ -274,6 +274,48 @@ function checkFetchIntegrity(books) {
   }
 }
 
+// Verified case: book #282's cover_url returned HTTP 200 and looked
+// completely normal, but was a 9103-byte "no cover available" graphic, not
+// real art — no-cover-art (above) only catches a null URL, which this one
+// wasn't. A follow-up catalog-wide scan found 44 more books doing the same
+// thing. Small-file-size is a cheap, real signal for the common case, but
+// isn't complete on its own — a manual fix pass on those 44 also turned up
+// a 246KB blank template graphic that this size check alone would miss, so
+// this stays a "verify manually" flag, never an auto-fix.
+const COVER_SIZE_THRESHOLD_BYTES = 15000;
+const COVER_CHECK_CONCURRENCY = 8;
+
+async function fetchCoverSize(url) {
+  try {
+    const res = await fetch(url, { method: 'HEAD' });
+    if (!res.ok) return null;
+    const len = res.headers.get('content-length');
+    return len ? Number(len) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function checkCoverImageIntegrity(books) {
+  const candidates = books.filter((b) => b.cover_url);
+  let cursor = 0;
+  async function worker() {
+    while (cursor < candidates.length) {
+      const b = candidates[cursor++];
+      const size = await fetchCoverSize(b.cover_url);
+      if (size != null && size < COVER_SIZE_THRESHOLD_BYTES) {
+        flag(
+          'low',
+          'placeholder-cover-suspected',
+          `#${b.id} "${b.title}": cover_url returns only ${size} bytes — likely a placeholder graphic, not real cover art. Verify visually before replacing (a wrong cover is worse than a missing one).`,
+          b.id
+        );
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: COVER_CHECK_CONCURRENCY }, worker));
+}
+
 function checkDuplicateTitles(books) {
   const byTitle = new Map();
   for (const b of books) {
@@ -436,7 +478,7 @@ function persistFindings() {
   insertMany();
 }
 
-export function runAudit() {
+export async function runAudit() {
   checkTaxonomyDrift();
   const books = db.prepare('SELECT * FROM books').all();
   checkPerRowTaxonomyValidity(books);
@@ -448,6 +490,7 @@ export function runAudit() {
   checkMissingSynthesis(books);
   checkQuoteGrounding(books);
   checkPraiseGrounding(books);
+  await checkCoverImageIntegrity(books);
   persistFindings();
   printReport();
 }

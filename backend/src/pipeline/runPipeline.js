@@ -168,7 +168,7 @@ export async function runPipeline() {
   log(`Pipeline finished. ${status.total - status.errors.length}/${status.total} processed cleanly.`);
 
   log('Running catalog audit...');
-  runAudit();
+  await runAudit();
 
   // WAL mode means writes from this whole run sit in prose-and-thorns.sqlite-wal
   // until checkpointed — .gitignore excludes that file as transient, so a
