@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 105 / 126 authors checked
+## Status: 116 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -264,18 +264,30 @@ All 2-entry authors now checked. Remaining: 55 single-entry authors.
 - [x] Katherine Addison (1) "The Goblin Emperor" — confirmed real.
       Clean.
 
+- [x] Kate Golden (1) "A Dawn of Onyx" — confirmed real. Clean.
+- [x] Justinian Huang (1) "The Emperor and the Endless Palace" —
+      confirmed real. Clean.
+- [x] Juliet Marillier (1) "Daughter of the Forest" — confirmed real
+      (Sevenwaters #1). Clean.
+- [x] Jennifer Estep (1) "Kill the Queen" — confirmed real (Crown of
+      Shards #1). Clean.
+- [x] India Holton (1) "The Wisteria Society of Lady Scoundrels" —
+      confirmed real. Clean.
+- [x] Ilona Andrews (1) "Magic Bites" — confirmed real (Kate Daniels
+      #1). Clean.
+- [x] Grace Draven (1) "Radiance" — confirmed real (Wraith Kings #1).
+      Clean.
+- [x] Gena Showalter (1) "The Darkest Night" — confirmed real (Lords
+      of the Underworld #1). Clean.
+- [x] Erin A. Craig (1) "House of Salt and Sorrows" — confirmed real.
+      Clean.
+- [x] Emily Thiede (1) "This Cursed Light" — confirmed real (Last
+      Finestra #2; matches the fetch-integrity bug referenced elsewhere
+      in this codebase's history, but the title itself is genuine).
+      Clean.
+- [x] E.V. Mitchell (1) "Savage Bonds" — confirmed real. Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Kate Golden (1)
-- [ ] Justinian Huang (1)
-- [ ] Juliet Marillier (1)
-- [ ] Jennifer Estep (1)
-- [ ] India Holton (1)
-- [ ] Ilona Andrews (1)
-- [ ] Grace Draven (1)
-- [ ] Gena Showalter (1)
-- [ ] Erin A. Craig (1)
-- [ ] Emily Thiede (1)
-- [ ] E.V. Mitchell (1)
 - [ ] Donyae Coles (1)
 - [ ] Diana Wynne Jones (1)
 - [ ] Courtney Gould (1)
