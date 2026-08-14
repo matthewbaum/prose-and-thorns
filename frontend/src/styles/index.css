@@ -50,6 +50,12 @@ body {
      case for a future overflow bug becomes "something is invisibly
      clipped," not "the whole page can be dragged into a broken state." */
   overflow-x: hidden;
+  /* overflow-x:hidden stops the page from actually scrolling sideways,
+     but iOS Safari's rubber-band gesture is a separate native layer that
+     doesn't always fully respect it — reported as content "moving back
+     and forth" when dragged, i.e. bounce-and-spring-back rather than a
+     real scroll. This is the direct way to kill that gesture. */
+  overscroll-behavior-x: none;
 }
 
 body {

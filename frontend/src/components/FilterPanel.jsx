@@ -122,6 +122,16 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
           onToggle={(value) => onChange({ darkness_level: toggleValue(filters.darkness_level, value) })}
         />
 
+        <CheckboxFilterSection
+          title="Content Warnings — Exclude"
+          defaultOpen={false}
+          options={CONTENT_WARNINGS}
+          selected={filters.exclude_warnings}
+          onToggle={(value) =>
+            onChange({ exclude_warnings: toggleValue(filters.exclude_warnings, value) })
+          }
+        />
+
         <CollapsibleSection
           title="Minimum Quality Score"
           defaultOpen={false}
@@ -154,16 +164,6 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
             })}
           </div>
         </CollapsibleSection>
-
-        <CheckboxFilterSection
-          title="Content Warnings — Exclude"
-          defaultOpen={false}
-          options={CONTENT_WARNINGS}
-          selected={filters.exclude_warnings}
-          onToggle={(value) =>
-            onChange({ exclude_warnings: toggleValue(filters.exclude_warnings, value) })
-          }
-        />
 
       </aside>
     </>
