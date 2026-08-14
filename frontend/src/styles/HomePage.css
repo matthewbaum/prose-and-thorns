@@ -201,14 +201,27 @@
     transform-origin: top left;
   }
   .home-hero-rose-watermark {
-    /* Cut on mobile rather than rescaled — the covers cluster alone
-       already fills the available width tightly at this size; adding a
-       second large absolutely-positioned layer on top of it is exactly
-       the kind of interaction that produced the mobile clipping bugs
-       fixed earlier, and the payoff (ambient texture in leftover
-       desktop whitespace) doesn't exist on a screen with no leftover
-       whitespace to fill. */
-    display: none;
+    /* Below the covers, not layered behind/over them — mobile has no
+       leftover whitespace mid-composition the way desktop does, so
+       "behind" isn't meaningful here; "below, as its own element" is a
+       different, simpler placement. Taken out of absolute positioning
+       entirely (position:static) so it becomes a normal grid row instead
+       of needing a hand-measured pixel offset; order:1 (copy/covers stay
+       at default order:0) places it after both regardless of DOM order.
+       margin-top is negative to cancel out dead space, not decorative:
+       .home-hero-covers keeps its full 480px pre-scale layout height
+       (required for its own overflow:hidden clipping, see above) even
+       though scale(0.7) paints it at only ~336px visually — without this
+       correction the rose would sit ~144px below the covers' visible
+       bottom edge, floating in blank space. */
+    position: static;
+    order: 1;
+    display: block;
+    width: 82%;
+    max-width: 340px;
+    height: auto;
+    margin: -210px auto 0;
+    opacity: 0.16;
   }
 }
 
