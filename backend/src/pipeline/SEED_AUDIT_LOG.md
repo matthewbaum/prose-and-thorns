@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 43 / 126 authors checked
+## Status: 48 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -163,12 +163,17 @@ checked regardless of what a batch comment claims.
 - [x] Freya Marske (3) — confirmed real (The Last Binding trilogy).
       Clean.
 
+- [x] Cassandra Clare (3) — confirmed real (Mortal Instruments #1-3).
+      Clean.
+- [x] Andrea Stewart (3) — confirmed real (Drowning Empire trilogy).
+      Clean.
+- [x] Amanda Foody (3) — confirmed real (Shadow Game trilogy). Clean.
+- [x] Alex Aster (3) — confirmed real (Lightlark series). Clean.
+- [x] Adalyn Grace (3) — confirmed real (Belladonna trilogy). Clean.
+
+All 3-entry authors now checked.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Cassandra Clare (3)
-- [ ] Andrea Stewart (3)
-- [ ] Amanda Foody (3)
-- [ ] Alex Aster (3)
-- [ ] Adalyn Grace (3)
 - [ ] Victoria Aveyard (2)
 - [ ] Tracy Deonn (2)
 - [ ] Tomi Adeyemi (2)
