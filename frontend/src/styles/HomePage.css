@@ -1,17 +1,25 @@
 .home-hero {
   position: relative;
   display: grid;
-  /* Text column is capped, not 1fr — verified case: on a wide viewport,
-     1fr let the text column balloon far past its actual content width
-     (the copy itself wraps at ~46ch), leaving a large empty gap between
-     the text and the fixed-width art column sitting at the far right of
-     that oversized column. Capping it pulls the art back in next to the
-     text instead. Still no outer max-width/centering on the hero itself,
-     so the left edge stays flush with the header/shelves above and below. */
-  grid-template-columns: minmax(0, 720px) 460px;
+  /* Text column is capped, not 1fr, for the same reason as the art column
+     below: an unbounded track balloons past its content's real width.
+     Verified case: at 1920px, the old fixed-460px art column plus capped
+     text column left a 626px dead void on the right of the hero (nothing
+     upstream of this element constrains its width) — invisible at the
+     ~1280px viewport this was originally built and tested at, glaring on
+     a wider screen. max-width + margin:auto below caps the whole hero
+     instead of letting it stretch to fill an arbitrarily wide viewport. */
+  /* Second column is a fixed value, not minmax(520px, 600px) — verified
+     case: grid's track-growing step filled that column to its max before
+     the first (text) column got anywhere near its own 720px cap, squeezing
+     the heading to a 3rd line at ~1280px. A fixed value is deterministic
+     regardless of how grid chooses to distribute extra space. */
+  grid-template-columns: minmax(0, 720px) 520px;
   gap: 48px;
   align-items: center;
   padding: 20px 0 56px;
+  max-width: 1500px;
+  margin: 0 auto;
 }
 
 .home-hero-atmosphere {
@@ -79,11 +87,14 @@
 .home-hero-covers {
   position: relative;
   z-index: 1;
-  /* Two staggered rows of three (6 covers total) rather than 4 larger
-     ones — fills the wider column with more real catalog variety instead
-     of blowing up the same books. Tall enough to contain the deepest
-     cover (c5, bottom edge ~465px) plus its badge and clearance before
-     the primary card below. */
+  /* Two staggered rows of four (8 covers, was 6 in 2 rows of 3) — packed
+     with tighter overlap than a naive 4-across layout would need, so the
+     art column only grows modestly (460px -> ~520-600px) instead of
+     demanding ~650px+, which was squeezing the text column enough to
+     push the heading onto an extra, awkwardly-broken third line at
+     common (~1280px) viewport widths. Denser overlap reads as a fuller
+     "deck," not just a wider one. Tall enough for the deepest cover
+     (c6, bottom edge ~228+225=453px) plus badge and clearance. */
   height: 480px;
 }
 
@@ -112,11 +123,33 @@
 }
 
 .home-hero-cover.c1 { top: 0px;   left: 0px;   transform: rotate(-6deg); z-index: 1; }
-.home-hero-cover.c2 { top: 25px;  left: 140px; transform: rotate(3deg);  z-index: 2; }
-.home-hero-cover.c3 { top: 0px;   left: 280px; transform: rotate(-4deg); z-index: 1; }
-.home-hero-cover.c4 { top: 205px; left: 30px;  transform: rotate(5deg);  z-index: 3; }
-.home-hero-cover.c5 { top: 230px; left: 170px; transform: rotate(-3deg); z-index: 4; }
-.home-hero-cover.c6 { top: 200px; left: 305px; transform: rotate(6deg);  z-index: 3; }
+.home-hero-cover.c2 { top: 22px;  left: 108px; transform: rotate(3deg);  z-index: 2; }
+.home-hero-cover.c3 { top: 0px;   left: 216px; transform: rotate(-4deg); z-index: 1; }
+.home-hero-cover.c4 { top: 20px;  left: 324px; transform: rotate(5deg);  z-index: 2; }
+.home-hero-cover.c5 { top: 210px; left: 20px;  transform: rotate(4deg);  z-index: 4; }
+.home-hero-cover.c6 { top: 228px; left: 128px; transform: rotate(-3deg); z-index: 5; }
+.home-hero-cover.c7 { top: 205px; left: 236px; transform: rotate(6deg);  z-index: 4; }
+.home-hero-cover.c8 { top: 222px; left: 344px; transform: rotate(-5deg); z-index: 3; }
+
+/* Reuses the header's rose-logo.svg mark (linework, not a filled shape,
+   so it holds up fine scaled way up and faded way down) as ambient
+   texture filling the negative space the wider cover cluster still
+   leaves around it — ties back to the actual brand mark instead of
+   generic fantasy iconography (a dragon/couple silhouette would only
+   speak to one of thirteen subgenres this catalog covers). Sits behind
+   the covers (z-index 0, same layer as the atmosphere glow) and is
+   deliberately barely-there: a shape to notice, not read. */
+.home-hero-rose-watermark {
+  position: absolute;
+  top: -80px;
+  right: -60px;
+  width: 620px;
+  height: 620px;
+  z-index: 0;
+  opacity: 0.05;
+  pointer-events: none;
+  filter: brightness(0) invert(1);
+}
 
 .home-hero-cover-badge {
   position: absolute;
@@ -148,23 +181,31 @@
     /* overflow:hidden clips against this box's PRE-transform layout size,
        not its post-scale visual size — scale() is paint-time only, it
        doesn't shrink what overflow:hidden treats as "inside the box."
-       Previous attempt set max-width to the desired ~330px *visual*
-       result and got clipped hard, because the actual content (c1-c6
-       spanning left:0 to 305+150=455px, height to c5's 230+~225=455px)
-       needs that much real layout room before the scale shrinks it down.
-       500px/500px comfortably contains the full pre-scale composition;
-       scale(0.72) then paints it at ~360px, and the global overflow-x:hidden
-       on body (see index.css) is what actually keeps this from widening
-       the page, not this element's own sizing. Explicit width (not 100%)
-       so max-width doesn't get capped down by a narrower parent before
-       the transform ever applies. */
-    max-width: 500px;
-    width: 500px;
-    height: 500px;
+       Recomputed for the 8-cover, tighter-overlap cluster (was 6):
+       content now spans left:0 to 344+150=494px, top:0 to 228+~225=453px,
+       so the box needs to be at least that big pre-scale. 520px/480px
+       comfortably contains it; scale(0.7) then paints it at ~364x336,
+       close to the old 6-cover version's ~360x360 visual size. Explicit
+       width (not 100%), same reasoning as before: max-width alone can
+       get capped down by a narrower parent before the transform ever
+       applies. */
+    max-width: 520px;
+    width: 520px;
+    height: 480px;
     margin: 0 auto;
     overflow: hidden;
-    transform: scale(0.72);
+    transform: scale(0.7);
     transform-origin: top left;
+  }
+  .home-hero-rose-watermark {
+    /* Cut on mobile rather than rescaled — the covers cluster alone
+       already fills the available width tightly at this size; adding a
+       second large absolutely-positioned layer on top of it is exactly
+       the kind of interaction that produced the mobile clipping bugs
+       fixed earlier, and the payoff (ambient texture in leftover
+       desktop whitespace) doesn't exist on a screen with no leftover
+       whitespace to fill. */
+    display: none;
   }
 }
 

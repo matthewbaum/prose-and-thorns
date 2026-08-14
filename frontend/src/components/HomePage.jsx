@@ -28,14 +28,16 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
   // weight instead of a wall of text/inputs — reuses the same "Highest
   // quality scores" shelf that's also rendered in full further down (not a
   // separate fetch), since a book worth putting in the cluster is also
-  // worth being in that shelf. Six, not four — more real catalog variety
-  // rather than blowing up the same handful of covers.
-  const heroCovers = (shelves[0]?.books || []).slice(0, 6);
+  // worth being in that shelf. Eight, not four — more real catalog variety
+  // rather than blowing up the same handful of covers. (Was six; widened
+  // to eight alongside the hero's wider art column — see HomePage.css.)
+  const heroCovers = (shelves[0]?.books || []).slice(0, 8);
 
   return (
     <div className="home-page">
       <div className="home-hero">
         <div className="home-hero-atmosphere" aria-hidden="true" />
+        <img className="home-hero-rose-watermark" src="/rose-logo.svg" alt="" aria-hidden="true" />
         <div className="home-hero-copy">
           <p className="home-hero-eyebrow">Six dimensions scored &middot; real reader reviews</p>
           <h1 className="home-hero-title">
