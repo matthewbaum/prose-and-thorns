@@ -139,21 +139,23 @@
   .home-hero-copy { text-align: center; }
   .home-hero-text { margin-left: auto; margin-right: auto; }
   .home-hero-covers {
-    /* c1-c6 (below) span left:0 to left:305+150=455px intrinsically.
-       transform-origin:top CENTER (the previous value) scales asymmetrically
-       around the box's own midpoint, not around the content's actual
-       bounding box — a 336px box under that origin still clipped ~38px off
-       the right edge (verified: right-most point lands at 0.28*(W/2) +
-       327.6, which only equals W at W≈381px, not the 328px the naive
-       "scale the span" math suggested). Switching to top LEFT makes this
-       exact: content scales flush from x:0, so post-scale(0.72) it spans
-       precisely 0 to 455*0.72=327.6px — no center-offset math needed.
-       330px contains that with a couple px to spare; overflow:hidden stays
-       as a hard backstop. */
-    max-width: 330px;
-    height: 340px;
+    /* overflow:hidden clips against this box's PRE-transform layout size,
+       not its post-scale visual size — scale() is paint-time only, it
+       doesn't shrink what overflow:hidden treats as "inside the box."
+       Previous attempt set max-width to the desired ~330px *visual*
+       result and got clipped hard, because the actual content (c1-c6
+       spanning left:0 to 305+150=455px, height to c5's 230+~225=455px)
+       needs that much real layout room before the scale shrinks it down.
+       500px/500px comfortably contains the full pre-scale composition;
+       scale(0.72) then paints it at ~360px, and the global overflow-x:hidden
+       on body (see index.css) is what actually keeps this from widening
+       the page, not this element's own sizing. Explicit width (not 100%)
+       so max-width doesn't get capped down by a narrower parent before
+       the transform ever applies. */
+    max-width: 500px;
+    width: 500px;
+    height: 500px;
     margin: 0 auto;
-    width: 100%;
     overflow: hidden;
     transform: scale(0.72);
     transform-origin: top left;
