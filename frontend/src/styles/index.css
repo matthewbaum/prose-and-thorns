@@ -39,6 +39,17 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   min-height: 100vh;
+  /* Hard backstop: without this, any single oversized element (verified
+     case: the home hero's absolutely-positioned book covers exceeding
+     their mobile container) makes the *entire page* horizontally
+     draggable. Since view changes in this SPA don't reload the page, a
+     scroll position picked up on one screen carries into whatever view
+     loads next — the actual mechanism behind "the results page/detail
+     panel is cut off too" reports on pages with no overflow issue of
+     their own. This makes that carryover structurally impossible: worst
+     case for a future overflow bug becomes "something is invisibly
+     clipped," not "the whole page can be dragged into a broken state." */
+  overflow-x: hidden;
 }
 
 body {

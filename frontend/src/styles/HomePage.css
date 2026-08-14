@@ -139,10 +139,19 @@
   .home-hero-copy { text-align: center; }
   .home-hero-text { margin-left: auto; margin-right: auto; }
   .home-hero-covers {
-    max-width: 320px;
+    /* c1-c6 (below) are hardcoded pixel positions spanning left:0 to
+       left:305+150=455px intrinsically. At scale(0.72) that's ~328px —
+       already wider than the old 320px box, with no overflow:hidden to
+       clip it, so the rightmost cover bled past the edge into the page
+       (confirmed: reported as page content, not a zoom artifact, since
+       Chrome's own address bar rendered normally in the screenshot).
+       336px comfortably contains the scaled footprint; overflow:hidden is
+       a hard backstop so this can't silently escape the box again. */
+    max-width: 336px;
     height: 340px;
     margin: 0 auto;
     width: 100%;
+    overflow: hidden;
     transform: scale(0.72);
     transform-origin: top center;
   }

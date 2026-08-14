@@ -106,20 +106,41 @@
   left: 20px;
   bottom: 24px;
   flex-direction: column;
-  gap: 5px;
+  gap: 7px;
   background: transparent;
   border: none;
   cursor: pointer;
   padding: 8px;
 }
 
+/* Three equal bars read as a hamburger — identical in shape to SiteMenu's
+   own icon on the opposite corner, which does something different (site
+   nav vs. this button's filter drawer). Sliders-with-a-handle is the
+   standard "filter" icon (Spotify, Airbnb, etc.) precisely because it
+   doesn't collide with "menu." */
 .sidebar-toggle span {
+  position: relative;
   width: 22px;
   height: 2px;
-  background: var(--text);
+  background: var(--border);
   display: block;
   border-radius: 2px;
 }
+
+.sidebar-toggle span::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text);
+  transform: translate(-50%, -50%);
+}
+
+.sidebar-toggle span:nth-child(1)::after { left: 30%; }
+.sidebar-toggle span:nth-child(2)::after { left: 70%; }
+.sidebar-toggle span:nth-child(3)::after { left: 45%; }
 
 @media (max-width: 900px) {
   .sidebar-toggle {
