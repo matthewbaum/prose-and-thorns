@@ -153,6 +153,7 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
           options={DARKNESS_LEVELS}
           selected={filters.darkness_level}
           onToggle={(value) => onChange({ darkness_level: toggleValue(filters.darkness_level, value) })}
+          description="How intense the content is (violence, trauma, tone) — separate from genre labels like “Dark Fantasy” or “Dark Romance” above."
         />
 
         <CheckboxFilterSection

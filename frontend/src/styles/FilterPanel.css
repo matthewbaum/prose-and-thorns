@@ -135,6 +135,14 @@
   font-weight: 600;
 }
 
+.filter-section-description {
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
 .filter-done-btn {
   margin-top: 12px;
   background: var(--accent-soft);

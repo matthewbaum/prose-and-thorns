@@ -7,6 +7,7 @@ export default function CheckboxFilterSection({
   selected,
   onToggle,
   defaultOpen = true,
+  description,
 }) {
   const [committed, setCommitted] = useState(selected.length > 0);
   const prevCount = useRef(selected.length);
@@ -45,6 +46,7 @@ export default function CheckboxFilterSection({
         </div>
       ) : (
         <>
+          {description && <p className="filter-section-description">{description}</p>}
           <div className="checkbox-list">
             {options.map((opt) => (
               <label key={opt.value} className="checkbox-item">
