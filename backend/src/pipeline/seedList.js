@@ -182,7 +182,15 @@ export const SEED_BOOKS = [
   { title: 'The Iron Queen', author: 'Julie Kagawa' },
   { title: 'The Iron Knight', author: 'Julie Kagawa' },
   { title: 'The Merciless Ones', author: 'Namina Forna' },
-  { title: 'The Fallen Ones', author: 'Namina Forna' },
+  // "The Fallen Ones" removed 2026-08-14 — the real book 3 of the Gilded
+  // Ones trilogy is "The Eternal Ones" (confirmed via web search). This
+  // seed's Google Books fetch correctly found nothing (title/author never
+  // got set), but Hardcover's fuzzy match landed on "The Gilded Ones"
+  // itself (book 1, already correctly catalogued as id 161) — pulling
+  // its 29 reviews and a full quality-profile synthesis under this fake
+  // title. A distinct failure class from the Peckham/Jensen cases: no
+  // existing audit check catches "Hardcover matched despite title/author
+  // both being null" (title-mismatch needs a non-null title to compare).
   { title: 'A Torch Against the Night', author: 'Sabaa Tahir' },
   { title: 'A Reaper at the Gates', author: 'Sabaa Tahir' },
   { title: 'A Sky Beyond the Storm', author: 'Sabaa Tahir' },

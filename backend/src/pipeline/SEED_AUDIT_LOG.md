@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 31 / 126 authors checked
+## Status: 37 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -112,12 +112,39 @@ checked regardless of what a batch comment claims.
 - [x] Rachel Gillig (3) — confirmed real (Shepherd King duology +
       Stonewater Kingdom #1). Clean.
 
+- [x] Olivie Blake (3) — confirmed real (Atlas trilogy). Clean.
+- [x] Namina Forna (3) — 2/3 confirmed real (The Gilded Ones, The
+      Merciless Ones). **1 FIXED**: "The Fallen Ones" was not the real
+      book 3 — the actual title is "The Eternal Ones." Google Books
+      correctly found nothing, but Hardcover's fuzzy match landed on
+      "The Gilded Ones" itself (already separately catalogued as id 161)
+      and pulled its 29 reviews + a full quality-profile synthesis under
+      this fake title. Removed (book id 274).
+      **New systemic check added**: `unverified-hardcover-match` in
+      auditCatalog.js flags any row where Google Books never identified
+      a title/author but Hardcover matched something anyway — that match
+      is inherently unverifiable. Ran a one-off scan of the whole catalog
+      for this exact pattern (title+author both null, hardcover_url or
+      hardcover_ratings_count set) — found 4 more rows: The Iron Daughter
+      (Kagawa), The Primal of Blood and Bone (Armentrout), Our Violent
+      Ends (Gong), The Spear Cuts Through Water (Jimenez) — all 4
+      manually confirmed as legitimate title matches (just a Google Books
+      fetch gap, not wrong content), left as-is. A 5th, **The Throne of
+      Bone and Ash (Armentrout, id 300), was wrongly duplicating "The
+      Primal of Blood and Bone"'s exact rating/reviews/quality-profile**
+      (same hardcover_url) — real, upcoming (2026) book, not yet
+      populated in Hardcover, so the fuzzy matcher fell back to its
+      sibling. Stripped the borrowed hardcover_url/rating/reviews/
+      quality_profile back to null (kept the row — it's a real book,
+      just not yet reviewable) so a future pipeline run can re-attempt
+      the fetch once Hardcover actually has it.
+- [x] Katherine Arden (3) — confirmed real (Winternight trilogy). Clean.
+- [x] Joe Abercrombie (3) — confirmed real (Age of Madness trilogy).
+      Clean.
+- [x] Jay Kristoff (3) — confirmed real (Nevernight Chronicle trilogy).
+      Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Olivie Blake (3)
-- [ ] Namina Forna (3)
-- [ ] Katherine Arden (3)
-- [ ] Joe Abercrombie (3)
-- [ ] Jay Kristoff (3)
 - [ ] Holly Black (3)
 - [ ] Heather Fawcett (3)
 - [ ] Hannah Nicole Maehrer (3)
@@ -214,4 +241,8 @@ checked regardless of what a batch comment claims.
 (append here as authors are checked and fixes applied, with commit hash)
 
 - Caroline Peckham cluster — commits a17da5e, 18760fe, 2dd3b0e (2026-08-14)
-- Danielle L. Jensen "The Inevitable Fall" (book id 267) — commit pending (2026-08-14)
+- Danielle L. Jensen "The Inevitable Fall" (book id 267) — commit 623f86a (2026-08-14)
+- Namina Forna "The Fallen Ones" (book id 274, wrong Gilded Ones content)
+  + Armentrout "The Throne of Bone and Ash" (id 300, borrowed sibling
+  data stripped) + new unverified-hardcover-match audit check — commit
+  pending (2026-08-14)

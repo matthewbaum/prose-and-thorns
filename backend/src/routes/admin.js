@@ -39,7 +39,7 @@ function checkPassword(req, res) {
 // can make one of these stop showing up as needing attention. The only way
 // off this list is fixing (or removing) the underlying row, which deletes
 // the finding itself on the next audit run.
-const NEVER_DISMISSIBLE_CATEGORIES = ['author-mismatch', 'title-mismatch', 'wrong-product-title', 'duplicate-title'];
+const NEVER_DISMISSIBLE_CATEGORIES = ['author-mismatch', 'title-mismatch', 'wrong-product-title', 'duplicate-title', 'unverified-hardcover-match'];
 
 function loadFindings() {
   const auditFindings = db

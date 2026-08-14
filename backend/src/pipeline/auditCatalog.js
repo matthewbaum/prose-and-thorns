@@ -273,6 +273,21 @@ function checkFetchIntegrity(books) {
         flag('high', 'title-mismatch', `#${b.id}: matched title "${b.title}" shares no word with seed_title "${b.seed_title}" — likely matched an unrelated book entirely.`, b.id);
       }
     }
+    // Verified case: #274 ("The Fallen Ones," a seed title that turned out
+    // not to exist — the real book was "The Eternal Ones") had title/author
+    // both null (Google Books correctly found nothing), but Hardcover's
+    // fuzzy matcher still landed on an unrelated real book ("The Gilded
+    // Ones," book 1 of the same series, already separately catalogued) and
+    // pulled its full review set + quality-profile synthesis under this
+    // row's fake identity. Neither author-mismatch nor title-mismatch
+    // (above) can catch this — both require a non-null title/author to
+    // compare against. This is a distinct, cheaper signal: any Hardcover
+    // match at all on a row Google Books never identified is inherently
+    // unverifiable (nothing to check the match against) and should be
+    // flagged regardless of what it matched.
+    if (!b.title && !b.author && (b.hardcover_url || b.hardcover_ratings_count != null)) {
+      flag('high', 'unverified-hardcover-match', `#${b.id} (seed "${b.seed_title}" by ${b.seed_author}): Google Books never identified this book (title/author null) but Hardcover matched something anyway (${b.hardcover_url || 'no url'}) — this match can't be verified against anything and may belong to an unrelated book.`, b.id);
+    }
     if (b.hardcover_ratings_count != null && b.hardcover_ratings_count > 0 && b.hardcover_ratings_count < THIN_REVIEW_COUNT_THRESHOLD) {
       flag('low', 'thin-hardcover-match', `#${b.id} "${b.title}": only ${b.hardcover_ratings_count} Hardcover ratings — verify this matched the right/canonical edition (worth checking for a title-variant mismatch, e.g. diacritics).`, b.id);
     }
