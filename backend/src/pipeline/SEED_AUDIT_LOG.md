@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 25 / 126 authors checked
+## Status: 31 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -100,13 +100,19 @@ checked regardless of what a batch comment claims.
 - [x] Hannah Whitten (4) — confirmed real (Nightshade Crown trilogy +
       Wilderwood duology). Clean.
 
+- [x] Travis Baldree (3) — confirmed real (Legends & Lattes series #1-3).
+      Clean.
+- [x] Tracy Wolff (3) — confirmed real (Crave series). Clean.
+- [x] Shelby Mahurin (3) — confirmed real (Serpent & Dove trilogy).
+      Clean.
+- [x] Rosaria Munda (3) — confirmed real (Aurelian Cycle trilogy).
+      Clean.
+- [x] Rebecca Yarros (3) — confirmed real (Empyrean series #1-3).
+      Clean.
+- [x] Rachel Gillig (3) — confirmed real (Shepherd King duology +
+      Stonewater Kingdom #1). Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Travis Baldree (3)
-- [ ] Tracy Wolff (3)
-- [ ] Shelby Mahurin (3)
-- [ ] Rosaria Munda (3)
-- [ ] Rebecca Yarros (3)
-- [ ] Rachel Gillig (3)
 - [ ] Olivie Blake (3)
 - [ ] Namina Forna (3)
 - [ ] Katherine Arden (3)
