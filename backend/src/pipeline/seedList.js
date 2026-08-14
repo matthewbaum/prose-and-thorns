@@ -210,7 +210,6 @@ export const SEED_BOOKS = [
   { title: 'Cursed Fates', author: 'Caroline Peckham' },
   { title: 'Reckless Oaths', author: 'Caroline Peckham' },
   { title: 'Vicious Circle', author: 'Caroline Peckham' },
-  { title: 'Fatal Truths', author: 'Caroline Peckham' },
   { title: 'Heartless Sky', author: 'Caroline Peckham' },
   { title: 'Golden Curse', author: 'Caroline Peckham' },
   { title: 'The Golden Enclaves', author: 'Naomi Novik' },
