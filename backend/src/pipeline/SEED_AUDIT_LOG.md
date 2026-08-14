@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 85 / 126 authors checked
+## Status: 95 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -234,17 +234,24 @@ All 2-entry authors now checked. Remaining: 55 single-entry authors.
 - [x] Raven Kennedy (1) "Gild" — confirmed real (Plated Prisoner
       series). Clean.
 
+- [x] Penn Cole (1) "Spark of the Everflame" — confirmed real. Clean.
+- [x] Patrick Rothfuss (1) "The Name of the Wind" — unambiguous, not
+      individually re-searched. Clean.
+- [x] Patricia Briggs (1) "Moon Called" — confirmed real (Mercy
+      Thompson #1). Clean.
+- [x] Pam Godwin (1) "Sea of Ruin" — confirmed real. Clean.
+- [x] P. Djèlí Clark (1) "A Master of Djinn" — confirmed real. Clean.
+- [x] Odette C. Bell (1) "One More Bite Book One" — confirmed real
+      (self-published, 4-book series, checked carefully given the
+      title format). Clean.
+- [x] Nalini Singh (1) "Slave to Sensation" — confirmed real
+      (Psy-Changeling #1). Clean.
+- [x] Melissa Marr (1) "Wicked Lovely" — confirmed real. Clean.
+- [x] Matt Haig (1) "The Midnight Library" — unambiguous, already
+      verified live on the site earlier. Clean.
+- [x] Mary E. Pearson (1) "Dance of Thieves" — confirmed real. Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Penn Cole (1)
-- [ ] Patrick Rothfuss (1)
-- [ ] Patricia Briggs (1)
-- [ ] Pam Godwin (1)
-- [ ] P. Djèlí Clark (1)
-- [ ] Odette C. Bell (1)
-- [ ] Nalini Singh (1)
-- [ ] Melissa Marr (1)
-- [ ] Matt Haig (1)
-- [ ] Mary E. Pearson (1)
 - [ ] Mark Lawrence (1)
 - [ ] Lucy Holland (1)
 - [ ] Lexi Ryan (1)
