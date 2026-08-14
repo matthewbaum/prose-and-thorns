@@ -26,15 +26,13 @@ export default function Header({ onToggleSidebar, view, onNavigateHome, onNaviga
       </button>
 
       <nav className="header-nav">
-        {/* Redundant with the hero's own "Browse all books" button on Home
-            — hidden there, but this is the only route back to Browse from
-            Recommend/About, so it stays everywhere else. */}
-        {view !== 'home' && (
-          <button
-            type="button"
-            className={`nav-link ${view === 'browse' ? 'active' : ''}`}
-            onClick={onNavigateBrowse}
-          >
+        {/* Hidden on Home (redundant with the hero's own "Browse all books"
+            button there) and on Browse itself (clicking it while already on
+            Browse is a no-op — not worth the confusion of a clickable-looking
+            button that does nothing, even styled as "active"). Still shown
+            on Recommend/About, where it's the only route back to Browse. */}
+        {view !== 'home' && view !== 'browse' && (
+          <button type="button" className="nav-link" onClick={onNavigateBrowse}>
             Browse all
           </button>
         )}
