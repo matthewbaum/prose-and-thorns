@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 71 / 126 authors checked
+## Status: 85 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -211,21 +211,30 @@ All 3-entry authors now checked.
 
 All 2-entry authors now checked. Remaining: 55 single-entry authors.
 
+- [x] Zoraida Cordova (1) "Labyrinth Lost" — confirmed real. Clean.
+- [x] Xiran Jay Zhao (1) "Iron Widow" — confirmed real. Clean.
+- [x] Virginia Boecker (1) "An Assassin's Guide to Love and Treason" —
+      confirmed real. Clean.
+- [x] Tricia Levenseller (1) "The Shadows Between Us" — confirmed real.
+      Clean.
+- [x] Tasha Suri (1) "The Jasmine Throne" — confirmed real. Clean.
+- [x] Simon Jimenez (1) "The Spear Cuts Through Water" — confirmed real
+      (verified earlier during the unverified-hardcover-match scan).
+      Clean.
+- [x] Silvia Moreno-Garcia (1) "Mexican Gothic" — confirmed real. Clean.
+- [x] Sherrilyn Kenyon (1) "Fantasy Lover" — confirmed real. Clean.
+- [x] Shannon Chakraborty (1) "The Adventures of Amina al-Sirafi" —
+      confirmed real. Clean.
+- [x] Sarah Rees Brennan (1) "In Other Lands" — confirmed real. Clean.
+- [x] Sarah Beth Durst (1) "The Spellshop" — confirmed real. Clean.
+- [x] Sangu Mandanna (1) "The Very Secret Society of Irregular Witches"
+      — confirmed real. Clean.
+- [x] Roshani Chokshi (1) "The Last Tale of the Flower Bride" —
+      confirmed real. Clean.
+- [x] Raven Kennedy (1) "Gild" — confirmed real (Plated Prisoner
+      series). Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Zoraida Cordova (1)
-- [ ] Xiran Jay Zhao (1)
-- [ ] Virginia Boecker (1)
-- [ ] Tricia Levenseller (1)
-- [ ] Tasha Suri (1)
-- [ ] Simon Jimenez (1)
-- [ ] Silvia Moreno-Garcia (1)
-- [ ] Sherrilyn Kenyon (1)
-- [ ] Shannon Chakraborty (1)
-- [ ] Sarah Rees Brennan (1)
-- [ ] Sarah Beth Durst (1)
-- [ ] Sangu Mandanna (1)
-- [ ] Roshani Chokshi (1)
-- [ ] Raven Kennedy (1)
 - [ ] Penn Cole (1)
 - [ ] Patrick Rothfuss (1)
 - [ ] Patricia Briggs (1)
