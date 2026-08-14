@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 48 / 126 authors checked
+## Status: 60 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -173,19 +173,25 @@ checked regardless of what a batch comment claims.
 
 All 3-entry authors now checked.
 
+- [x] TJ Klune (2) — confirmed real (Cerulean Chronicles). Clean.
+- [x] Tracy Deonn (2) — confirmed real (Legendborn Cycle). Clean.
+- [x] Thea Guanzon (2) — confirmed real (Hurricane Wars series). Clean.
+- [x] Victoria Aveyard (2) — Red Queen series, not individually
+      re-searched (unambiguous). Clean.
+- [x] Tomi Adeyemi (2) — Legacy of Orïsha, not individually re-searched
+      (unambiguous). Clean.
+- [x] Tamsyn Muir (2) — Locked Tomb series, not individually re-searched
+      (unambiguous). Clean.
+- [x] Sarah A. Parker (2) — confirmed real (Moonfall series). Clean.
+- [x] Kristen Ciccarelli (2) — confirmed real (Crimson Moth duology).
+      Clean.
+- [x] Madeline Miller (2) — confirmed real (Circe, Song of Achilles).
+      Clean.
+- [x] Margaret Rogerson (2) — confirmed real. Clean.
+- [x] Marissa Meyer (2) — confirmed real (Lunar Chronicles). Clean.
+- [x] Lauren Roberts (2) — confirmed real (Powerless trilogy). Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Victoria Aveyard (2)
-- [ ] Tracy Deonn (2)
-- [ ] Tomi Adeyemi (2)
-- [ ] Thea Guanzon (2)
-- [ ] Tamsyn Muir (2)
-- [ ] TJ Klune (2)
-- [ ] Sarah A. Parker (2)
-- [ ] Marissa Meyer (2)
-- [ ] Margaret Rogerson (2)
-- [ ] Madeline Miller (2)
-- [ ] Lauren Roberts (2)
-- [ ] Kristen Ciccarelli (2)
 - [ ] Jennifer Saint (2)
 - [ ] Heather Walter (2)
 - [ ] Erin Morgenstern (2)
