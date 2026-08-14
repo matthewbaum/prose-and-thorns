@@ -131,24 +131,27 @@
 .home-hero-cover.c7 { top: 205px; left: 236px; transform: rotate(6deg);  z-index: 4; }
 .home-hero-cover.c8 { top: 222px; left: 344px; transform: rotate(-5deg); z-index: 3; }
 
-/* Reuses the header's rose-logo.svg mark (linework, not a filled shape,
-   so it holds up fine scaled way up and faded way down) as ambient
-   texture filling the negative space the wider cover cluster still
-   leaves around it — ties back to the actual brand mark instead of
-   generic fantasy iconography (a dragon/couple silhouette would only
-   speak to one of thirteen subgenres this catalog covers). Sits behind
-   the covers (z-index 0, same layer as the atmosphere glow) and is
-   deliberately barely-there: a shape to notice, not read. */
+/* Reuses the header's rose-logo.svg mark as ambient texture — ties back
+   to the actual brand mark instead of generic fantasy iconography (a
+   dragon/couple silhouette would only speak to one of thirteen
+   subgenres this catalog covers). Two corrections from the first pass:
+   (1) no color filter — this is genuine multi-toned line art (dark
+   reds/browns, fill:none), and forcing it to flat white via
+   brightness(0) invert(1) threw away exactly the texture that made it
+   worth using over a plain shape; (2) enlarged and moved so its top
+   edge sits flush with the covers' own top edge, spanning down and
+   left across the text column instead of being tucked into the art
+   column's top-right corner, where most of it sat hidden directly
+   under the covers themselves. */
 .home-hero-rose-watermark {
   position: absolute;
-  top: -80px;
-  right: -60px;
-  width: 620px;
-  height: 620px;
+  top: 20px;
+  left: 160px;
+  width: 900px;
+  height: 900px;
   z-index: 0;
-  opacity: 0.05;
+  opacity: 0.14;
   pointer-events: none;
-  filter: brightness(0) invert(1);
 }
 
 .home-hero-cover-badge {
