@@ -38,6 +38,39 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
           </div>
         </div>
 
+        <CollapsibleSection
+          title="Minimum Quality Score"
+          defaultOpen={false}
+          className="filter-section-quality"
+          headerExtra={<ScoreMethodologyInfo label="" />}
+        >
+          <div className="slider-list">
+            {MIN_QUALITY_FILTERS.map((f) => {
+              // Per-dimension scores are stored as whole numbers only (Claude's
+              // synthesis never outputs a fractional dimension score) — finer
+              // steps there would just be fake precision. Overall is a genuine
+              // average of six of those integers, so it's meaningfully fractional.
+              const step = f.key === 'min_overall' ? 0.1 : 1;
+              return (
+                <div key={f.key} className="slider-item">
+                  <div className="slider-label">
+                    <span>{f.label}</span>
+                    <span className="slider-value">{filters[f.key].toFixed(1)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step={step}
+                    value={filters[f.key]}
+                    onChange={(e) => onChange({ [f.key]: Number(e.target.value) })}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </CollapsibleSection>
+
         <CheckboxFilterSection
           title="Series Status"
           defaultOpen={false}
@@ -131,39 +164,6 @@ export default function FilterPanel({ filters, onChange, onReset, open, onClose 
             onChange({ exclude_warnings: toggleValue(filters.exclude_warnings, value) })
           }
         />
-
-        <CollapsibleSection
-          title="Minimum Quality Score"
-          defaultOpen={false}
-          className="filter-section-quality"
-          headerExtra={<ScoreMethodologyInfo label="" />}
-        >
-          <div className="slider-list">
-            {MIN_QUALITY_FILTERS.map((f) => {
-              // Per-dimension scores are stored as whole numbers only (Claude's
-              // synthesis never outputs a fractional dimension score) — finer
-              // steps there would just be fake precision. Overall is a genuine
-              // average of six of those integers, so it's meaningfully fractional.
-              const step = f.key === 'min_overall' ? 0.1 : 1;
-              return (
-                <div key={f.key} className="slider-item">
-                  <div className="slider-label">
-                    <span>{f.label}</span>
-                    <span className="slider-value">{filters[f.key].toFixed(1)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="5"
-                    step={step}
-                    value={filters[f.key]}
-                    onChange={(e) => onChange({ [f.key]: Number(e.target.value) })}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </CollapsibleSection>
 
       </aside>
     </>
