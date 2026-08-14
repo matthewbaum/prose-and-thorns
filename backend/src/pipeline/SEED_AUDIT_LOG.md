@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 116 / 126 authors checked
+## Status: 126 / 126 authors checked — SWEEP COMPLETE (2026-08-14)
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -287,17 +287,66 @@ All 2-entry authors now checked. Remaining: 55 single-entry authors.
       Clean.
 - [x] E.V. Mitchell (1) "Savage Bonds" — confirmed real. Clean.
 
-### Unchecked — ordered by entry count (highest risk first)
-- [ ] Donyae Coles (1)
-- [ ] Diana Wynne Jones (1)
-- [ ] Courtney Gould (1)
-- [ ] Christine Feehan (1)
-- [ ] C.L. Wilson (1)
-- [ ] Arkady Martine (1)
-- [ ] Amber V. Nicole (1)
-- [ ] Amalie Howard (1)
-- [ ] Ali Hazelwood (1)
-- [ ] Aimee Lynn (1)
+- [x] Donyae Coles (1) "Midnight Rooms" — confirmed real. Clean.
+- [x] Diana Wynne Jones (1) "Howl's Moving Castle" — confirmed real.
+      Clean.
+- [x] Courtney Gould (1) "The Dead and the Dark" — confirmed real.
+      Clean.
+- [x] Christine Feehan (1) "Dark Prince" — confirmed real (Carpathians
+      #1). Clean.
+- [x] C.L. Wilson (1) "Lord of the Fading Lands" — confirmed real
+      (Tairen Soul #1). Clean.
+- [x] Arkady Martine (1) "A Memory Called Empire" — confirmed real.
+      Clean.
+- [x] Amber V. Nicole (1) "The Book of Azrael" — confirmed real (Gods &
+      Monsters #1; independently corroborated earlier this session via
+      an OCR'd listicle snippet in an unrelated wrong-match investigation).
+      Clean.
+- [x] Amalie Howard (1) "The Starlight Heir" — confirmed real. Clean.
+- [x] Ali Hazelwood (1) "Bride" — confirmed real. Clean.
+- [x] Aimee Lynn (1) "Flameborne: Chosen" — confirmed real. Clean.
+
+## SWEEP COMPLETE — 126/126 authors checked (2026-08-14)
+
+Total findings across the full sweep: **6 hallucinated/mismatched seed
+titles found and fixed**, all in the original (pre-batch-comment,
+unverified) portion of the seed list:
+1. "Fatal Truths" (Caroline Peckham) — hallucinated, removed
+2. "Reckless Oaths" (Caroline Peckham) — hallucinated, removed
+3. "Vicious Circle" (Caroline Peckham) — hallucinated, removed
+4. "Golden Curse" (Caroline Peckham) — hallucinated, removed
+5. "The Inevitable Fall" (Danielle L. Jensen) — hallucinated, removed
+6. "The Fallen Ones" (Namina Forna) — hallucinated, removed (real title
+   is "The Eternal Ones")
+7. "Sidekick to the Villain" (Hannah Nicole Maehrer) — hallucinated,
+   relabeled to "Adversary to the Villain" (a different real book the
+   fetch had already correctly found) + added the actual missing book
+   ("Apprentice to the Villain") fresh
+
+Plus one non-seed-hallucination data-integrity bug found via a
+by-product scan: "The Throne of Bone and Ash" (Armentrout, real book,
+just not yet in Hardcover) had wrongly inherited a sibling book's full
+review/rating/quality-profile data — stripped back to null.
+
+**Every other author/title in the 126-author, ~305-entry seed list
+checked out as genuinely real**, including several that
+initially looked hallucination-shaped by naming pattern alone (JLA's
+"The Primal of Blood and Bone"/"The Throne of Bone and Ash," which
+turned out to be real upcoming series entries) — underscoring that
+title-pattern suspicion alone isn't a reliable signal; the web-search
+verification step is what actually did the work.
+
+**Two new permanent audit safeguards shipped as a result:**
+- `title-mismatch` check in auditCatalog.js (catches a wrong match with
+  a coincidentally-correct author, the exact way #306/#267 slipped past
+  the pre-existing author-mismatch check)
+- `unverified-hardcover-match` check (catches a Hardcover match on a row
+  Google Books never identified, the exact way #274 slipped past both
+  author-mismatch and title-mismatch)
+- Both new categories, plus the pre-existing author-mismatch/
+  wrong-product-title/duplicate-title, are now permanently
+  non-dismissible in admin.js — no future disposition can suppress an
+  identity-integrity finding again.
 
 ## Fixes made this pass
 
