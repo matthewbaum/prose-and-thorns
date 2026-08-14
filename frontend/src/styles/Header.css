@@ -78,10 +78,24 @@
 }
 
 @media (max-width: 900px) {
+  /* Absolute top:28/right:24 positioning assumed the centered wordmark
+     would never reach that corner — true on desktop, false on mobile,
+     where the wordmark's own width can extend under this nav and collide
+     with the tagline (confirmed: "Browse all" rendering directly over
+     "Find romantasy worth reading." on a 390px-wide screen). Taking it out
+     of absolute positioning and letting it wrap onto its own full-width
+     row below the wordmark makes the collision structurally impossible
+     rather than repositioning it to another spot that could collide again
+     at some other width. */
+  .site-header {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
   .header-nav {
-    top: auto;
-    bottom: 24px;
-    right: 20px;
+    position: static;
+    width: 100%;
+    justify-content: center;
   }
 }
 

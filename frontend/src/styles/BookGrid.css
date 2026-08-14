@@ -17,6 +17,16 @@
   }
 }
 
+@media (max-width: 640px) {
+  .book-grid {
+    /* The 165px desktop floor was still in effect on phones (the 5-column
+       cap math only kicks in above ~897px), holding cards at ~170-180px —
+       noticeably large relative to a ~375-390px screen. Drops to 3 columns
+       on a typical phone instead of 2. */
+    grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  }
+}
+
 .book-card-skeleton {
   aspect-ratio: 2 / 3.6;
   background: linear-gradient(100deg, var(--surface) 30%, var(--surface-raised) 50%, var(--surface) 70%);
