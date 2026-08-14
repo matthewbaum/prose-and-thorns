@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 13 / 126 authors checked
+## Status: 25 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -76,19 +76,31 @@ caught before insertion). That prior cleanup was inconsistent/incomplete
 does NOT exempt any batch from this sweep — every title still gets
 checked regardless of what a batch comment claims.
 
+- [x] Tahereh Mafi (4) — confirmed real (This Woven Kingdom + Shatter Me
+      trilogies). Clean.
+- [x] Stephenie Meyer (4) — Twilight saga, not individually re-searched
+      (unambiguous). Clean.
+- [x] Samantha Shannon (4) — confirmed real (Bone Season series +
+      Priory of the Orange Tree). Clean.
+- [x] Sabaa Tahir (4) — confirmed real (full An Ember in the Ashes
+      series). Clean.
+- [x] Renee Ahdieh (4) — confirmed real (Wrath and the Dawn + Flame in
+      the Mist duologies). Clean.
+- [x] Rebecca Ross (4) — confirmed real (Letters of Enchantment +
+      Elements of Cadence duologies). Clean.
+- [x] R.F. Kuang (4) — confirmed real (Poppy War trilogy + Babel).
+      Clean.
+- [x] Laini Taylor (4) — confirmed real (Daughter of Smoke and Bone
+      trilogy + Strange the Dreamer duology). Clean.
+- [x] Kerri Maniscalco (4) — confirmed real (Kingdom of the Wicked
+      trilogy + "Throne of Secrets" spinoff). Clean.
+- [x] Katee Robert (4) — confirmed real (Dark Olympus series #1-4).
+      Clean.
+- [x] Julie Kagawa (4) — confirmed real (Iron Fey series #1-4). Clean.
+- [x] Hannah Whitten (4) — confirmed real (Nightshade Crown trilogy +
+      Wilderwood duology). Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Tahereh Mafi (4)
-- [ ] Stephenie Meyer (4)
-- [ ] Samantha Shannon (4)
-- [ ] Sabaa Tahir (4)
-- [ ] Renee Ahdieh (4)
-- [ ] Rebecca Ross (4)
-- [ ] R.F. Kuang (4)
-- [ ] Laini Taylor (4)
-- [ ] Kerri Maniscalco (4)
-- [ ] Katee Robert (4)
-- [ ] Julie Kagawa (4)
-- [ ] Hannah Whitten (4)
 - [ ] Travis Baldree (3)
 - [ ] Tracy Wolff (3)
 - [ ] Shelby Mahurin (3)
