@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 1 / 126 authors checked
+## Status: 8 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -35,16 +35,25 @@ titles without ever verifying they're real books).
       whichever else survived) — NOT yet individually re-verified beyond
       what today's fix touched; worth a quick pass too since we know this
       author's cluster was compromised.
+- [x] Sarah J. Maas (16) — all confirmed real (ACOTAR, Throne of Glass,
+      Crescent City). Clean.
+- [x] Jennifer L. Armentrout (12) — all confirmed real, including
+      "The Soul of Ash and Blood," "The Primal of Blood and Bone," and
+      "The Throne of Bone and Ash" which initially looked hallucination-
+      shaped (pattern-matched naming) but checked out as real books
+      #5/#6/#7 of the Blood and Ash series. Clean.
+- [x] Scarlett St. Clair (7) — all confirmed real across Hades x
+      Persephone and Adrian X Isolde series. Clean.
+- [x] Leigh Bardugo (7) — all confirmed real (Grishaverse + Ninth House).
+      Clean.
+- [x] Stephanie Garber (6) — all confirmed real (Caraval + Once Upon a
+      Broken Heart trilogies). Clean.
+- [x] Richelle Mead (6) — Vampire Academy 1-6, not individually
+      re-searched (unambiguous, globally-known series). Clean.
+- [x] Carissa Broadbent (6) — all confirmed real (Crowns of Nyaxia series
+      + War of Lost Hearts trilogy). Clean.
 
 ### Unchecked — ordered by entry count (highest risk first)
-
-- [ ] Sarah J. Maas (16)
-- [ ] Jennifer L. Armentrout (12)
-- [ ] Scarlett St. Clair (7)
-- [ ] Leigh Bardugo (7)
-- [ ] Stephanie Garber (6)
-- [ ] Richelle Mead (6)
-- [ ] Carissa Broadbent (6)
 - [ ] V.E. Schwab (5)
 - [ ] Naomi Novik (5)
 - [ ] Juliette Cross (5)
