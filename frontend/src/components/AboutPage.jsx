@@ -31,7 +31,7 @@ export default function AboutPage({ onBrowseAll }) {
       <p>
         So this is the thing I wished existed: tell it what you&apos;re after, and it tells you
         what&apos;s actually good — not from a single star rating, not from hype, but from real
-        reader reviews synthesized into six specific dimensions (prose, romance, world-building,
+        reader reviews distilled into six specific dimensions (prose, romance, world-building,
         pacing, emotional payoff, character depth), so you can see exactly what&apos;s strong and
         what isn&apos;t before you start.
       </p>

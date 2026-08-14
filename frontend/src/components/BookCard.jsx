@@ -90,7 +90,7 @@ export default function BookCard({ book, onSelect, filters, matchLabel }) {
               </span>
             )}
             {book.overall_score != null && (
-              <span className="overall-score" title="Quality Profile score — average of the six synthesized dimensions below">
+              <span className="overall-score" title="Quality Profile score — average of the six distilled dimensions below">
                 <span className="star">&#9734;</span> {book.overall_score.toFixed(1)}
               </span>
             )}

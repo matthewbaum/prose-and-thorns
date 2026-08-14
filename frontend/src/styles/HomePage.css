@@ -217,10 +217,16 @@
     position: static;
     order: 1;
     display: block;
-    width: 82%;
-    max-width: 340px;
+    width: 96%;
+    max-width: 440px;
     height: auto;
-    margin: -210px auto 0;
+    /* Negative margin-bottom, not just margin-top: .home-primary-card is
+       a sibling of .home-hero (not a child), so pulling .home-hero's own
+       box shorter via a negative margin on its last child lets the card
+       overlap the rose's lower portion below — same "base of the flower
+       flows through the semi-transparent card" effect as desktop,
+       instead of the rose sitting as a fully separate element above it. */
+    margin: -230px auto -130px;
     opacity: 0.16;
   }
 }

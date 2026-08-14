@@ -37,7 +37,7 @@ export default function RatingLegend() {
               <p>
                 A plain aggregate rating from Hardcover (or Google Books when Hardcover has no
                 match) — thousands of individual readers&apos; own star ratings, averaged. This is
-                not synthesized or AI-generated; it&apos;s the same kind of number you&apos;d see on
+                not distilled or AI-generated; it&apos;s the same kind of number you&apos;d see on
                 any book platform.
               </p>
 
@@ -46,7 +46,7 @@ export default function RatingLegend() {
               </h3>
               <p>
                 This app&apos;s own score — an average of six dimensions (prose, romance,
-                world-building, pacing, emotional payoff, character depth), each synthesized by AI
+                world-building, pacing, emotional payoff, character depth), each distilled by AI
                 from real review text and reconciled against the aggregate rating above. It exists
                 to break a single star rating into the specific things that make a book good or
                 not, for the type of book you&apos;re looking for.

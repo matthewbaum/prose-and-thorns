@@ -306,7 +306,7 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                     ))}
                   </div>
                   <p className="review-source-note">
-                    Quality profile synthesized from {quality.review_count_used ?? 0} real reader
+                    Quality profile distilled from {quality.review_count_used ?? 0} real reader
                     reviews (Hardcover and review blogs), weighed against the book&apos;s aggregate
                     rating shown above.
                     {quality.confidence === 'low' && (
@@ -333,7 +333,7 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                 </>
               ) : (
                 <p className="quality-missing">
-                  No quality profile yet — this book hasn&apos;t been through review synthesis.
+                  No quality profile yet — this book hasn&apos;t been through review distillation.
                 </p>
               )}
             </section>
