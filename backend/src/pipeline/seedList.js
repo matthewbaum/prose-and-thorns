@@ -168,7 +168,11 @@ export const SEED_BOOKS = [
   { title: 'The Atlas Complex', author: 'Olivie Blake' },
   { title: 'The Bone Shard Emperor', author: 'Andrea Stewart' },
   { title: 'The Bone Shard War', author: 'Andrea Stewart' },
-  { title: 'The Inevitable Fall', author: 'Danielle L. Jensen' },
+  // "The Inevitable Fall" removed 2026-08-14 — not a real Danielle L.
+  // Jensen title (confirmed via web search of her full bibliography);
+  // matched an unrelated 1955 periodical ("The Film Weekly") whose author
+  // field coincidentally read "Danielle L. Jensen." Same failure class as
+  // the Peckham cluster and "The Undying Empire" below.
   // "The Undying Empire" removed — Google Books search deterministically
   // either finds nothing or mismatches to an unrelated public-domain
   // record ("Catalog of Copyright Entries") for this title, confirmed

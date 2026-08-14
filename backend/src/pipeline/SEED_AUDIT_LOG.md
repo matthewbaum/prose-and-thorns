@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 8 / 126 authors checked
+## Status: 13 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -52,13 +52,31 @@ titles without ever verifying they're real books).
       re-searched (unambiguous, globally-known series). Clean.
 - [x] Carissa Broadbent (6) — all confirmed real (Crowns of Nyaxia series
       + War of Lost Hearts trilogy). Clean.
+- [x] V.E. Schwab (5) — all confirmed real (Villains, Shades of Magic,
+      standalones). Clean.
+- [x] Naomi Novik (5) — all confirmed real (Scholomance trilogy +
+      standalones). Clean.
+- [x] Juliette Cross (5) — all confirmed real (Vale of Stars series incl.
+      the 0.5 prequel "Dragon Heartstring"). Clean.
+- [x] Elise Kova (5) — all confirmed real (Married to Magic series).
+      Clean.
+- [x] Danielle L. Jensen (5) — 4/5 confirmed real (Bridge Kingdom x2, A
+      Fate Inked in Blood, A Curse Carved in Bone). **1 FIXED**:
+      "The Inevitable Fall" was not a real title — matched a 1955
+      periodical ("The Film Weekly") on coincidental author-name match.
+      Removed (book id 267, commit pending).
+
+## Status note
+
+Discovered while checking Jensen: seedList.js already has partial
+cleanup history predating this sweep (see comments near "Batch 3"/"Batch
+4" — "The Undying Empire" and one Juliette Cross candidate were already
+caught before insertion). That prior cleanup was inconsistent/incomplete
+(it didn't catch "The Inevitable Fall" or the 4 Peckham titles), so it
+does NOT exempt any batch from this sweep — every title still gets
+checked regardless of what a batch comment claims.
 
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] V.E. Schwab (5)
-- [ ] Naomi Novik (5)
-- [ ] Juliette Cross (5)
-- [ ] Elise Kova (5)
-- [ ] Danielle L. Jensen (5)
 - [ ] Tahereh Mafi (4)
 - [ ] Stephenie Meyer (4)
 - [ ] Samantha Shannon (4)
@@ -178,3 +196,4 @@ titles without ever verifying they're real books).
 (append here as authors are checked and fixes applied, with commit hash)
 
 - Caroline Peckham cluster — commits a17da5e, 18760fe, 2dd3b0e (2026-08-14)
+- Danielle L. Jensen "The Inevitable Fall" (book id 267) — commit pending (2026-08-14)
