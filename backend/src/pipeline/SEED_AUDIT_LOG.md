@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 37 / 126 authors checked
+## Status: 43 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -144,14 +144,26 @@ checked regardless of what a batch comment claims.
 - [x] Jay Kristoff (3) — confirmed real (Nevernight Chronicle trilogy).
       Clean.
 
+- [x] Holly Black (3) — confirmed real (Folk of the Air trilogy). Clean.
+- [x] Devney Perry (3) — confirmed real (Shield of Sparrows trilogy).
+      Clean.
+- [x] Hannah Nicole Maehrer (3) — 2/3 confirmed real (Assistant to the
+      Villain, Accomplice to the Villain). **1 FIXED**: "Sidekick to the
+      Villain" was not the real book 2 (real title: "Apprentice to the
+      Villain") — but the Google Books/Hardcover fetch had already
+      correctly found a *different*, real book in the series ("Adversary
+      to the Villain," book 4) and fully tagged/synthesized it. Rather
+      than discard good data, relabeled the seed to match what the row
+      actually contains and added "Apprentice to the Villain" fresh so
+      the real gap gets filled on a future pipeline run (book id 287).
+- [x] Deborah Harkness (3) — confirmed real (All Souls trilogy, books
+      1-3 of a longer series). Clean.
+- [x] Heather Fawcett (3) — confirmed real (Emily Wilde trilogy). Clean.
+- [x] Erin Sterling (3) — confirmed real (Graves Glen series). Clean.
+- [x] Freya Marske (3) — confirmed real (The Last Binding trilogy).
+      Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Holly Black (3)
-- [ ] Heather Fawcett (3)
-- [ ] Hannah Nicole Maehrer (3)
-- [ ] Freya Marske (3)
-- [ ] Erin Sterling (3)
-- [ ] Devney Perry (3)
-- [ ] Deborah Harkness (3)
 - [ ] Cassandra Clare (3)
 - [ ] Andrea Stewart (3)
 - [ ] Amanda Foody (3)
@@ -245,4 +257,7 @@ checked regardless of what a batch comment claims.
 - Namina Forna "The Fallen Ones" (book id 274, wrong Gilded Ones content)
   + Armentrout "The Throne of Bone and Ash" (id 300, borrowed sibling
   data stripped) + new unverified-hardcover-match audit check — commit
-  pending (2026-08-14)
+  e1a881f (2026-08-14)
+- Hannah Nicole Maehrer "Sidekick to the Villain" relabeled to "Adversary
+  to the Villain" (id 287) + "Apprentice to the Villain" added fresh —
+  commit pending (2026-08-14)

@@ -203,7 +203,15 @@ export const SEED_BOOKS = [
   { title: 'The Lion and the Deathless Dark', author: 'Carissa Broadbent' },
   { title: 'A Curse Carved in Bone', author: 'Danielle L. Jensen' },
   { title: 'A Monsoon Rising', author: 'Thea Guanzon' },
-  { title: 'Sidekick to the Villain', author: 'Hannah Nicole Maehrer' },
+  // "Sidekick to the Villain" was not the real book 2 — corrected below
+  // to "Adversary to the Villain" (2026-08-14) to match what this row's
+  // Google Books/Hardcover fetch had already correctly found (real book
+  // 4 in the same series, fully tagged and quality-synthesized before
+  // this was caught — relabeled rather than discarding good data). The
+  // actual book 2, "Apprentice to the Villain," was missing entirely and
+  // is added fresh below for the pipeline to fetch.
+  { title: 'Adversary to the Villain', author: 'Hannah Nicole Maehrer' },
+  { title: 'Apprentice to the Villain', author: 'Hannah Nicole Maehrer' },
   { title: 'Accomplice to the Villain', author: 'Hannah Nicole Maehrer' },
   { title: 'A Dance with the Fae Prince', author: 'Elise Kova' },
   { title: 'A Duel with the Vampire Lord', author: 'Elise Kova' },
