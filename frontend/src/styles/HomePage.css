@@ -133,7 +133,13 @@
 
 @media (max-width: 900px) {
   .home-hero {
-    grid-template-columns: 1fr;
+    /* Plain 1fr still defers to a grid item's min-content size as a floor
+       — .home-hero-covers now genuinely needs 500px of real (pre-scale)
+       layout width for its own overflow:hidden clipping to work, and
+       without minmax(0, ...) that 500px forced this whole track (and the
+       text copy sharing it) wider than the viewport, invisibly clipping
+       the heading text on the right. minmax(0, 1fr) removes that floor. */
+    grid-template-columns: minmax(0, 1fr);
     text-align: center;
   }
   .home-hero-copy { text-align: center; }
