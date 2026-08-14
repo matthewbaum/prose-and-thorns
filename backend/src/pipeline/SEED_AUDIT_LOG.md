@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 60 / 126 authors checked
+## Status: 71 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -191,18 +191,27 @@ All 3-entry authors now checked.
 - [x] Marissa Meyer (2) — confirmed real (Lunar Chronicles). Clean.
 - [x] Lauren Roberts (2) — confirmed real (Powerless trilogy). Clean.
 
+- [x] Erin Morgenstern (2) — confirmed real (Night Circus, Starless
+      Sea). Clean.
+- [x] Jennifer Saint (2) — confirmed real (Elektra, Ariadne). Clean.
+- [x] Heather Walter (2) — confirmed real (Malice duology). Clean.
+- [x] Chloe Gong (2) — confirmed real (These Violent Delights duet).
+      Clean.
+- [x] Elizabeth Lim (2) — confirmed real (Six Crimson Cranes duology).
+      Clean.
+- [x] Charlie N. Holmberg (2) — confirmed real (Spellbreaker duology).
+      Clean.
+- [x] Callie Hart (2) — confirmed real (Fae & Alchemy series). Clean.
+- [x] Analeigh Sbrana (2) — confirmed real (Lore of the Wilds duology).
+      Clean.
+- [x] Adrienne Young (2) — confirmed real (Sky and Sea series). Clean.
+- [x] Ava Reid (2) — confirmed real (both standalones). Clean.
+- [x] Brandon Sanderson (2) — confirmed real (Cosmere standalones).
+      Clean.
+
+All 2-entry authors now checked. Remaining: 55 single-entry authors.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Jennifer Saint (2)
-- [ ] Heather Walter (2)
-- [ ] Erin Morgenstern (2)
-- [ ] Elizabeth Lim (2)
-- [ ] Chloe Gong (2)
-- [ ] Charlie N. Holmberg (2)
-- [ ] Callie Hart (2)
-- [ ] Brandon Sanderson (2)
-- [ ] Ava Reid (2)
-- [ ] Analeigh Sbrana (2)
-- [ ] Adrienne Young (2)
 - [ ] Zoraida Cordova (1)
 - [ ] Xiran Jay Zhao (1)
 - [ ] Virginia Boecker (1)
