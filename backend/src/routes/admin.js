@@ -28,12 +28,28 @@ function checkPassword(req, res) {
 // unreviewed on the next `npm run seed`. A finding's disposition prefers a
 // specific-book override over the category-wide default, and falls back
 // to 'needs-fix' when nothing has ever reviewed it.
+// Verified case: #304/#305/#308 were correctly flagged as author-mismatch
+// months ago, then a past review pass marked them "accepted" with the
+// reasoning "already hidden by the zero-substance filter, so no wrong info
+// is visible to readers" — true on the homepage, but the garbage row was
+// still live at a direct URL, and "hidden" isn't "fixed." A wrong-book-
+// identity finding is never a matter of taste the way e.g.
+// thin-romance-content is, so these categories are excluded from the
+// disposition override entirely — no note, however reasonable it sounds,
+// can make one of these stop showing up as needing attention. The only way
+// off this list is fixing (or removing) the underlying row, which deletes
+// the finding itself on the next audit run.
+const NEVER_DISMISSIBLE_CATEGORIES = ['author-mismatch', 'title-mismatch', 'wrong-product-title', 'duplicate-title'];
+
 function loadFindings() {
   const auditFindings = db
     .prepare(
       `SELECT af.id, 'audit' as source, af.severity, af.category, af.message, af.book_id, af.status,
          af.run_at as created_at,
-         COALESCE(specific.disposition, general.disposition, 'needs-fix') as disposition,
+         CASE WHEN af.category IN (${NEVER_DISMISSIBLE_CATEGORIES.map(() => '?').join(',')})
+           THEN 'needs-fix'
+           ELSE COALESCE(specific.disposition, general.disposition, 'needs-fix')
+         END as disposition,
          COALESCE(specific.note, general.note) as disposition_note
        FROM audit_findings af
        LEFT JOIN finding_dispositions specific
@@ -43,7 +59,7 @@ function loadFindings() {
        WHERE af.status = 'open'
        ORDER BY CASE af.severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END, af.run_at DESC`
     )
-    .all();
+    .all(...NEVER_DISMISSIBLE_CATEGORIES);
 
   const reports = db
     .prepare(

@@ -258,6 +258,21 @@ function checkFetchIntegrity(books) {
         flag('medium', 'author-mismatch', `#${b.id} "${b.title}": author "${b.author}" shares no name with seed_author "${b.seed_author}" — verify this is the right book/edition.`, b.id);
       }
     }
+    // Verified case: #306's seed "Fatal Truths" matched an unrelated 1892
+    // public-domain scan whose OCR'd index text happened to contain the
+    // author's exact name as a substring — author-mismatch (above) had
+    // nothing to catch since the author field coincidentally matched. No
+    // existing check ever compares the matched TITLE against seed_title,
+    // so a wrong match with a coincidentally-right author was completely
+    // invisible. This closes that gap independent of the author field.
+    if (b.seed_title && b.title) {
+      const seedTitleTokens = new Set(normalizeTokens(b.seed_title));
+      const titleTokens = new Set(normalizeTokens(b.title));
+      const titleOverlap = [...seedTitleTokens].some((t) => titleTokens.has(t));
+      if (!titleOverlap && seedTitleTokens.size > 0) {
+        flag('high', 'title-mismatch', `#${b.id}: matched title "${b.title}" shares no word with seed_title "${b.seed_title}" — likely matched an unrelated book entirely.`, b.id);
+      }
+    }
     if (b.hardcover_ratings_count != null && b.hardcover_ratings_count > 0 && b.hardcover_ratings_count < THIN_REVIEW_COUNT_THRESHOLD) {
       flag('low', 'thin-hardcover-match', `#${b.id} "${b.title}": only ${b.hardcover_ratings_count} Hardcover ratings — verify this matched the right/canonical edition (worth checking for a title-variant mismatch, e.g. diacritics).`, b.id);
     }
