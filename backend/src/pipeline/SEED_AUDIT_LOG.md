@@ -27,7 +27,7 @@ Mark a row `[x]` only once actually checked this pass — don't mark from
 memory of unrelated earlier work (e.g. cover-fixing touched many of these
 titles without ever verifying they're real books).
 
-## Status: 95 / 126 authors checked
+## Status: 105 / 126 authors checked
 
 - [x] Caroline Peckham (5 remaining after cleanup) — 4 of original 9 were
       hallucinated and removed 2026-08-14 (see above). Remaining 5
@@ -251,17 +251,20 @@ All 2-entry authors now checked. Remaining: 55 single-entry authors.
       verified live on the site earlier. Clean.
 - [x] Mary E. Pearson (1) "Dance of Thieves" — confirmed real. Clean.
 
+- [x] Mark Lawrence (1) "Red Sister" — confirmed real. Clean.
+- [x] Lucy Holland (1) "Sistersong" — confirmed real. Clean.
+- [x] Lexi Ryan (1) "These Hollow Vows" — confirmed real. Clean.
+- [x] L.J. Andrews (1) "The Ever King" — confirmed real. Clean.
+- [x] Krystal Sutherland (1) "House of Hollow" — confirmed real. Clean.
+- [x] Kristin Hannah (1) "The Nightingale" — confirmed real. Clean.
+- [x] Kristin Cashore (1) "Graceling" — confirmed real. Clean.
+- [x] Kresley Cole (1) "A Hunger Like No Other" — confirmed real
+      (Immortals After Dark #1). Clean.
+- [x] Kaylie Smith (1) "Phantasma" — confirmed real. Clean.
+- [x] Katherine Addison (1) "The Goblin Emperor" — confirmed real.
+      Clean.
+
 ### Unchecked — ordered by entry count (highest risk first)
-- [ ] Mark Lawrence (1)
-- [ ] Lucy Holland (1)
-- [ ] Lexi Ryan (1)
-- [ ] L.J. Andrews (1)
-- [ ] Krystal Sutherland (1)
-- [ ] Kristin Hannah (1)
-- [ ] Kristin Cashore (1)
-- [ ] Kresley Cole (1)
-- [ ] Kaylie Smith (1)
-- [ ] Katherine Addison (1)
 - [ ] Kate Golden (1)
 - [ ] Justinian Huang (1)
 - [ ] Juliet Marillier (1)
