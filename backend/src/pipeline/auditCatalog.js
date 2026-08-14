@@ -1,5 +1,6 @@
 import db from '../db/index.js';
 import { WRONG_PRODUCT_PATTERN } from './googleBooks.js';
+import { resolveCoverUrl } from '../db/booksRepo.js';
 import {
   SERIES_STATUS_VALUES,
   AGE_CATEGORY_VALUES,
@@ -296,18 +297,28 @@ async function fetchCoverSize(url) {
   }
 }
 
+// Must check the URL resolveCoverUrl() actually serves to users, not the
+// raw cover_url column — resolveCoverUrl() prefers hardcover_cover_url
+// whenever it's set, so checking cover_url alone both misses bad
+// hardcover_cover_url values entirely and false-flags books where cover_url
+// looks bad but hardcover_cover_url (what's actually shown) is fine.
+// Verified case: 38 of the 43 "cover_url" fixes made in one pass were
+// silently irrelevant on the live site because hardcover_cover_url was
+// already set on those rows and takes priority.
 async function checkCoverImageIntegrity(books) {
-  const candidates = books.filter((b) => b.cover_url);
+  const candidates = books
+    .map((b) => ({ book: b, url: resolveCoverUrl(b) }))
+    .filter((c) => c.url);
   let cursor = 0;
   async function worker() {
     while (cursor < candidates.length) {
-      const b = candidates[cursor++];
-      const size = await fetchCoverSize(b.cover_url);
+      const { book: b, url } = candidates[cursor++];
+      const size = await fetchCoverSize(url);
       if (size != null && size < COVER_SIZE_THRESHOLD_BYTES) {
         flag(
           'low',
           'placeholder-cover-suspected',
-          `#${b.id} "${b.title}": cover_url returns only ${size} bytes — likely a placeholder graphic, not real cover art. Verify visually before replacing (a wrong cover is worse than a missing one).`,
+          `#${b.id} "${b.title}": resolved cover (${url}) returns only ${size} bytes — likely a placeholder graphic, not real cover art. Verify visually before replacing (a wrong cover is worse than a missing one).`,
           b.id
         );
       }

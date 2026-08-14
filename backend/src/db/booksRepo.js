@@ -56,7 +56,7 @@ function buildQualityProfile(row) {
 // itself looks valid. Prefer Hardcover's cover (real edition art, and much
 // better matched overall) whenever we have it; only fall back to Google's
 // when Hardcover has nothing and Google's own ID isn't a known-bad stub.
-function resolveCoverUrl(row) {
+export function resolveCoverUrl(row) {
   if (row.hardcover_cover_url) return row.hardcover_cover_url;
   const isStubRecord = row.google_books_id && row.google_books_id.endsWith('ACAAJ');
   return isStubRecord ? null : row.cover_url || null;
