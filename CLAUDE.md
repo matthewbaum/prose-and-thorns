@@ -1,34 +1,43 @@
 # Prose & Thorns — notes for Claude sessions
 
-## Top priority: no durable way to run the catalog pipeline
+## Node is already installed locally — check here before concluding otherwise
 
-As of 2026-08-14: there is no working path to run `backend/src/pipeline/runPipeline.js`
-(`npm run seed`) that durably persists its results. Fix this before adding new books.
+**Real, working Node lives at `~/.local/prose-and-thorns-node/bin/node`** (confirmed
+v24.19.0 as of 2026-08-14). This is a project-specific install, not on the default
+PATH of a fresh Bash session — `which node` alone will report nothing, which twice
+now got misread as "no Node available on this machine" when the real situation is
+"not on this shell's PATH by default." Before concluding Node is unavailable, always
+check this exact path first:
+```
+~/.local/prose-and-thorns-node/bin/node --version
+```
+This same binary is what `npm run dev` (the root `concurrently` script running
+`dev:backend` + `dev:frontend`) has been using all along — confirmed via `lsof` on
+`backend/data/prose-and-thorns.sqlite` showing an active connection from it. To use
+it in a given shell: `export PATH="$HOME/.local/prose-and-thorns-node/bin:$PATH"`.
+(A second, redundant Node copy was briefly downloaded into `backend/.tools/` before
+this was discovered — gitignored, safe to ignore or delete, not the canonical one.)
 
-- **No local Node**: check fresh each session (`which node`) — don't assume from this
-  note alone, environments vary. As of 2026-08-14, this session's sandbox had no
-  `node`/`npm` on PATH or in common install locations (nvm/volta/asdf/homebrew).
-- **The live `POST /api/seed` endpoint exists but is unsafe to use as-is**: it's a
-  password-gated (`ADMIN_PASSWORD`) route on the deployed Railway server that runs the
-  pipeline using Railway's own Node. The problem: `railway.json` has no persistent
-  volume configured, and this project's data model is "local
-  `backend/data/prose-and-thorns.sqlite` is source of truth, committed to git, Railway
-  rebuilds from that git snapshot on every deploy." Triggering the pipeline via that
-  live endpoint writes only to the running container's ephemeral disk — any later
-  `git push` (even something unrelated) redeploys from git and silently discards
-  whatever the live run added. Books could appear, then vanish later with no obvious
-  cause.
-- **Fix options**: (a) get real Node in whatever sandbox is running, so the pipeline
-  runs locally and its output gets committed the normal way, matching how every batch
-  before this was almost certainly done; or (b) add a persistent volume to
-  `railway.json` for `backend/data/`, or a step to pull the container's updated sqlite
-  file back down into git after a live run.
-- Once a durable path exists, run a **small** test batch first (2-3 new titles) to
-  validate `backend/src/pipeline/seedVerification.js` — a new pipeline step added
-  2026-08-14 that has never actually executed (built and reviewed, never run for
-  real, since there was no Node to test it with). See
-  `backend/src/pipeline/SEED_AUDIT_LOG.md` for the hallucinated-seed-title incident
-  that motivated it.
+## The catalog pipeline now has a durable path — use the real Node above
+
+`backend/src/pipeline/runPipeline.js` (`npm run seed`) can be run locally with the
+Node install above, committing its output the normal way. Do **not** use the live
+`POST /api/seed` Railway endpoint — it's password-gated but unsafe: `railway.json`
+has no persistent volume, so a live run's writes hit the container's ephemeral disk
+and get silently discarded by the next `git push`-triggered redeploy (which rebuilds
+from git, not from whatever's live on the server).
+
+**Cost note (learned 2026-08-14):** `runPipeline()` always iterates the *entire*
+`SEED_BOOKS` list, not just newly-added titles — each step is individually guarded
+("skip if already fetched"), so re-running is normally a cheap no-op for existing
+books. The exception: when a *new* pipeline step/column is added (e.g.
+`seedVerification.js`'s `seed_verified_at`), every existing book has never run that
+new step, so a full `npm run seed` will trigger it for the whole ~300+ book catalog
+at once — burning real Anthropic API credit on a backfill that usually isn't needed
+(the existing catalog was already hand-verified in `SEED_AUDIT_LOG.md`'s 126-author
+sweep). To test a small number of new titles cheaply without that side effect, call
+`processBook()` (exported from `runPipeline.js`) directly against just the new seeds
+instead of running the full `runPipeline()`.
 
 ## Current state (as of 2026-08-14)
 

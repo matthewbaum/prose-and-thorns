@@ -1,6 +1,7 @@
 node_modules/
 dist/
 build/
+.tools/
 .env
 *.log
 # The .sqlite file itself IS committed (see prose-and-thorns.sqlite below) —

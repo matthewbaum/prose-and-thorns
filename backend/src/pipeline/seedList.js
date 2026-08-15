@@ -365,4 +365,22 @@ export const SEED_BOOKS = [
   { title: 'Daughter of the Forest', author: 'Juliet Marillier' },
   { title: 'The Darkest Night', author: 'Gena Showalter' },
   { title: 'Fantasy Lover', author: 'Sherrilyn Kenyon' },
+
+  // Test batch (2026-08-14) — first real run since restoring a durable local
+  // Node path (see CLAUDE.md). Also the first live exercise of
+  // seedVerification.js. Confirmed real via web search before adding, not
+  // from recall: Roth's is a new 2026 series starter (pubbed 2026-05-12);
+  // Gillig's is the sequel to "The Knight and the Moth" (pubs 2026-09-01,
+  // so no reviews yet expected — correctly absent from listings until
+  // then, not an error). "The Last Thorn" by Talia Hibbert (also real,
+  // also confirmed) was tried and dropped (was book #427) — Google Books
+  // has no listing for it at all yet (too new even for that), and the
+  // fallback search matched something unrelated ("Videohound's Golden
+  // Movie Retriever") instead of returning no match. Not retrying until
+  // Google Books actually lists it. "Hooked" (Emily McIntire, pub. 2021,
+  // well-established, ~35k Hardcover ratings) added in its place as a
+  // clean happy-path test case with real, available source data.
+  { title: "Seek the Traitor's Son", author: 'Veronica Roth' },
+  { title: 'The Knave and the Moon', author: 'Rachel Gillig' },
+  { title: 'Hooked', author: 'Emily McIntire' },
 ];
