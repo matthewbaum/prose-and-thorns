@@ -215,6 +215,7 @@ export default function App() {
         onNavigateHome={goHome}
         onNavigateBrowse={goBrowse}
         onNavigateAbout={goAbout}
+        onSelectBook={(id) => setSelectedId(id)}
       />
       {view === 'home' ? (
         <main className="app-main">

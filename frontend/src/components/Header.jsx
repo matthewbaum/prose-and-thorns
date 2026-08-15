@@ -1,8 +1,9 @@
 import React from 'react';
 import SiteMenu from './SiteMenu.jsx';
+import HeaderSearch from './HeaderSearch.jsx';
 import '../styles/Header.css';
 
-export default function Header({ onToggleSidebar, view, onNavigateHome, onNavigateBrowse, onNavigateAbout }) {
+export default function Header({ onToggleSidebar, view, onNavigateHome, onNavigateBrowse, onNavigateAbout, onSelectBook }) {
   return (
     <header className="site-header">
       {view === 'browse' && (
@@ -36,6 +37,7 @@ export default function Header({ onToggleSidebar, view, onNavigateHome, onNaviga
             Browse all
           </button>
         )}
+        <HeaderSearch onSelectBook={onSelectBook} />
         <SiteMenu onNavigateAbout={onNavigateAbout} aboutActive={view === 'about'} />
       </nav>
     </header>

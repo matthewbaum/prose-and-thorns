@@ -45,7 +45,7 @@ export default function BookPicker({ onRecommend, initialSelected, initialMode, 
         <input
           type="text"
           className="book-picker-input"
-          placeholder="Search for a book you like…"
+          placeholder="Enter a book you love…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
