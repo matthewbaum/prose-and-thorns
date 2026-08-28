@@ -59,8 +59,22 @@ body {
 }
 
 body {
+  /* Sized and faded to carry the same purple tint continuously from the
+     very top of the page (behind the header, which has no background of
+     its own — see Header.css) down into the hero's own atmosphere glow
+     (HomePage.css), rather than fading out partway and leaving a flat
+     --bg gap between the two. A slow "transparent 100%" falloff (instead
+     of stopping at 60% of the ellipse's radius) is what keeps this
+     gradual rather than reading as its own second hard edge.
+     Vertical radius is generous (110%, not just enough to cover a
+     desktop header) specifically because the mobile header wraps onto a
+     taller multi-row layout — verified case: at 65%, the glow had fully
+     faded out by ~450px down, well above the ~380px-tall mobile header's
+     own bottom edge, leaving a faint but visible dip before the hero's
+     own atmosphere glow (positioned lower, relative to the hero box)
+     picked back up. */
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, #1c1430 0%, transparent 60%),
+    radial-gradient(ellipse 90% 110% at 50% -10%, #1c1430 0%, transparent 100%),
     var(--bg);
   background-attachment: fixed;
 }

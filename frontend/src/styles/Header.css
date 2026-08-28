@@ -4,7 +4,13 @@
   justify-content: center;
   position: relative;
   padding: 34px 24px 30px;
-  background: linear-gradient(180deg, #12101c 0%, rgba(10, 10, 20, 0) 100%);
+  /* No background of its own — this used to be an opaque near-black
+     gradient that fully masked the body's purple glow behind it,
+     creating a hard seam where the header ended and the hero's own
+     atmosphere glow began. Leaving this transparent lets the single,
+     continuous body-level gradient (index.css) show through the header
+     the same way it does everywhere else, so the two never visibly meet. */
+  background: none;
 }
 
 .wordmark {
