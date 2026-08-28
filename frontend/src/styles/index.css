@@ -59,23 +59,49 @@ body {
 }
 
 body {
-  /* Sized and faded to carry the same purple tint continuously from the
-     very top of the page (behind the header, which has no background of
-     its own — see Header.css) down into the hero's own atmosphere glow
-     (HomePage.css), rather than fading out partway and leaving a flat
-     --bg gap between the two. A slow "transparent 100%" falloff (instead
-     of stopping at 60% of the ellipse's radius) is what keeps this
-     gradual rather than reading as its own second hard edge.
-     Vertical radius is generous (110%, not just enough to cover a
-     desktop header) specifically because the mobile header wraps onto a
-     taller multi-row layout — verified case: at 65%, the glow had fully
-     faded out by ~450px down, well above the ~380px-tall mobile header's
-     own bottom edge, leaving a faint but visible dip before the hero's
-     own atmosphere glow (positioned lower, relative to the hero box)
-     picked back up. */
+  /* Carries the same purple tint continuously from the very top of the
+     page (behind the header, which has no background of its own — see
+     Header.css) down into the hero's own atmosphere glow (HomePage.css),
+     rather than fading out partway and leaving a flat --bg gap between
+     the two.
+     Two earlier approaches were tried and replaced:
+     1. A single 0%->transparent-at-100% two-stop fade — mathematically
+        smooth (verified by simulating the exact alpha-per-pixel curve:
+        monotonic, no discontinuity) but still read as a visible hard
+        edge. Two very dark, low-contrast colors joined by a purely
+        linear ramp is a textbook case for Mach banding — the eye
+        perceives a false edge the math doesn't actually contain.
+     2. A percentage-sized ellipse (e.g. "90% 110%") with eased
+        multi-stops — fixed the banding at normal aspect ratios, but
+        percentage sizing means the ellipse's shape (and therefore how
+        far down the tint reaches) swings with the viewport's aspect
+        ratio, not just its height. Verified case: a wide-but-short
+        window (1920x450) reintroduced a visible seam that never showed
+        up at any normal-shaped viewport tested.
+     The fix for #2 is this linear-gradient as the base tone: its stops
+     are purely a function of vertical position, completely independent
+     of width, so it can't be thrown off by an unusual aspect ratio. The
+     radial-gradient layered on top is now a fixed-pixel-size accent
+     glow (not a percentage-of-viewport one) purely for visual character
+     — the linear gradient alone is what guarantees full, smooth
+     coverage. Both use eased multi-stops rather than a plain two-stop
+     fade, for the same anti-banding reason as approach #2. */
   background:
-    radial-gradient(ellipse 90% 110% at 50% -10%, #1c1430 0%, transparent 100%),
-    var(--bg);
+    radial-gradient(
+      1400px 800px at 30% -10%,
+      #2a1f45 0%,
+      #21183a 30%,
+      #1c1430 55%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      #1c1430 0%,
+      #17122a 20%,
+      #120e22 40%,
+      #0d0b1a 65%,
+      var(--bg) 100%
+    );
   background-attachment: fixed;
 }
 
