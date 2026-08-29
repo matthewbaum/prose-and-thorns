@@ -91,18 +91,20 @@ body {
      a visible line at a perfectly ordinary window shape — a case this
      session's own screenshot tooling never reproduced, because
      screenshot compression/downscaling was quietly smoothing over the
-     exact subtlety this bug is made of. Rather than keep chasing one
-     more stop-count tweak blind, this adds the standard, source-agnostic
-     fix for gradient banding: a faint tiled noise texture (a data-URI
-     SVG feTurbulence pattern, baked-in alpha ~4%) layered on top via
-     background-blend-mode: overlay. Dithering like this breaks up
-     banding regardless of whether the root cause is perceptual
-     (Mach bands), real 8-bit color quantization, or a rendering seam
-     where another element's box happens to meet this gradient — it
-     doesn't require knowing which one it is. */
+     exact subtlety this bug is made of.
+     Rather than chase one more stop-count tweak blind, this needed the
+     standard, source-agnostic fix for gradient banding: a faint tiled
+     noise texture blended over the gradient. First attempt used a
+     data-URI SVG feTurbulence filter for that noise — but the report
+     came from Firefox with strict tracking protection on (visible from
+     its own "reduce advanced privacy protections" banner in the
+     screenshot), and SVG filter effects are a known target of privacy
+     hardening specifically because they can be used for fingerprinting
+     — so that noise may not have been rendering at all for that report.
+     Replaced with a static, pre-baked noise PNG (see body::before below)
+     instead of a live-computed filter, which privacy tooling has no
+     reason to alter. */
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
-      repeat,
     radial-gradient(
       1400px 800px at 30% -10%,
       #2a1f45 0%,
@@ -118,8 +120,33 @@ body {
       #0d0b1a 65%,
       var(--bg) 100%
     );
-  background-blend-mode: overlay, normal, normal;
   background-attachment: fixed;
+}
+
+body::before {
+  /* The dither layer itself — see the body rule above for why this is a
+     static image rather than a live SVG filter. position:fixed so it
+     stays viewport-relative like the gradient it's breaking up banding
+     on, rather than scrolling with (and eventually running out of
+     coverage past) the page's real content height.
+     z-index:0 here PLUS z-index:1 on .app-shell (App.css) is required,
+     not decorative — position:fixed alone does not reliably determine
+     paint order against a plain, non-positioned sibling; this project
+     already hit that exact cross-browser trap once with the hero rose
+     watermark (see HomePage.css's .home-hero comment). Explicit z-index
+     on both sides makes it a plain, unambiguous z-index comparison
+     instead of one relying on implicit category rules browsers don't
+     all resolve identically. */
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url('data:image/png;base64,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');
+  background-repeat: repeat;
+  background-size: 64px 64px;
+  opacity: 0.13;
+  mix-blend-mode: overlay;
 }
 
 #root {

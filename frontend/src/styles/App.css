@@ -2,6 +2,17 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  /* Paired with body::before's z-index:0 (index.css) — that pseudo-
+     element is a position:fixed dither overlay meant to sit behind all
+     real page content. Without an explicit stacking context here too,
+     paint order between it and this plain, non-positioned div would
+     fall back to implicit "positioned vs non-positioned" category
+     rules, which this project already found don't resolve identically
+     across browsers (see HomePage.css's .home-hero comment for the
+     earlier case that taught this lesson). Explicit z-index on both
+     sides makes it a plain, unambiguous comparison instead. */
+  position: relative;
+  z-index: 1;
 }
 
 .app-layout {
