@@ -50,6 +50,20 @@
   background:
     radial-gradient(ellipse 760px 520px at 12% 20%, var(--accent-soft), transparent 78%),
     radial-gradient(ellipse 560px 460px at 100% 30%, #c9a84c14, transparent 75%);
+  /* The falloff tuning above reduces how strong the blobs are up near this
+     element's own top edge, but doesn't get them to zero there — verified
+     by evaluating the actual gradient math at inset's top boundary: still
+     a real, non-trivial color value, not "transparent" yet. That's a
+     genuine step (0 contribution just outside this box's edge, a real one
+     just inside it), independent of anything body's own background does —
+     confirmed as the actual cause of a seam reported as localized to
+     exactly this spot and nowhere else on the page, several rounds of
+     tuning body's gradient never having touched it. A mask forces this
+     element's own rendered opacity to true zero at its top edge by
+     construction, closing the gap regardless of how the underlying blob
+     math happens to evaluate there. */
+  mask-image: linear-gradient(to bottom, transparent 0, black 90px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 90px);
 }
 
 .home-hero-copy {
