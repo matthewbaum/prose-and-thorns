@@ -85,8 +85,24 @@ body {
      glow (not a percentage-of-viewport one) purely for visual character
      — the linear gradient alone is what guarantees full, smooth
      coverage. Both use eased multi-stops rather than a plain two-stop
-     fade, for the same anti-banding reason as approach #2. */
+     fade, for the same anti-banding reason as approach #2.
+     Even after both of those, a real user report (high-DPI display,
+     full clean screenshot, hard-refreshed private window) still showed
+     a visible line at a perfectly ordinary window shape — a case this
+     session's own screenshot tooling never reproduced, because
+     screenshot compression/downscaling was quietly smoothing over the
+     exact subtlety this bug is made of. Rather than keep chasing one
+     more stop-count tweak blind, this adds the standard, source-agnostic
+     fix for gradient banding: a faint tiled noise texture (a data-URI
+     SVG feTurbulence pattern, baked-in alpha ~4%) layered on top via
+     background-blend-mode: overlay. Dithering like this breaks up
+     banding regardless of whether the root cause is perceptual
+     (Mach bands), real 8-bit color quantization, or a rendering seam
+     where another element's box happens to meet this gradient — it
+     doesn't require knowing which one it is. */
   background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
+      repeat,
     radial-gradient(
       1400px 800px at 30% -10%,
       #2a1f45 0%,
@@ -102,6 +118,7 @@ body {
       #0d0b1a 65%,
       var(--bg) 100%
     );
+  background-blend-mode: overlay, normal, normal;
   background-attachment: fixed;
 }
 
