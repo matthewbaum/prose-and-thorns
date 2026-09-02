@@ -383,4 +383,107 @@ export const SEED_BOOKS = [
   { title: "Seek the Traitor's Son", author: 'Veronica Roth' },
   { title: 'The Knave and the Moon', author: 'Rachel Gillig' },
   { title: 'Hooked', author: 'Emily McIntire' },
+
+  // Expansion batch 1 of N (2026-09-02) — 300->500 catalog expansion,
+  // approved by user with per-book cost sign-off. Sourced from Goodreads
+  // Choice Awards "Romantasy"/"Fantasy" category nominee lists 2020-2025
+  // (fetched directly from goodreads.com/choiceawards, not a summary --
+  // vote counts confirm these are genuine award nominees, not
+  // recall/hallucination risk) plus 3 titles targeted at this session's
+  // gap analysis (shifters-werewolves subgenre, currently only 3 books
+  // in the whole catalog). Every title cross-checked against the
+  // existing seedList.js before adding (44 Choice Awards nominees were
+  // already present and skipped). Hardcover review-volume and trope
+  // verification happens per this project's normal pipeline + audit
+  // flow, not before ingestion -- titles under the 5-review threshold
+  // will be flagged, not silently added, per this batch's instructions.
+  { title: 'Alchemised', author: 'SenLinYu' },
+  { title: 'Mate', author: 'Ali Hazelwood' },
+  { title: "A Witch's Guide to Magical Innkeeping", author: 'Sangu Mandanna' },
+  { title: 'Enchantra', author: 'Kaylie Smith' },
+  { title: 'Wild Reverence', author: 'Rebecca Ross' },
+  { title: 'Silver Elite', author: 'Dani Francis' },
+  { title: 'The Songbird & the Heart of Stone', author: 'Carissa Broadbent' },
+  { title: 'Dire Bound', author: 'Sable Sorensen' },
+  { title: 'The Irresistible Urge to Fall for Your Enemy', author: 'Brigitte Knightley' },
+  { title: 'Bonds of Hercules', author: 'Jasmine Mas' },
+  { title: 'Rose in Chains', author: 'Julie Soto' },
+  { title: 'Immortal', author: 'Sue Lynn Tan' },
+  { title: 'On Wings of Blood', author: 'Briar Boleyn' },
+  { title: 'The Wrath of the Fallen', author: 'Amber V. Nicole' },
+  { title: 'Our Vicious Oaths', author: 'N.E. Davenport' },
+  { title: 'Restless Stars', author: 'Caroline Peckham' },
+  { title: 'The Honey Witch', author: 'Sydney J. Shields' },
+  { title: 'Faebound', author: 'Saara El-Arifi' },
+  { title: 'A Dark and Drowning Tide', author: 'Allison Saft' },
+  { title: 'Blood of Hercules', author: 'Jasmine Mas' },
+  { title: 'The Games Gods Play', author: 'Abigail Owen' },
+  { title: 'Gold', author: 'Raven Kennedy' },
+  { title: 'The Veiled Kingdom', author: 'Holly Renee' },
+  { title: 'A Crown This Cold and Heavy', author: 'Stacia Stark' },
+  { title: 'Fate of the Sun King', author: 'Nisha J. Tuli' },
+  { title: 'A Promise of Peridot', author: 'Kate Golden' },
+  { title: 'A Soul of Ash and Blood', author: 'Jennifer L. Armentrout' },
+  { title: 'Sorrow and Starlight', author: 'Caroline Peckham' },
+  { title: 'Throne of the Fallen', author: 'Kerri Maniscalco' },
+  { title: 'The Hanging City', author: 'Charlie N. Holmberg' },
+  { title: 'The Jasad Heir', author: 'Sara Hashem' },
+  { title: 'A Game of Gods', author: 'Scarlett St. Clair' },
+  { title: 'The Coven', author: 'Harper L. Woods' },
+  { title: 'Fall of Ruin and Wrath', author: 'Jennifer L. Armentrout' },
+  { title: 'Bewitched', author: 'Laura Thalassa' },
+  { title: 'Slaying the Vampire Conqueror', author: 'Carissa Broadbent' },
+  { title: 'Rule of the Aurora King', author: 'Nisha J. Tuli' },
+  { title: 'A Queen of Thieves & Chaos', author: 'K.A. Tucker' },
+  { title: 'A Court This Cruel & Lovely', author: 'Stacia Stark' },
+  { title: 'Daughter of the Moon Goddess', author: 'Sue Lynn Tan' },
+  { title: 'Under the Whispering Door', author: 'T.J. Klune' },
+  { title: "The Witch's Heart", author: 'Genevieve Gornichec' },
+  { title: 'The Chosen and the Beautiful', author: 'Nghi Vo' },
+  { title: 'The Once and Future Witches', author: 'Alix E. Harrow' },
+  // Gap-fill: shifters-werewolves subgenre (3 books total pre-expansion)
+  { title: 'The Wolf King', author: 'Lauren Palphreyman' },
+  { title: 'The Mating Game', author: 'Lana Ferguson' },
+  { title: 'The Last Namsara', author: 'Kristen Ciccarelli' },
+
+  // Expansion batch 2 (2026-09-02) — more gap-fill, sourced from Goodreads
+  // shelf pages for the specific thin subgenres (shifters-werewolves,
+  // magic-academy, dragon-riders), cross-checked against seedList.js.
+  // Excluded several shelf entries that are either not romance-forward
+  // (Eragon, His Majesty's Dragon, the Pern books) or too obscure/thin
+  // self-pub series likely to fail the 5-review Hardcover threshold
+  // (Supernatural Academy, Nightworld Academy, the Bro and the Beast
+  // series) rather than risk adding titles that can't be tagged well.
+  { title: 'Wolfsong', author: 'T.J. Klune' },
+  { title: 'Cry Wolf', author: 'Patricia Briggs' },
+  { title: 'Feral Sins', author: 'Suzanne Wright' },
+  { title: 'Wicked Wings', author: 'Elizabeth Briggs' },
+  { title: 'First Year', author: 'Rachel E. Carter' },
+  { title: 'The Bond That Burns', author: 'Briar Boleyn' },
+
+  // Expansion batch 3 (2026-09-02) — gap-fill for urban-fantasy,
+  // vampire-dark-fantasy, gothic, and dystopian (all still under-
+  // represented after batches 1-2), plus 4 confirmed-real, very recent
+  // (2026) releases from Goodreads' romantasy genre page "New Releases"
+  // section (each verified individually via web search, not just the
+  // page summary, since new-release title/author pairs are exactly the
+  // higher-hallucination-risk case seedVerification.js exists for).
+  { title: 'Burn for Me', author: 'Ilona Andrews' },
+  { title: 'Magic Burns', author: 'Ilona Andrews' },
+  { title: 'Halfway to the Grave', author: 'Jeaniene Frost' },
+  { title: "Angels' Blood", author: 'Nalini Singh' },
+  { title: 'Dark Lover', author: 'J.R. Ward' },
+  { title: 'Guilty Pleasures', author: 'Laurell K. Hamilton' },
+  { title: 'Nocticadia', author: 'Keri Lake' },
+  { title: 'Gothikana', author: 'RuNyx' },
+  { title: 'Master of Salt & Bones', author: 'Keri Lake' },
+  { title: 'A Dowry of Blood', author: 'S.T. Gibson' },
+  { title: 'Hollow Heathens', author: 'Nicole Fiorina' },
+  { title: 'Unravel Me', author: 'Tahereh Mafi' },
+  { title: 'The Selection', author: 'Kiera Cass' },
+  { title: 'Pestilence', author: 'Laura Thalassa' },
+  { title: 'Starside', author: 'Alex Aster' },
+  { title: 'Steelborn', author: 'Taylor J. LaRue' },
+  { title: 'Devour Me', author: 'Emily Rath' },
+  { title: 'The Dark in Her Veins', author: 'M.K. Lobb' },
 ];
