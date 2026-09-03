@@ -591,4 +591,12 @@ export const SEED_BOOKS = [
   { title: "Archangel's Kiss", author: 'Nalini Singh' },
   { title: 'White Hot', author: 'Ilona Andrews' },
   { title: 'One Foot in the Grave', author: 'Jeaniene Frost' },
+
+  // Expansion batch 16 (2026-09-03) — targeting dark-romance-fantasy and
+  // magic-academy (both still thin), continuing series already in the
+  // catalog. "A Promise of Peridot" retried (was rejected in batch 1 for
+  // thin reviews) and rejected again -- still no Hardcover reviews at all.
+  { title: 'Scarred', author: 'Emily McIntire' },
+  { title: 'The Ever Queen', author: 'LJ Andrews' },
+  { title: "Earth's End", author: 'Elise Kova' },
 ];
