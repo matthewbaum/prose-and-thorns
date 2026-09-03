@@ -785,4 +785,17 @@ export const SEED_BOOKS = [
   { title: 'A Song to Drown Rivers', author: 'Ann Liang' },
   { title: 'The Night Ends with Fire', author: 'K.X. Song' },
   { title: 'A Sweet Sting of Salt', author: 'Rose Sutherland' },
+
+  // Expansion batch 37 (2026-09-03) — Goodreads Choice Awards Best
+  // Fantasy 2025 nominees.
+  { title: 'Alchemy of Secrets', author: 'Stephanie Garber' },
+  { title: 'Hemlock & Silver', author: 'T. Kingfisher' },
+  // "The River Has Roots" (Amal El-Mohtar) -- a genuine novella, finally
+  // landed the pacing:quick-read tag after 3 earlier failed attempts
+  // this session.
+  { title: 'The River Has Roots', author: 'Amal El-Mohtar' },
+  { title: 'Water Moon', author: 'Samantha Sotto Yambao' },
+  // "Thief of Night" (Holly Black) and "A Resistance of Witches" (Morgan
+  // Ryan) tried and rejected: both very recent releases with only 3
+  // Hardcover reviews each.
 ];
