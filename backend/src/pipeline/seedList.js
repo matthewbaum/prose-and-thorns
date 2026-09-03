@@ -582,4 +582,13 @@ export const SEED_BOOKS = [
   { title: "King's Cage", author: 'Victoria Aveyard' },
   { title: 'The Elite', author: 'Kiera Cass' },
   { title: 'War', author: 'Laura Thalassa' },
+
+  // Expansion batch 15 (2026-09-03) — more backlist continuations,
+  // targeting magic-academy, vampire-dark-fantasy, urban-fantasy.
+  { title: 'Zodiac Academy 3: The Reckoning', author: 'Caroline Peckham' },
+  { title: 'Lover Revealed', author: 'J.R. Ward' },
+  { title: 'Magic Slays', author: 'Ilona Andrews' },
+  { title: "Archangel's Kiss", author: 'Nalini Singh' },
+  { title: 'White Hot', author: 'Ilona Andrews' },
+  { title: 'One Foot in the Grave', author: 'Jeaniene Frost' },
 ];
