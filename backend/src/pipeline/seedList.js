@@ -540,4 +540,17 @@ export const SEED_BOOKS = [
   // each (below the 5-review floor), so removed rather than added with a
   // low-confidence score. "Down Comes the Night" kept (8 reviews).
   { title: 'Down Comes the Night', author: 'Allison Saft' },
+
+  // Expansion batch 11 (2026-09-03) — gap-fill for dragon-riders and
+  // shifters-werewolves (still thinnest subgenres after the Juliette
+  // Cross series-metadata fix reclassified 3 books from dragon-riders to
+  // shifters-werewolves — see commit for that fix). "Fire in His Kiss" is
+  // the sequel to Ruby Dixon's already-cataloged "Fire in His Blood",
+  // also targeting the thin very-high spice level. "The Scattered Bones"
+  // (274pg standalone) is a third attempt at the still-empty
+  // pacing:quick-read gap.
+  { title: 'Fear the Flames', author: 'Olivia Rose Darling' },
+  { title: 'Twilight of Embers', author: 'Tessa Hale' },
+  { title: 'Fire in His Kiss', author: 'Ruby Dixon' },
+  { title: 'The Scattered Bones', author: 'Nicole Scarano' },
 ];
