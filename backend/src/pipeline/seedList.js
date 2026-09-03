@@ -553,4 +553,14 @@ export const SEED_BOOKS = [
   { title: 'Twilight of Embers', author: 'Tessa Hale' },
   { title: 'Fire in His Kiss', author: 'Ruby Dixon' },
   { title: 'The Scattered Bones', author: 'Nicole Scarano' },
+
+  // Expansion batch 12 (2026-09-03) — backlist continuations from
+  // shifters-werewolves authors/series already in the catalog
+  // (guaranteed real, well-reviewed by construction).
+  { title: 'Caressed By Ice', author: 'Nalini Singh' },
+  { title: 'Mine to Possess', author: 'Nalini Singh' },
+  { title: 'Hunting Ground', author: 'Patricia Briggs' },
+  { title: 'Ravensong', author: 'TJ Klune' },
+  // "Wicked Cravings" (Suzanne Wright) tried and rejected: only 2
+  // Hardcover reviews, below the 5-review floor.
 ];
