@@ -739,4 +739,15 @@ export const SEED_BOOKS = [
   { title: 'The Empress of Salt and Fortune', author: 'Nghi Vo' },
   { title: 'Black Sun', author: 'Rebecca Roanhorse' },
   { title: 'Smoke Bitten', author: 'Patricia Briggs' },
+
+  // Expansion batch 32 (2026-09-03) — Goodreads Choice Awards Best Young
+  // Adult Fantasy 2023 nominees. "Divine Rivals", "A Study in Drowning",
+  // "Foxglove" already present, skipped.
+  { title: 'The Stolen Heir', author: 'Holly Black' },
+  { title: 'What the River Knows', author: 'Isabel Ibañez' },
+  { title: 'Song of Silver, Flame Like Night', author: 'Amélie Wen Zhao' },
+  { title: 'House of Roots and Ruin', author: 'Erin A. Craig' },
+  { title: 'The Scarlet Veil', author: 'Shelby Mahurin' },
+  // "Silver in the Bone" (Alexandra Bracken) tried and rejected: only 4
+  // Hardcover reviews.
 ];
