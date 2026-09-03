@@ -725,4 +725,11 @@ export const SEED_BOOKS = [
   { title: 'The Hidden Palace', author: 'Helene Wecker' },
   // "The Book of Magic" (Alice Hoffman) tried and rejected: only 4
   // Hardcover reviews.
+
+  // Expansion batch 30 (2026-09-03) — Goodreads Choice Awards Best
+  // Fantasy 2022 nominees. "Legends & Lattes" and "The Golden Enclaves"
+  // already present, skipped.
+  { title: 'Kaikeyi', author: 'Vaishnavi Patel' },
+  { title: 'The Book Eaters', author: 'Sunyi Dean' },
+  { title: 'The Stardust Thief', author: 'Chelsea Abdullah' },
 ];
