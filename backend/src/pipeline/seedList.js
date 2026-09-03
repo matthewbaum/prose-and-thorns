@@ -767,4 +767,12 @@ export const SEED_BOOKS = [
   { title: 'A Magic Steeped in Poison', author: 'Judy I. Lin' },
   { title: 'Violet Made of Thorns', author: 'Gina Chen' },
   { title: 'The Girl Who Fell Beneath the Sea', author: 'Axie Oh' },
+
+  // Expansion batch 35 (2026-09-03) — Goodreads Choice Awards Best Young
+  // Adult Fantasy 2021 nominees. "The Gilded Ones", "Six Crimson Cranes",
+  // "Gods & Monsters", "These Hollow Vows" already present, skipped.
+  { title: 'Lore', author: 'Alexandra Bracken' },
+  { title: 'Namesake', author: 'Adrienne Young' },
+  { title: 'We Free the Stars', author: 'Hafsah Faizal' },
+  { title: 'A Vow So Bold and Deadly', author: 'Brigid Kemmerer' },
 ];
