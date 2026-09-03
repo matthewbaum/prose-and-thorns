@@ -716,4 +716,13 @@ export const SEED_BOOKS = [
   { title: 'Fragile Eternity', author: 'Melissa Marr' },
   // "The Mask Falling" (Samantha Shannon, Bone Season #4) tried and
   // rejected: only 3 Hardcover reviews.
+
+  // Expansion batch 29 (2026-09-03) — Goodreads Choice Awards Best
+  // Fantasy 2021 nominees (predates romantasy having its own category),
+  // cross-checked against the existing catalog.
+  { title: 'She Who Became the Sun', author: 'Shelley Parker-Chan' },
+  { title: 'A Spindle Splintered', author: 'Alix E. Harrow' },
+  { title: 'The Hidden Palace', author: 'Helene Wecker' },
+  // "The Book of Magic" (Alice Hoffman) tried and rejected: only 4
+  // Hardcover reviews.
 ];
