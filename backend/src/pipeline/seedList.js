@@ -647,4 +647,13 @@ export const SEED_BOOKS = [
   { title: 'Nona the Ninth', author: 'Tamsyn Muir' },
   { title: 'Burn Bright', author: 'Patricia Briggs' },
   { title: 'Heartsong', author: 'TJ Klune' },
+
+  // Expansion batch 22 (2026-09-03) — more dystopian/urban-fantasy
+  // backlist. Found "A Duet with the Siren Duke" (#291, already in
+  // catalog) had no series_name at all despite clearly being Married to
+  // Magic book 4 -- fixed directly in the DB, no new seed needed.
+  { title: 'The One', author: 'Kiera Cass' },
+  { title: 'Winter', author: 'Marissa Meyer' },
+  // "Branded by Fire" (Nalini Singh) tried and rejected: only 4 Hardcover
+  // reviews, below the 5-review floor.
 ];
