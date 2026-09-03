@@ -697,4 +697,13 @@ export const SEED_BOOKS = [
   // "Bride of the Shadow King" (Sylvia Mercedes) tried and rejected: only
   // 4 Hardcover reviews despite being a viral BookTok title -- popularity
   // on TikTok doesn't always translate to Hardcover review volume.
+
+  // Expansion batch 27 (2026-09-03) — more backlist continuations. Found
+  // "Heartless Sky" (#307, already in catalog) had no series_name at all
+  // despite being Zodiac Academy 7 -- fixed directly. "Archangel's
+  // Consort" (Guild Hunter #3) already tried and rejected in batch 20.
+  { title: 'Magic Breaks', author: 'Ilona Andrews' },
+  { title: 'Bone Crossed', author: 'Patricia Briggs' },
+  // "Lover Unbound" (J.R. Ward, Black Dagger Brotherhood #5) tried and
+  // rejected: only 4 Hardcover reviews.
 ];
