@@ -563,4 +563,14 @@ export const SEED_BOOKS = [
   { title: 'Ravensong', author: 'TJ Klune' },
   // "Wicked Cravings" (Suzanne Wright) tried and rejected: only 2
   // Hardcover reviews, below the 5-review floor.
+
+  // Expansion batch 13 (2026-09-03) — more backlist continuations,
+  // targeting magic-academy and shifters-werewolves (both still thin).
+  { title: 'Blood Bound', author: 'Patricia Briggs' },
+  { title: 'Fire Falling', author: 'Elise Kova' },
+  { title: 'Fair Game', author: 'Patricia Briggs' },
+  // "Ruthless Fae" (Caroline Peckham) already present as "Zodiac Academy
+  // 2: Ruthless Fae" (#301) from an earlier batch -- duplicate seed,
+  // removed. "Hostage to Pleasure" (Nalini Singh) tried and rejected:
+  // only 3 Hardcover reviews, below the 5-review floor.
 ];
