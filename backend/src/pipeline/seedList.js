@@ -759,4 +759,12 @@ export const SEED_BOOKS = [
   { title: 'Where the Dark Stands Still', author: 'A.B. Poranek' },
   { title: 'The Darkness Within Us', author: 'Tricia Levenseller' },
   { title: 'Your Blood, My Bones', author: 'Kelly Andrew' },
+
+  // Expansion batch 34 (2026-09-03) — Goodreads Choice Awards Best Young
+  // Adult Fantasy 2022 nominees. "Bloodmarked", "Kingdom of the Feared",
+  // "Belladonna" already present, skipped.
+  { title: 'These Twisted Bonds', author: 'Lexi Ryan' },
+  { title: 'A Magic Steeped in Poison', author: 'Judy I. Lin' },
+  { title: 'Violet Made of Thorns', author: 'Gina Chen' },
+  { title: 'The Girl Who Fell Beneath the Sea', author: 'Axie Oh' },
 ];
