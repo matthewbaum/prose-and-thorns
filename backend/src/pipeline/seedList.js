@@ -637,4 +637,14 @@ export const SEED_BOOKS = [
   // Marillier), and "Lady of Light and Shadows" (C.L. Wilson) all tried
   // and rejected: 3, 4, and 2 Hardcover reviews respectively, below the
   // 5-review floor.
+
+  // Expansion batch 21 (2026-09-03) — targeting dystopian, gothic, and
+  // shifters-werewolves (still the thinnest subgenres now that
+  // urban-fantasy has grown past thin). "Godsgrave" (Nevernight #2)
+  // already present, skipped.
+  { title: 'War Storm', author: 'Victoria Aveyard' },
+  { title: 'Defy Me', author: 'Tahereh Mafi' },
+  { title: 'Nona the Ninth', author: 'Tamsyn Muir' },
+  { title: 'Burn Bright', author: 'Patricia Briggs' },
+  { title: 'Heartsong', author: 'TJ Klune' },
 ];
