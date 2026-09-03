@@ -679,4 +679,14 @@ export const SEED_BOOKS = [
   // independently confirmed via web search to be a real, if obscure,
   // self-pub title, but it has zero real review data on Hardcover either
   // way, so it fails the review-volume bar regardless.
+
+  // Expansion batch 25 (2026-09-03) — targeting dark-romance-fantasy and
+  // gothic. "Legendary" (Caraval #2) and "The Hemlock Queen" (Nightshade
+  // Crown #2) already present, skipped. "Twisted" (Never After #4)
+  // deliberately skipped -- same reasoning as "Wretched": confirmed via
+  // web search to be a straight contemporary romance (Aladdin retelling
+  // with no fantasy elements), not a fit for a romantasy-only catalog.
+  { title: 'The Mist Thief', author: 'LJ Andrews' },
+  // "Death" (Laura Thalassa, Four Horsemen #4) tried and rejected: only 2
+  // Hardcover reviews, a very recent release.
 ];
