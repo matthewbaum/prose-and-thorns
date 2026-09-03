@@ -706,4 +706,14 @@ export const SEED_BOOKS = [
   { title: 'Bone Crossed', author: 'Patricia Briggs' },
   // "Lover Unbound" (J.R. Ward, Black Dagger Brotherhood #5) tried and
   // rejected: only 4 Hardcover reviews.
+
+  // Expansion batch 28 (2026-09-03) — more backlist continuations. Found
+  // "Shadow of Night" (#336, already in catalog) used series_name "All
+  // Souls Trilogy" while its siblings used "All Souls" -- fixed directly;
+  // the series is actually already complete (3/3), the stale series_total
+  // (5) just made it look incomplete. "Son of the Shadows" and "Lady of
+  // Light and Shadows" already tried and rejected in batch 20.
+  { title: 'Fragile Eternity', author: 'Melissa Marr' },
+  // "The Mask Falling" (Samantha Shannon, Bone Season #4) tried and
+  // rejected: only 3 Hardcover reviews.
 ];
