@@ -689,4 +689,12 @@ export const SEED_BOOKS = [
   { title: 'The Mist Thief', author: 'LJ Andrews' },
   // "Death" (Laura Thalassa, Four Horsemen #4) tried and rejected: only 2
   // Hardcover reviews, a very recent release.
+
+  // Expansion batch 26 (2026-09-03) — targeting the thinnest romance
+  // tropes (fake-dating: 9, age-gap: 11) rather than subgenre, since
+  // subgenre gap-filling from backlist is hitting diminishing returns.
+  { title: 'Heart of the Raven Prince', author: 'Tessonja Odette' },
+  // "Bride of the Shadow King" (Sylvia Mercedes) tried and rejected: only
+  // 4 Hardcover reviews despite being a viral BookTok title -- popularity
+  // on TikTok doesn't always translate to Hardcover review volume.
 ];
