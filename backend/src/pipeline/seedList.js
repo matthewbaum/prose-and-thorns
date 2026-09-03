@@ -486,4 +486,23 @@ export const SEED_BOOKS = [
   { title: 'Steelborn', author: 'Taylor J. LaRue' },
   { title: 'Devour Me', author: 'Emily Rath' },
   { title: 'The Dark in Her Veins', author: 'M.K. Lobb' },
+
+  // Expansion batch 4 (2026-09-02) — backlist gap-fill from authors
+  // already well-represented in the catalog (Ilona Andrews, Grace Draven,
+  // Nalini Singh), continuing their existing series. Guaranteed real and
+  // well-reviewed by construction (established, multi-book series), used
+  // to build general volume toward the 500 target alongside gap-fill.
+  { title: 'Magic Strikes', author: 'Ilona Andrews' },
+  { title: 'Magic Bleeds', author: 'Ilona Andrews' },
+  { title: 'Eidolon', author: 'Grace Draven' },
+  { title: 'Phoenix Unbound', author: 'Grace Draven' },
+  { title: 'Visions of Heat', author: 'Nalini Singh' },
+  { title: 'Silver Silence', author: 'Nalini Singh' },
+  { title: 'Cruel Seduction', author: 'Katee Robert' },
+  { title: 'Midnight Ruin', author: 'Katee Robert' },
+  { title: 'Dark Restraint', author: 'Katee Robert' },
+  { title: 'Sweet Obsession', author: 'Katee Robert' },
+  { title: 'Tender Cruelty', author: 'Katee Robert' },
+  { title: 'A Game of Fate', author: 'Scarlett St. Clair' },
+  { title: 'A Game of Retribution', author: 'Scarlett St. Clair' },
 ];
