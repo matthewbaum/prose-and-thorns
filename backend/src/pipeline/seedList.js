@@ -616,4 +616,14 @@ export const SEED_BOOKS = [
   // "Emberclaw" (L.R. Lam), "The Blood King" (Abigail Owen), and "The
   // Darkest Kiss" (Gena Showalter) tried and rejected: 2, 3, and 4
   // Hardcover reviews respectively, all below the 5-review floor.
+
+  // Expansion batch 19 (2026-09-03) — more backlist continuations
+  // (magic-academy, shifters-werewolves, urban-fantasy).
+  { title: 'Dead Heat', author: 'Patricia Briggs' },
+  { title: 'Iron Kissed', author: 'Patricia Briggs' },
+  { title: 'Magic Rises', author: 'Ilona Andrews' },
+  // "Zodiac Academy 6: Fated Throne" rejected: matched a near-empty
+  // Hardcover edition (1 rating) despite the series otherwise having
+  // strong review volume -- almost certainly a wrong-edition match, not
+  // a genuinely under-reviewed book.
 ];
