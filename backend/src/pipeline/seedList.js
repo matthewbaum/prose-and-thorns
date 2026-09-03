@@ -667,4 +667,16 @@ export const SEED_BOOKS = [
   // diluting a romantasy-only catalog's genre focus.
   { title: 'Famine', author: 'Laura Thalassa' },
   { title: 'The Cursed', author: 'Harper L. Woods' },
+
+  // Expansion batch 24 (2026-09-03) — targeting dragon-riders and
+  // magic-academy. "The Bond That Burns" (Bloodwing Academy #2) already
+  // present, skipped.
+  { title: 'Amid Clouds and Bones', author: 'Ella Fields' },
+  // "Serpents of Sky and Flame" (Rebecca F. Kenney) rejected: only 1
+  // Hardcover review. "Made For Magic" (Melody Rose) rejected: the
+  // pipeline's own seed verification couldn't corroborate it and Google
+  // Books matched a completely unrelated 1900s poetry collection --
+  // independently confirmed via web search to be a real, if obscure,
+  // self-pub title, but it has zero real review data on Hardcover either
+  // way, so it fails the review-volume bar regardless.
 ];
