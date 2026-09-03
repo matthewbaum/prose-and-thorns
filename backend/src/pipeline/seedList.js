@@ -608,4 +608,12 @@ export const SEED_BOOKS = [
   // "Wrath of the Dragons" (Olivia Rose Darling) tried and rejected: a
   // very recent (2025) release with only 2 Hardcover reviews so far,
   // below the 5-review floor.
+
+  // Expansion batch 18 (2026-09-03) — continuing series just added in
+  // batch 17 (dragon-riders/shifters-werewolves), plus vampire-dark-
+  // fantasy backlist continuations.
+  { title: 'The Laughing Corpse', author: 'Laurell K. Hamilton' },
+  // "Emberclaw" (L.R. Lam), "The Blood King" (Abigail Owen), and "The
+  // Darkest Kiss" (Gena Showalter) tried and rejected: 2, 3, and 4
+  // Hardcover reviews respectively, all below the 5-review floor.
 ];
