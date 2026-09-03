@@ -505,4 +505,14 @@ export const SEED_BOOKS = [
   { title: 'Tender Cruelty', author: 'Katee Robert' },
   { title: 'A Game of Fate', author: 'Scarlett St. Clair' },
   { title: 'A Game of Retribution', author: 'Scarlett St. Clair' },
+
+  // Expansion batch 6 (2026-09-02) — more backlist continuations from
+  // established authors/series already in the catalog.
+  { title: 'This Shattered Tempest', author: 'Thea Guanzon' },
+  { title: 'Lover Eternal', author: 'J.R. Ward' },
+  { title: 'Lover Awakened', author: 'J.R. Ward' },
+  { title: 'The Inadequate Heir', author: 'Danielle L. Jensen' },
+  { title: 'The Endless War', author: 'Danielle L. Jensen' },
+  { title: 'The Twisted Throne', author: 'Danielle L. Jensen' },
+  { title: 'Wicked', author: 'Jennifer L. Armentrout' },
 ];
