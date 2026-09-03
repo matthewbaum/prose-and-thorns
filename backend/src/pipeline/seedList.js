@@ -599,4 +599,13 @@ export const SEED_BOOKS = [
   { title: 'Scarred', author: 'Emily McIntire' },
   { title: 'The Ever Queen', author: 'LJ Andrews' },
   { title: "Earth's End", author: 'Elise Kova' },
+
+  // Expansion batch 17 (2026-09-03) — targeting dragon-riders and
+  // magic-academy, the two thinnest subgenres.
+  { title: 'Dragonfall', author: 'L.R. Lam' },
+  { title: 'The Rogue King', author: 'Abigail Owen' },
+  { title: 'Arcana Academy', author: 'Elise Kova' },
+  // "Wrath of the Dragons" (Olivia Rose Darling) tried and rejected: a
+  // very recent (2025) release with only 2 Hardcover reviews so far,
+  // below the 5-review floor.
 ];
