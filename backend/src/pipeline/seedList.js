@@ -656,4 +656,15 @@ export const SEED_BOOKS = [
   { title: 'Winter', author: 'Marissa Meyer' },
   // "Branded by Fire" (Nalini Singh) tried and rejected: only 4 Hardcover
   // reviews, below the 5-review floor.
+
+  // Expansion batch 23 (2026-09-03) — targeting dark-romance-fantasy.
+  // "Crush" (Crave #2) already present, skipped. "Wretched" (Never After
+  // #3) explicitly skipped -- confirmed via web search to be a straight
+  // contemporary mafia romance with no fantasy elements at all, unlike
+  // its two series predecessors (Hooked, Scarred), which are genuinely
+  // fantasy-adjacent dark fairy-tale retellings. Adding it would mean
+  // either mistagging a non-fantasy book as dark-romance-fantasy or
+  // diluting a romantasy-only catalog's genre focus.
+  { title: 'Famine', author: 'Laura Thalassa' },
+  { title: 'The Cursed', author: 'Harper L. Woods' },
 ];
