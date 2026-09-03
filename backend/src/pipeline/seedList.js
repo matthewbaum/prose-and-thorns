@@ -732,4 +732,11 @@ export const SEED_BOOKS = [
   { title: 'Kaikeyi', author: 'Vaishnavi Patel' },
   { title: 'The Book Eaters', author: 'Sunyi Dean' },
   { title: 'The Stardust Thief', author: 'Chelsea Abdullah' },
+
+  // Expansion batch 31 (2026-09-03) — Goodreads Choice Awards Best
+  // Fantasy 2020 nominees. "A Deadly Education" already present, skipped.
+  { title: 'The Empire of Gold', author: 'S.A. Chakraborty' },
+  { title: 'The Empress of Salt and Fortune', author: 'Nghi Vo' },
+  { title: 'Black Sun', author: 'Rebecca Roanhorse' },
+  { title: 'Smoke Bitten', author: 'Patricia Briggs' },
 ];
