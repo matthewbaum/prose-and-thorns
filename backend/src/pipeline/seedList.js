@@ -750,4 +750,13 @@ export const SEED_BOOKS = [
   { title: 'The Scarlet Veil', author: 'Shelby Mahurin' },
   // "Silver in the Bone" (Alexandra Bracken) tried and rejected: only 4
   // Hardcover reviews.
+
+  // Expansion batch 33 (2026-09-03) — Goodreads Choice Awards Best Young
+  // Adult Fantasy 2024 nominees. "Ruthless Vows", "Reckless", "Heartless
+  // Hunter", "Wisteria" already present, skipped.
+  { title: "The Prisoner's Throne", author: 'Holly Black' },
+  { title: 'Immortal Dark', author: 'Tigest Girma' },
+  { title: 'Where the Dark Stands Still', author: 'A.B. Poranek' },
+  { title: 'The Darkness Within Us', author: 'Tricia Levenseller' },
+  { title: 'Your Blood, My Bones', author: 'Kelly Andrew' },
 ];
