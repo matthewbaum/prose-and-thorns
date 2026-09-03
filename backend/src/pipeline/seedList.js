@@ -515,4 +515,14 @@ export const SEED_BOOKS = [
   { title: 'The Endless War', author: 'Danielle L. Jensen' },
   { title: 'The Twisted Throne', author: 'Danielle L. Jensen' },
   { title: 'Wicked', author: 'Jennifer L. Armentrout' },
+
+  // Expansion batch 7 (2026-09-02) — targeted at the pacing:quick-read gap
+  // (still 0 books after 6 batches; T. Kingfisher's catalog specifically
+  // is known for shorter, breezier fantasy romance) plus 1 more
+  // dragon-riders/very-high-spice entry (Ruby Dixon, an author known for
+  // explicit heat).
+  { title: 'Swordheart', author: 'T. Kingfisher' },
+  { title: "Paladin's Grace", author: 'T. Kingfisher' },
+  { title: 'Nettle & Bone', author: 'T. Kingfisher' },
+  { title: 'Fire in His Blood', author: 'Ruby Dixon' },
 ];
