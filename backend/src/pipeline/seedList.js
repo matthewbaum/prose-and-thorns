@@ -573,4 +573,13 @@ export const SEED_BOOKS = [
   // 2: Ruthless Fae" (#301) from an earlier batch -- duplicate seed,
   // removed. "Hostage to Pleasure" (Nalini Singh) tried and rejected:
   // only 3 Hardcover reviews, below the 5-review floor.
+
+  // Expansion batch 14 (2026-09-03) — backlist continuations targeting
+  // dystopian and dark-romance-fantasy (both still thin). "Once Upon a
+  // Broken Heart" book 2 already present (#151), skipped.
+  { title: 'Restore Me', author: 'Tahereh Mafi' },
+  { title: 'Cress', author: 'Marissa Meyer' },
+  { title: "King's Cage", author: 'Victoria Aveyard' },
+  { title: 'The Elite', author: 'Kiera Cass' },
+  { title: 'War', author: 'Laura Thalassa' },
 ];
