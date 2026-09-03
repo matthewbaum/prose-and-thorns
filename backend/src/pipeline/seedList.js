@@ -525,4 +525,13 @@ export const SEED_BOOKS = [
   { title: "Paladin's Grace", author: 'T. Kingfisher' },
   { title: 'Nettle & Bone', author: 'T. Kingfisher' },
   { title: 'Fire in His Blood', author: 'Ruby Dixon' },
+
+  // Expansion batch 8 (2026-09-02) — Plated Prisoner sequels (already
+  // have Gild #1 and Gold #5 in the catalog).
+  { title: 'Glint', author: 'Raven Kennedy' },
+  { title: 'Gleam', author: 'Raven Kennedy' },
+  { title: 'Glow', author: 'Raven Kennedy' },
+  { title: 'Goldfinch', author: 'Raven Kennedy' },
+  { title: 'Keeper of Enchanted Rooms', author: 'Charlie N. Holmberg' },
+  { title: 'Air Awakens', author: 'Elise Kova' },
 ];
