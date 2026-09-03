@@ -535,12 +535,9 @@ export const SEED_BOOKS = [
   { title: 'Keeper of Enchanted Rooms', author: 'Charlie N. Holmberg' },
   { title: 'Air Awakens', author: 'Elise Kova' },
 
-  // Expansion batch 10 (2026-09-02) -- "The Warlord Wants Forever" is a
-  // genuine short novella (Immortals After Dark #0.5, Kresley Cole
-  // already has a book in the catalog), a second attempt at the
-  // pacing:quick-read gap after batch 7's shorter-but-still-full-length
-  // T. Kingfisher titles didn't register as quick-read.
-  { title: 'The Warlord Wants Forever', author: 'Kresley Cole' },
+  // Expansion batch 10 (2026-09-02) -- "The Warlord Wants Forever" and
+  // "Born in Fire" were tried and rejected: only 4 Hardcover reviews
+  // each (below the 5-review floor), so removed rather than added with a
+  // low-confidence score. "Down Comes the Night" kept (8 reviews).
   { title: 'Down Comes the Night', author: 'Allison Saft' },
-  { title: 'Born in Fire', author: 'K.F. Breene' },
 ];
