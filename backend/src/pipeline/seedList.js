@@ -775,4 +775,14 @@ export const SEED_BOOKS = [
   { title: 'Namesake', author: 'Adrienne Young' },
   { title: 'We Free the Stars', author: 'Hafsah Faizal' },
   { title: 'A Vow So Bold and Deadly', author: 'Brigid Kemmerer' },
+
+  // Expansion batch 36 (2026-09-03) — Goodreads Choice Awards Best
+  // Fantasy 2024 nominees. "Emily Wilde's Map of the Otherlands" already
+  // present, skipped.
+  { title: 'Empire of the Damned', author: 'Jay Kristoff' },
+  { title: 'Five Broken Blades', author: 'Mai Corland' },
+  { title: 'An Academy for Liars', author: 'Alexis Henderson' },
+  { title: 'A Song to Drown Rivers', author: 'Ann Liang' },
+  { title: 'The Night Ends with Fire', author: 'K.X. Song' },
+  { title: 'A Sweet Sting of Salt', author: 'Rose Sutherland' },
 ];
