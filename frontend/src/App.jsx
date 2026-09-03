@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import Header from './components/Header.jsx';
 import FilterPanel from './components/FilterPanel.jsx';
 import BookGrid from './components/BookGrid.jsx';
@@ -105,16 +105,38 @@ export default function App() {
     };
   }, [filters, view]);
 
+  const loadMoreInFlight = useRef(false);
+
   const loadMore = useCallback(() => {
+    // Guards a real race, not just a style nit: `disabled={loadingMore}`
+    // on the button doesn't stop a second click fired in the same tick
+    // as the first (React batches the setLoadingMore(true) re-render), so
+    // two clicks close over the *same* stale `offset`, fire two identical
+    // fetches, and both `.then` callbacks append the same page -- visible
+    // as a duplicated book in the grid (e.g. reported case: "The Name of
+    // the Wind" appearing twice in a Browse list). The ref updates
+    // synchronously, unlike state, so it actually blocks the second call.
+    if (loadMoreInFlight.current) return;
+    loadMoreInFlight.current = true;
     const nextOffset = offset + PAGE_SIZE;
     setLoadingMore(true);
     fetchBooks({ ...filters, limit: PAGE_SIZE, offset: nextOffset })
       .then((data) => {
-        setBooks((prev) => [...prev, ...(data.books || [])]);
+        // Also dedupe by id -- a stale in-flight request landing after the
+        // filters-changed effect has already reset `books` could otherwise
+        // reintroduce a book that's now on the fresh first page.
+        setBooks((prev) => {
+          const seen = new Set(prev.map((b) => b.id));
+          const fresh = (data.books || []).filter((b) => !seen.has(b.id));
+          return [...prev, ...fresh];
+        });
         setOffset(nextOffset);
       })
       .catch((err) => setError(err.message))
-      .finally(() => setLoadingMore(false));
+      .finally(() => {
+        setLoadingMore(false);
+        loadMoreInFlight.current = false;
+      });
   }, [filters, offset]);
 
   useEffect(() => {
