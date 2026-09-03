@@ -626,4 +626,15 @@ export const SEED_BOOKS = [
   // Hardcover edition (1 rating) despite the series otherwise having
   // strong review volume -- almost certainly a wrong-edition match, not
   // a genuinely under-reviewed book.
+
+  // Expansion batch 20 (2026-09-03) — more backlist continuations. Also
+  // found "Breaking Dawn" was tagged series_name "The Twilight Saga"
+  // while its 3 siblings used "Twilight" -- same class of bug as the
+  // Vale of Stars fix earlier; corrected directly in the DB, no new seed
+  // needed since all 4 Twilight books were already present.
+  { title: 'Ink Exchange', author: 'Melissa Marr' },
+  // "Archangel's Consort" (Nalini Singh), "Son of the Shadows" (Juliet
+  // Marillier), and "Lady of Light and Shadows" (C.L. Wilson) all tried
+  // and rejected: 3, 4, and 2 Hardcover reviews respectively, below the
+  // 5-review floor.
 ];
