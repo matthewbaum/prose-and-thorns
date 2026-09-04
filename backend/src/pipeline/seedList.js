@@ -798,4 +798,15 @@ export const SEED_BOOKS = [
   // "Thief of Night" (Holly Black) and "A Resistance of Witches" (Morgan
   // Ryan) tried and rejected: both very recent releases with only 3
   // Hardcover reviews each.
+
+  // Expansion batch 38 (2026-09-03) — Goodreads Choice Awards Best Young
+  // Adult Fantasy & Sci-Fi 2025 nominees. "Rebel Witch" already present,
+  // skipped.
+  { title: 'Fearless', author: 'Lauren Roberts' },
+  { title: 'Wings of Starlight', author: 'Allison Saft' },
+  { title: 'The Rose Bargain', author: 'Sasha Peyton Smith' },
+  { title: 'A Language of Dragons', author: 'S.F. Williamson' },
+  { title: 'A Forgery of Fate', author: 'Elizabeth Lim' },
+  // "Never Ever After" (Sue Lynn Tan) tried and rejected: only 3
+  // Hardcover reviews.
 ];
