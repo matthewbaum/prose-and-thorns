@@ -838,4 +838,9 @@ export const SEED_BOOKS = [
   { title: "At Grave's End", author: 'Jeaniene Frost' },
   // "Archangel's Blade" (Nalini Singh) tried and rejected: only 3
   // Hardcover reviews.
+
+  // Expansion batch 42 (2026-09-03) — more backlist continuations.
+  { title: 'Blaze of Memory', author: 'Nalini Singh' },
+  // "The Darkest Pleasure" (Gena Showalter) and "Archangel's Storm"
+  // (Nalini Singh) tried and rejected: only 3 Hardcover reviews each.
 ];
