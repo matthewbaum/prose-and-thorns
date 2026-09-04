@@ -855,4 +855,9 @@ export const SEED_BOOKS = [
   { title: 'Lover Mine', author: 'J.R. Ward' },
   // "Play of Passion" (Nalini Singh) tried and rejected: only 3 Hardcover
   // reviews.
+
+  // Expansion batch 45 (2026-09-04) — closing the final gap to 500.
+  { title: 'Lover Unleashed', author: 'J.R. Ward' },
+  // "Archangel's Legion" (Nalini Singh) tried and rejected: only 1
+  // Hardcover review.
 ];
