@@ -809,4 +809,14 @@ export const SEED_BOOKS = [
   { title: 'A Forgery of Fate', author: 'Elizabeth Lim' },
   // "Never Ever After" (Sue Lynn Tan) tried and rejected: only 3
   // Hardcover reviews.
+
+  // Expansion batch 39 (2026-09-03) — more backlist continuations,
+  // targeting magic-academy and dark-romance-fantasy. Found "Flamefall"
+  // (#332) used series_name "Aurelian Cycle" while its siblings used
+  // "The Aurelian Cycle" -- fixed directly.
+  { title: 'Grey Sister', author: 'Mark Lawrence' },
+  { title: 'Holy Sister', author: 'Mark Lawrence' },
+  // "Bespelled" (Laura Thalassa) and "The Damned" (Harper L. Woods) tried
+  // and rejected: both very recent releases with only 2 and 1 Hardcover
+  // reviews respectively.
 ];
