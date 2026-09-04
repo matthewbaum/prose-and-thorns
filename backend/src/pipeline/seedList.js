@@ -860,4 +860,23 @@ export const SEED_BOOKS = [
   { title: 'Lover Unleashed', author: 'J.R. Ward' },
   // "Archangel's Legion" (Nalini Singh) tried and rejected: only 1
   // Hardcover review.
+
+  // Expansion batch 46 (2026-09-04) — closing the last of the gap to
+  // 500. "Magic Bleeds" (Kate Daniels #4) already present, skipped.
+  // "Lover Reborn" (3 reviews), "Lover At Last" (no Hardcover match), and
+  // "Archangel's Shadows" (2 reviews) all tried and rejected.
+
+  // Expansion batch 47 (2026-09-04) — final push to 500.
+  { title: 'Magic Triumphs', author: 'Ilona Andrews' },
+  // "Archangel's Enigma" (2 reviews) and "Kiss of Snow" (4 reviews)
+  // (Nalini Singh) both tried and rejected.
+
+  // Expansion batch 48 (2026-09-04) — final 2 titles to close the gap to
+  // 500. Found "Wildfire" (#662, already in catalog) was mispositioned
+  // as Hidden Legacy #5 when the author's own site confirms it's #3 (the
+  // Nevada trilogy's conclusion); fixed directly, along with the
+  // series_total (7->6, since "Diamond Fire" is a 3.5 novella not
+  // counted in the main sequence).
+  { title: 'Sapphire Flames', author: 'Ilona Andrews' },
+  { title: 'Emerald Blaze', author: 'Ilona Andrews' },
 ];
