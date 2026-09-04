@@ -849,4 +849,10 @@ export const SEED_BOOKS = [
   { title: 'Magic Shifts', author: 'Ilona Andrews' },
   { title: 'Lover Avenged', author: 'J.R. Ward' },
   { title: 'Bonds of Justice', author: 'Nalini Singh' },
+
+  // Expansion batch 44 (2026-09-04) — final push toward the 500 target.
+  { title: 'Magic Binds', author: 'Ilona Andrews' },
+  { title: 'Lover Mine', author: 'J.R. Ward' },
+  // "Play of Passion" (Nalini Singh) tried and rejected: only 3 Hardcover
+  // reviews.
 ];
