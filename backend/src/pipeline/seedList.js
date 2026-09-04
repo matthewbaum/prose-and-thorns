@@ -843,4 +843,10 @@ export const SEED_BOOKS = [
   { title: 'Blaze of Memory', author: 'Nalini Singh' },
   // "The Darkest Pleasure" (Gena Showalter) and "Archangel's Storm"
   // (Nalini Singh) tried and rejected: only 3 Hardcover reviews each.
+
+  // Expansion batch 43 (2026-09-04) — more backlist continuations,
+  // pushing toward the 500 target.
+  { title: 'Magic Shifts', author: 'Ilona Andrews' },
+  { title: 'Lover Avenged', author: 'J.R. Ward' },
+  { title: 'Bonds of Justice', author: 'Nalini Singh' },
 ];
