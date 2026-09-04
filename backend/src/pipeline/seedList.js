@@ -819,4 +819,13 @@ export const SEED_BOOKS = [
   // "Bespelled" (Laura Thalassa) and "The Damned" (Harper L. Woods) tried
   // and rejected: both very recent releases with only 2 and 1 Hardcover
   // reviews respectively.
+
+  // Expansion batch 40 (2026-09-03) — completing series already in the
+  // catalog. Found "Sorrow and Starlight" (#457) and "Restless Stars"
+  // (#445), both already present, were mistagged into completely wrong
+  // series ("The Savage Kingdom" and "The Reckoning") when they're
+  // actually Zodiac Academy 8 and 9 -- fixed directly.
+  // "The Wings That Bind" (Briar Boleyn), "Court", "Charm", and "Cherish"
+  // (all Tracy Wolff, Crave #4-6) all tried and rejected: 1, 4, 2, and 4
+  // Hardcover reviews respectively -- all very recent releases.
 ];
