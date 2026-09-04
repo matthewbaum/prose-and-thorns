@@ -879,4 +879,23 @@ export const SEED_BOOKS = [
   // counted in the main sequence).
   { title: 'Sapphire Flames', author: 'Ilona Andrews' },
   { title: 'Emerald Blaze', author: 'Ilona Andrews' },
+
+  // Expansion batch 49 (2026-09-04) — restoring the count to 500 after
+  // removing 6 books found to be below the review-volume standard during
+  // an admin-findings cleanup pass (see commit b950e7b). "Zodiac Academy
+  // 6" was tried twice (once as "Zodiac Academy 6: Fated Throne", once
+  // as the bare Goodreads title "Fated Throne") and rejected both times
+  // for a near-empty/zero Hardcover match -- genuinely giving up on book
+  // 6 of this series rather than trying a third variant.
+  { title: 'The King', author: 'J.R. Ward' },
+  { title: 'River Marked', author: 'Patricia Briggs' },
+  { title: 'Destined for an Early Grave', author: 'Jeaniene Frost' },
+  // "Tangle of Need" (4 reviews) and "Archangel's Heart" (3 reviews)
+  // (both Nalini Singh) tried and rejected.
+
+  // Expansion batch 50 (2026-09-04) — final push, reaches 500.
+  { title: 'The Shadows', author: 'J.R. Ward' },
+  { title: 'Fire Touched', author: 'Patricia Briggs' },
+  // "Archangel's Viper" (Nalini Singh) tried and rejected: only 3
+  // Hardcover reviews.
 ];
