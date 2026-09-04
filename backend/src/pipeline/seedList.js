@@ -901,4 +901,15 @@ export const SEED_BOOKS = [
 
   // Expansion batch 51 (2026-09-04) — the last title, reaches 500.
   { title: 'Silence Fallen', author: 'Patricia Briggs' },
+
+  // Expansion batch 52 (2026-09-04) — replacing 2 pre-existing catalog
+  // entries ("One More Bite Book One", "The Knave and the Moon") found
+  // and removed during a live-vs-local count discrepancy investigation:
+  // both had zero reviews and zero ratings, so the site's own
+  // zero-substance filter was correctly hiding them (explaining why the
+  // live count read 498 against a local raw count of 500).
+  { title: 'Storm Cursed', author: 'Patricia Briggs' },
+  // "Archangel's Prophecy" (Nalini Singh) tried and rejected: only 3
+  // Hardcover reviews.
+  { title: 'Brothersong', author: 'TJ Klune' },
 ];
