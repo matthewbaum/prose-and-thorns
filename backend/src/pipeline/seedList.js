@@ -898,4 +898,7 @@ export const SEED_BOOKS = [
   { title: 'Fire Touched', author: 'Patricia Briggs' },
   // "Archangel's Viper" (Nalini Singh) tried and rejected: only 3
   // Hardcover reviews.
+
+  // Expansion batch 51 (2026-09-04) — the last title, reaches 500.
+  { title: 'Silence Fallen', author: 'Patricia Briggs' },
 ];
