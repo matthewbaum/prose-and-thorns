@@ -828,4 +828,14 @@ export const SEED_BOOKS = [
   // "The Wings That Bind" (Briar Boleyn), "Court", "Charm", and "Cherish"
   // (all Tracy Wolff, Crave #4-6) all tried and rejected: 1, 4, 2, and 4
   // Hardcover reviews respectively -- all very recent releases.
+
+  // Expansion batch 41 (2026-09-03) — more backlist continuations from
+  // established, older series (higher review-volume odds than recent
+  // releases).
+  { title: 'Lover Enshrined', author: 'J.R. Ward' },
+  { title: 'Silver Borne', author: 'Patricia Briggs' },
+  { title: 'Wildfire', author: 'Ilona Andrews' },
+  { title: "At Grave's End", author: 'Jeaniene Frost' },
+  // "Archangel's Blade" (Nalini Singh) tried and rejected: only 3
+  // Hardcover reviews.
 ];
