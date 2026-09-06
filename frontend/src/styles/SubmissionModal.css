@@ -148,6 +148,58 @@
   cursor: default;
 }
 
+/* Same "search result" visual language as HeaderSearch's own dropdown —
+   this is functionally the same lookup (title -> existing catalog rows),
+   just surfaced inline in a form instead of a flyout. */
+.submission-catalog-match {
+  background: var(--surface-raised);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: -4px 0 14px;
+}
+
+.submission-catalog-match > p {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.submission-catalog-match-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 8px 10px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 6px;
+}
+
+.submission-catalog-match-item:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.submission-catalog-match-title {
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.submission-catalog-match-author {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.submission-catalog-match-hint {
+  margin: 4px 0 0 !important;
+  font-size: 0.72rem !important;
+  font-style: italic;
+}
+
 .submission-error {
   color: #f0b7c9;
   font-size: 0.8rem;

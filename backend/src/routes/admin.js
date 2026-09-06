@@ -68,13 +68,14 @@ function loadFindings() {
     )
     .all();
 
-  // contact/review/partnership all land in the same submissions table but
-  // were never surfaced anywhere before this — they'd silently sit in the
-  // DB with zero visibility short of querying it directly.
+  // contact/review/partnership/book-request all land in the same
+  // submissions table but were never surfaced anywhere before this —
+  // they'd silently sit in the DB with zero visibility short of querying
+  // it directly.
   const messages = db
     .prepare(
-      `SELECT id, type, name, email, message, book_title, rating, channel_url, status, created_at
-       FROM submissions WHERE type IN ('contact', 'review', 'partnership') AND status = 'new'
+      `SELECT id, type, name, email, message, book_title, book_author, isbn, rating, channel_url, status, created_at
+       FROM submissions WHERE type IN ('contact', 'review', 'partnership', 'book-request') AND status = 'new'
        ORDER BY created_at DESC`
     )
     .all();
@@ -92,7 +93,7 @@ function escapeHtml(s) {
 }
 
 const SEVERITY_LABEL = { high: 'High', medium: 'Medium', low: 'Low' };
-const TYPE_LABEL = { contact: 'Contact', review: 'Review', partnership: 'Partnership' };
+const TYPE_LABEL = { contact: 'Contact', review: 'Review', partnership: 'Partnership', 'book-request': 'Book request' };
 
 function findingRow(f) {
   return `
@@ -135,15 +136,17 @@ router.get('/dashboard', (req, res) => {
     <tr>
       <td>${escapeHtml(m.created_at)}</td>
       <td><span class="badge badge-type">${TYPE_LABEL[m.type] || m.type}</span></td>
-      <td>${escapeHtml(m.name)}<br><span class="muted">${escapeHtml(m.email)}</span></td>
+      <td>${m.name ? escapeHtml(m.name) : '<span class="muted">—</span>'}${m.email ? `<br><span class="muted">${escapeHtml(m.email)}</span>` : ''}</td>
       <td>${
         m.type === 'review'
           ? `${escapeHtml(m.book_title)}${m.rating ? ` — ${m.rating}/5` : ''}`
           : m.type === 'partnership' && m.channel_url
             ? escapeHtml(m.channel_url)
-            : '—'
+            : m.type === 'book-request'
+              ? `${escapeHtml(m.book_title)}${m.book_author ? ` — ${escapeHtml(m.book_author)}` : ''}${m.isbn ? `<br><span class="muted">ISBN ${escapeHtml(m.isbn)}</span>` : ''}`
+              : '—'
       }</td>
-      <td style="white-space:pre-wrap;">${escapeHtml(m.message)}</td>
+      <td style="white-space:pre-wrap;">${m.message ? escapeHtml(m.message) : ''}</td>
     </tr>`
     )
     .join('');

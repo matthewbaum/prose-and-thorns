@@ -2,12 +2,12 @@ import db from './index.js';
 
 const insertSubmission = db.prepare(
   `INSERT INTO submissions (
-     type, name, email, message, book_title, book_id, category, rating,
+     type, name, email, message, book_title, book_author, isbn, book_id, category, rating,
      prose_quality, romance_quality, world_building, pacing_quality, emotional_payoff, character_depth,
      channel_url
    )
    VALUES (
-     @type, @name, @email, @message, @book_title, @book_id, @category, @rating,
+     @type, @name, @email, @message, @book_title, @book_author, @isbn, @book_id, @category, @rating,
      @prose_quality, @romance_quality, @world_building, @pacing_quality, @emotional_payoff, @character_depth,
      @channel_url
    )`
@@ -16,10 +16,12 @@ const insertSubmission = db.prepare(
 export function createSubmission(data) {
   const info = insertSubmission.run({
     type: data.type,
-    name: data.name,
-    email: data.email,
-    message: data.message,
+    name: data.name ?? null,
+    email: data.email ?? null,
+    message: data.message ?? null,
     book_title: data.book_title ?? null,
+    book_author: data.book_author ?? null,
+    isbn: data.isbn ?? null,
     book_id: data.book_id ?? null,
     category: data.category ?? null,
     rating: data.rating ?? null,

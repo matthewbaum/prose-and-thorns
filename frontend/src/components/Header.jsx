@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SiteMenu from './SiteMenu.jsx';
 import HeaderSearch from './HeaderSearch.jsx';
+import SubmissionModal from './SubmissionModal.jsx';
 import '../styles/Header.css';
 
 export default function Header({ onToggleSidebar, view, onNavigateHome, onNavigateBrowse, onNavigateAbout, onSelectBook }) {
+  const [requestOpen, setRequestOpen] = useState(false);
   return (
     <header className="site-header">
       {view === 'browse' && (
@@ -37,9 +39,26 @@ export default function Header({ onToggleSidebar, view, onNavigateHome, onNaviga
             Browse all
           </button>
         )}
+        {/* Browse-only, right next to the search bar — a reader who just
+            searched and came up empty is exactly who this is for, so it
+            lives beside HeaderSearch rather than tucked in the site menu
+            with the other, less time-sensitive forms. */}
+        {view === 'browse' && (
+          <button type="button" className="nav-link" onClick={() => setRequestOpen(true)}>
+            Request a book
+          </button>
+        )}
         <HeaderSearch onSelectBook={onSelectBook} />
         <SiteMenu onNavigateAbout={onNavigateAbout} aboutActive={view === 'about'} />
       </nav>
+
+      {requestOpen && (
+        <SubmissionModal
+          type="book-request"
+          onClose={() => setRequestOpen(false)}
+          onSelectBook={onSelectBook}
+        />
+      )}
     </header>
   );
 }

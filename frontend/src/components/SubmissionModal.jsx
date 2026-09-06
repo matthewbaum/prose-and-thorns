@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { submitInquiry } from '../api.js';
+import { submitInquiry, searchBooks } from '../api.js';
 import { QUALITY_DIMENSIONS } from '../constants/taxonomy.js';
 import '../styles/SubmissionModal.css';
 
@@ -42,13 +42,21 @@ const COPY = {
     messagePlaceholder: 'The more specific, the faster we can fix it.',
     submitLabel: 'Send report',
   },
+  'book-request': {
+    title: 'Request a book',
+    submitLabel: 'Request book',
+  },
 };
 
 // initialBookTitle/initialBookId: set when opened from a specific book's
 // detail panel — the title is then fixed (not re-typed) since the context
 // is unambiguous. 'correction' needs the real book_id (not just title text)
 // so a report resolves back to an exact catalog row.
-export default function SubmissionModal({ type, onClose, initialBookTitle, initialBookId }) {
+// onSelectBook: only passed by the "Request a book" entry point (Header) —
+// lets a match found while typing the title jump straight to that book's
+// detail panel instead of leaving a reader to submit a request for
+// something already in the catalog with no way to find out.
+export default function SubmissionModal({ type, onClose, initialBookTitle, initialBookId, onSelectBook }) {
   const copy = COPY[type];
   const bookTitleLocked = Boolean(initialBookTitle);
   const [name, setName] = useState('');
@@ -65,26 +73,79 @@ export default function SubmissionModal({ type, onClose, initialBookTitle, initi
   const [dimensionScores, setDimensionScores] = useState({});
   const [channelUrl, setChannelUrl] = useState('');
   const [category, setCategory] = useState('');
+  // 'book-request' only — this app doesn't have a catalog row to attach an
+  // author/ISBN to yet (that's the whole point of the request), so these
+  // are plain free-text fields rather than anything tied to booksRepo.
+  const [bookAuthor, setBookAuthor] = useState('');
+  const [isbn, setIsbn] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [done, setDone] = useState(false);
+  // Existing-catalog matches for the title being typed, book-request only.
+  const [catalogMatches, setCatalogMatches] = useState([]);
+  const catalogDebounceRef = useRef(null);
+
+  const isBookRequest = type === 'book-request';
+
+  // Same debounce/threshold pattern as HeaderSearch's own lookup — a
+  // reader typing a request should find out *before* submitting if the
+  // book's already here, not after.
+  useEffect(() => {
+    if (!isBookRequest) return;
+    if (catalogDebounceRef.current) clearTimeout(catalogDebounceRef.current);
+    const query = bookTitle.trim();
+    if (query.length < 2) {
+      setCatalogMatches([]);
+      return;
+    }
+    catalogDebounceRef.current = setTimeout(() => {
+      searchBooks(query)
+        .then((data) => setCatalogMatches(data.books || []))
+        .catch(() => setCatalogMatches([]));
+    }, 250);
+    return () => clearTimeout(catalogDebounceRef.current);
+  }, [bookTitle, isBookRequest]);
+
+  const goToMatch = (book) => {
+    onSelectBook?.(book.id);
+    onClose();
+  };
 
   const allDimensionsScored =
     type !== 'review' || QUALITY_DIMENSIONS.every((d) => dimensionScores[d.key]);
 
-  const canSubmit =
-    name.trim() &&
-    email.trim() &&
-    message.trim() &&
-    (type !== 'review' || (bookTitle.trim() && rating)) &&
-    (type !== 'correction' || category) &&
-    allDimensionsScored;
+  // 'book-request' skips name/email/message entirely — only the title is
+  // required, everything else on that form (author, ISBN, email) is
+  // optional, unlike every other submission type here.
+  const canSubmit = isBookRequest
+    ? Boolean(bookTitle.trim())
+    : name.trim() &&
+      email.trim() &&
+      message.trim() &&
+      (type !== 'review' || (bookTitle.trim() && rating)) &&
+      (type !== 'correction' || category) &&
+      allDimensionsScored;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!canSubmit || submitting) return;
     setSubmitting(true);
     setError(null);
+
+    if (isBookRequest) {
+      submitInquiry({
+        type,
+        book_title: bookTitle.trim(),
+        book_author: bookAuthor.trim() || undefined,
+        isbn: isbn.trim() || undefined,
+        email: email.trim() || undefined,
+      })
+        .then(() => setDone(true))
+        .catch((err) => setError(err.message))
+        .finally(() => setSubmitting(false));
+      return;
+    }
+
     const dimensionPayload = {};
     if (type === 'review') {
       for (const d of QUALITY_DIMENSIONS) {
@@ -135,6 +196,7 @@ export default function SubmissionModal({ type, onClose, initialBookTitle, initi
               {type === 'review' && "Your review has been submitted for review before it's posted."}
               {type === 'partnership' && "We'll take a look and follow up if it's a fit."}
               {type === 'correction' && "Thanks for the catch — we'll look into it."}
+              {isBookRequest && "Thanks — we'll do our best to add it within a few weeks."}
             </p>
             <button type="button" className="submission-submit" onClick={onClose}>
               Close
@@ -160,15 +222,68 @@ export default function SubmissionModal({ type, onClose, initialBookTitle, initi
               </p>
             )}
 
-            <label className="submission-field">
-              Name
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-            </label>
+            {!isBookRequest && (
+              <>
+                <label className="submission-field">
+                  Name
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+                </label>
 
-            <label className="submission-field">
-              Email
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </label>
+                <label className="submission-field">
+                  Email
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </label>
+              </>
+            )}
+
+            {isBookRequest && (
+              <>
+                <label className="submission-field">
+                  Title
+                  <input
+                    type="text"
+                    value={bookTitle}
+                    onChange={(e) => setBookTitle(e.target.value)}
+                    required
+                  />
+                </label>
+
+                {catalogMatches.length > 0 && (
+                  <div className="submission-catalog-match">
+                    <p>Looks like this might already be in our catalog:</p>
+                    {catalogMatches.map((book) => (
+                      <button
+                        key={book.id}
+                        type="button"
+                        className="submission-catalog-match-item"
+                        onClick={() => goToMatch(book)}
+                      >
+                        <span className="submission-catalog-match-title">{book.title}</span>
+                        <span className="submission-catalog-match-author">{book.author}</span>
+                      </button>
+                    ))}
+                    <p className="submission-catalog-match-hint">
+                      Not the one you meant? Keep filling out the form below.
+                    </p>
+                  </div>
+                )}
+
+                <label className="submission-field">
+                  Author (optional)
+                  <input type="text" value={bookAuthor} onChange={(e) => setBookAuthor(e.target.value)} />
+                </label>
+
+                <label className="submission-field">
+                  ISBN (optional)
+                  <input type="text" value={isbn} onChange={(e) => setIsbn(e.target.value)} />
+                </label>
+
+                <label className="submission-field">
+                  Email (optional — to notify you when it's added)
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </label>
+              </>
+            )}
 
             {type === 'review' && (
               <>
@@ -255,16 +370,18 @@ export default function SubmissionModal({ type, onClose, initialBookTitle, initi
               </label>
             )}
 
-            <label className="submission-field">
-              {copy.messageLabel}
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={copy.messagePlaceholder}
-                rows={5}
-                required
-              />
-            </label>
+            {!isBookRequest && (
+              <label className="submission-field">
+                {copy.messageLabel}
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={copy.messagePlaceholder}
+                  rows={5}
+                  required
+                />
+              </label>
+            )}
 
             {error && <p className="submission-error">{error}</p>}
 

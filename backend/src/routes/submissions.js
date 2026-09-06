@@ -6,11 +6,24 @@ import { QUALITY_DIMENSIONS, CORRECTION_CATEGORIES } from '../constants.js';
 
 const router = Router();
 
-const VALID_TYPES = ['contact', 'review', 'partnership', 'correction'];
+const VALID_TYPES = ['contact', 'review', 'partnership', 'correction', 'book-request'];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Generous but not unbounded — this is a contact form, not a document
 // upload; caps protect the DB from a pathological or scripted submission.
-const MAX_LEN = { name: 200, email: 254, message: 5000, book_title: 300, channel_url: 500 };
+const MAX_LEN = {
+  name: 200,
+  email: 254,
+  message: 5000,
+  book_title: 300,
+  channel_url: 500,
+  book_author: 200,
+  isbn: 32,
+};
+// 'book-request' is the one type with no name/email/message at all — it
+// asks for a title (and optionally author/ISBN/email) instead, so it's
+// validated on its own branch rather than forced through the
+// name+email+message requirement every other type shares.
+const BOOK_REQUEST_TYPE = 'book-request';
 
 function trimmedString(value, maxLen) {
   if (typeof value !== 'string') return null;
@@ -22,14 +35,44 @@ function trimmedString(value, maxLen) {
 router.post('/', (req, res) => {
   const body = req.body || {};
   const type = VALID_TYPES.includes(body.type) ? body.type : null;
-  const name = trimmedString(body.name, MAX_LEN.name);
-  const email = trimmedString(body.email, MAX_LEN.email);
-  const message = trimmedString(body.message, MAX_LEN.message);
 
   if (!type) {
     res.status(400).json({ error: `type must be one of: ${VALID_TYPES.join(', ')}` });
     return;
   }
+
+  // 'book-request' has its own shape entirely (title required, everything
+  // else optional, no name/message at all) so it's handled as its own
+  // branch rather than threaded through the name+email+message validation
+  // every other submission type shares below.
+  if (type === BOOK_REQUEST_TYPE) {
+    const bookTitle = trimmedString(body.book_title, MAX_LEN.book_title);
+    if (!bookTitle) {
+      res.status(400).json({ error: 'book_title is required' });
+      return;
+    }
+    const email = trimmedString(body.email, MAX_LEN.email);
+    if (email && !EMAIL_PATTERN.test(email)) {
+      res.status(400).json({ error: 'email is not a valid address' });
+      return;
+    }
+    const submission = {
+      type,
+      book_title: bookTitle,
+      book_author: trimmedString(body.book_author, MAX_LEN.book_author),
+      isbn: trimmedString(body.isbn, MAX_LEN.isbn),
+      email,
+    };
+    const id = createSubmission(submission);
+    notifyNewSubmission(submission);
+    res.status(201).json({ id });
+    return;
+  }
+
+  const name = trimmedString(body.name, MAX_LEN.name);
+  const email = trimmedString(body.email, MAX_LEN.email);
+  const message = trimmedString(body.message, MAX_LEN.message);
+
   if (!name || !email || !message) {
     res.status(400).json({ error: 'name, email, and message are required' });
     return;

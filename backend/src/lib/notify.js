@@ -10,6 +10,7 @@ const TYPE_LABEL = {
   review: 'Review submission',
   partnership: 'Partnership inquiry',
   correction: 'Error report',
+  'book-request': 'Book request',
 };
 
 function escapeHtml(s) {
@@ -17,11 +18,17 @@ function escapeHtml(s) {
 }
 
 function buildEmail(submission) {
-  const { type, name, email, message, book_title, book_id, category, rating, channel_url } = submission;
+  const { type, name, email, message, book_title, book_author, isbn, book_id, category, rating, channel_url } =
+    submission;
   const label = TYPE_LABEL[type] || type;
+  // 'book-request' has no name and an optional email — 'From' only makes
+  // sense to show when there's at least an email to show it with.
+  const from = name || email ? `${escapeHtml(name || 'Anonymous')}${email ? ` &lt;${escapeHtml(email)}&gt;` : ''}` : null;
   const rows = [
-    ['From', `${escapeHtml(name)} &lt;${escapeHtml(email)}&gt;`],
+    from ? ['From', from] : null,
     book_title ? ['Book', `${book_id ? `#${book_id} ` : ''}${escapeHtml(book_title)}`] : null,
+    book_author ? ['Author', escapeHtml(book_author)] : null,
+    isbn ? ['ISBN', escapeHtml(isbn)] : null,
     category ? ['Category', escapeHtml(category)] : null,
     rating ? ['Rating', `${rating}/5`] : null,
     channel_url ? ['Channel', escapeHtml(channel_url)] : null,
@@ -30,10 +37,10 @@ function buildEmail(submission) {
   const rowsHtml = rows.map(([k, v]) => `<tr><td style="color:#666;padding:2px 12px 2px 0;">${k}</td><td>${v}</td></tr>`).join('');
 
   return {
-    subject: `[Prose & Thorns] ${label} from ${name}`,
+    subject: `[Prose & Thorns] ${label}${book_title ? `: ${book_title}` : name ? ` from ${name}` : ''}`,
     html: `
       <table>${rowsHtml}</table>
-      <p style="white-space:pre-wrap;margin-top:16px;border-top:1px solid #ddd;padding-top:12px;">${escapeHtml(message)}</p>
+      ${message ? `<p style="white-space:pre-wrap;margin-top:16px;border-top:1px solid #ddd;padding-top:12px;">${escapeHtml(message)}</p>` : ''}
     `,
   };
 }

@@ -148,11 +148,19 @@ CREATE TABLE IF NOT EXISTS user_preferences (
 -- fuzzy-matching it to the catalog at submission time.
 CREATE TABLE IF NOT EXISTS submissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  type TEXT NOT NULL, -- 'contact' | 'review' | 'partnership' | 'correction'
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  message TEXT NOT NULL,
-  book_title TEXT, -- 'review' and 'correction'
+  type TEXT NOT NULL, -- 'contact' | 'review' | 'partnership' | 'correction' | 'book-request'
+  -- name/email/message are required for contact/review/partnership/
+  -- correction (enforced in routes/submissions.js, not here) but nullable
+  -- at the schema level because 'book-request' doesn't collect a name or
+  -- message at all, and its email is optional.
+  name TEXT,
+  email TEXT,
+  message TEXT,
+  book_title TEXT, -- 'review', 'correction', and 'book-request' (the requested title)
+  -- 'book-request' only, both optional — author/ISBN the requester
+  -- supplied to help identify the exact edition.
+  book_author TEXT,
+  isbn TEXT,
   -- 'correction' only — the actual catalog row being flagged. Unlike
   -- book_title (free text a reviewer types), this is set from the book the
   -- reader was actually looking at, so a report can be resolved back to a
