@@ -651,6 +651,17 @@
   line-height: 1.7;
 }
 
+.detail-audible-section {
+  margin: 18px 0 4px;
+}
+
+.detail-audible-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  border: 1px solid var(--gold);
+}
+
 .find-book-section {
   margin-top: 8px;
 }

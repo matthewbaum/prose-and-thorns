@@ -12,6 +12,15 @@ const WARNING_LABELS = Object.fromEntries(CONTENT_WARNINGS.map((w) => [w.value, 
 const PUBLISHER_TYPE_LABELS = Object.fromEntries(PUBLISHER_TYPE.map((p) => [p.value, p.label]));
 const DARKNESS_LABELS = Object.fromEntries(DARKNESS_LEVELS.map((d) => [d.value, d.label]));
 
+// Amazon Associates tag -- Audible is Amazon-owned and enrolled under the
+// same Associates program, so the one tag covers both the Amazon search
+// link and the Audible product link below.
+const ASSOCIATES_TAG = 'proseandthorn-20';
+
+function withAssociatesTag(url) {
+  return `${url}${url.includes('?') ? '&' : '?'}tag=${ASSOCIATES_TAG}`;
+}
+
 function seriesLine(book) {
   if (!book.series_name) return null;
   const parts = [];
@@ -84,6 +93,13 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
     seriesEntries.sort((a, b) => (a.position || 99) - (b.position || 99));
   }
 
+  // audible_asin only gets set on the book record once a real audiobook
+  // edition is confirmed to exist (see backend/src/pipeline/backfillAudible.js)
+  // -- so its presence alone is the "does an Audible edition exist" check.
+  const audibleUrl = book?.audible_asin
+    ? withAssociatesTag(`https://www.audible.com/pd/${book.audible_asin}`)
+    : null;
+
   const synopsis = book?.synopsis || book?.description || '';
   const praise = book?.praise || [];
   const truncated = synopsis.length > 420 && !descExpanded;
@@ -98,7 +114,9 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
         },
         {
           label: 'Amazon',
-          url: `https://www.amazon.com/s?k=${encodeURIComponent(`${book.title} ${book.author}`)}&i=stripbooks`,
+          url: withAssociatesTag(
+            `https://www.amazon.com/s?k=${encodeURIComponent(`${book.title} ${book.author}`)}&i=stripbooks`
+          ),
         },
         {
           // Verified case: B&N retired the old /s/{query} search path (it
@@ -347,6 +365,14 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                   ))}
                 </ul>
               </section>
+            )}
+
+            {audibleUrl && (
+              <div className="detail-audible-section">
+                <a className="find-book-btn detail-audible-btn" href={audibleUrl} target="_blank" rel="noreferrer">
+                  Listen on Audible
+                </a>
+              </div>
             )}
 
             <div className="find-book-section">

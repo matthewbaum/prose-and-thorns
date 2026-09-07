@@ -81,6 +81,7 @@ function serializeBook(row) {
     hardcover_avg_rating: row.hardcover_avg_rating ?? null,
     hardcover_ratings_count: row.hardcover_ratings_count ?? null,
     hardcover_url: row.hardcover_url || null,
+    audible_asin: row.audible_asin || null,
     editorial_review: row.editorial_review || null,
 
     series_name: row.series_name || null,

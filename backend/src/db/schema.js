@@ -47,6 +47,15 @@ CREATE TABLE IF NOT EXISTS books (
   hardcover_ratings_count INTEGER,
   hardcover_cover_url TEXT,
   hardcover_url TEXT,
+  -- Audible ASIN for this title's audiobook edition, from Hardcover's own
+  -- editions table (reading_format 'Listened') keyed off the book's already-
+  -- matched hardcover_url slug -- not guessed or constructed from title/
+  -- author, since a wrong ASIN would link to a different, unrelated
+  -- audiobook. NULL means no audiobook edition was found, not "not checked
+  -- yet" -- distinguishing those would need its own timestamp column, which
+  -- isn't worth it for a field that's cheap to recheck by rerunning the
+  -- backfill.
+  audible_asin TEXT,
   tagged_at TEXT,
   quality_synthesized_at TEXT,
 
