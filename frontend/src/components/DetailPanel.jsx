@@ -97,8 +97,14 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
   // audible_asin only gets set on the book record once a real audiobook
   // edition is confirmed to exist (see backend/src/pipeline/backfillAudible.js)
   // -- so its presence alone is the "does an Audible edition exist" check.
+  // The link itself is a search, not a direct https://www.audible.com/pd/{ASIN}
+  // product page -- verified case: that bare-ASIN format 404s with "Audiobook
+  // is not available" for real, current bestsellers (Fourth Wing, The Name of
+  // the Wind) because Audible's /pd/ route needs the title slug too, which we
+  // don't have and can't reliably guess. A search link, same pattern as the
+  // other four retailers below, always resolves.
   const audibleUrl = book?.audible_asin
-    ? withAssociatesTag(`https://www.audible.com/pd/${book.audible_asin}`)
+    ? withAssociatesTag(`https://www.audible.com/search?keywords=${encodeURIComponent(`${book.title} ${book.author}`)}`)
     : null;
 
   const synopsis = book?.synopsis || book?.description || '';
