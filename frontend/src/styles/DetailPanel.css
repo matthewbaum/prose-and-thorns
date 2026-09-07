@@ -143,6 +143,13 @@
   font-size: 0.9em;
 }
 
+.detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
 .detail-write-review-btn {
   display: inline-block;
   background: none;
@@ -153,7 +160,6 @@
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 20px;
-  margin-top: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
 }

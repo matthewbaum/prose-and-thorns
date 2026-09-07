@@ -51,3 +51,17 @@ export function submitInquiry(data) {
     body: JSON.stringify(data),
   });
 }
+
+// Fire-and-forget -- the retailer link already opens in a new tab via
+// target="_blank", so the current page never navigates away and a normal
+// fetch (no sendBeacon/keepalive) has time to complete. Bypasses the
+// request() helper above since it always calls res.json(), which throws on
+// this endpoint's empty 204 response. Never throws itself: a failed click
+// log shouldn't be visible to the reader or block the link.
+export function logRetailerClick(bookId, retailer) {
+  fetch(`${BASE}/books/${bookId}/click`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ retailer }),
+  }).catch(() => {});
+}

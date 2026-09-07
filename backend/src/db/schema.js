@@ -241,4 +241,20 @@ CREATE TABLE IF NOT EXISTS finding_dispositions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_finding_dispositions_category ON finding_dispositions(category);
+
+-- One row per outbound retailer click from a book's detail panel. No PII,
+-- no session/visitor id -- just enough to answer "which retailers actually
+-- get used" per book and in aggregate, which the ?tag= affiliate parameter
+-- alone can't tell us (Amazon/Audible only report clicks+orders under the
+-- one shared tag, not broken out per book or per retailer, and Bookshop/
+-- B&N/Google Books have no attribution at all).
+CREATE TABLE IF NOT EXISTS retailer_clicks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+  retailer TEXT NOT NULL, -- 'bookshop' | 'amazon' | 'barnes-noble' | 'google-books' | 'audible'
+  clicked_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_retailer_clicks_retailer ON retailer_clicks(retailer);
+CREATE INDEX IF NOT EXISTS idx_retailer_clicks_book_id ON retailer_clicks(book_id);
 `;

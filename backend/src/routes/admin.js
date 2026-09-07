@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import db from '../db/index.js';
+import { getClickSummary } from '../db/clicksRepo.js';
 
 const router = Router();
 
@@ -109,13 +110,30 @@ function findingRow(f) {
 // JSON viewer (Chrome/Firefox) — Safari just dumps it as an unformatted
 // wall of text. This is the same data, rendered as an actual page, so
 // "check the admin findings" doesn't require a specific browser.
+const RETAILER_LABEL = {
+  bookshop: 'Bookshop.org',
+  amazon: 'Amazon',
+  'barnes-noble': 'Barnes & Noble',
+  'google-books': 'Google Books',
+  audible: 'Audible',
+};
+
 router.get('/dashboard', (req, res) => {
   if (!checkPassword(req, res)) return;
   const { auditFindings, reports, messages } = loadFindings();
+  const clicks = getClickSummary();
   const password = escapeHtml(req.query.password || '');
 
   const needsFix = auditFindings.filter((f) => f.disposition === 'needs-fix');
   const accepted = auditFindings.filter((f) => f.disposition === 'accepted');
+
+  const totalClicks = clicks.byRetailer.reduce((sum, r) => sum + r.clicks, 0);
+  const clickRetailerRows = clicks.byRetailer
+    .map((r) => `<tr><td>${RETAILER_LABEL[r.retailer] || escapeHtml(r.retailer)}</td><td>${r.clicks}</td></tr>`)
+    .join('');
+  const clickTopBookRows = clicks.topBooks
+    .map((b) => `<tr><td>#${b.book_id} ${escapeHtml(b.title)}</td><td>${b.clicks}</td></tr>`)
+    .join('');
 
   const reportRows = reports
     .map(
@@ -210,6 +228,16 @@ router.get('/dashboard', (req, res) => {
   <p class="subtitle">${messages.length} message(s) &middot; ${reports.length} reader report(s) &middot; ${needsFix.length} finding${needsFix.length === 1 ? '' : 's'} need attention &middot; ${accepted.length} reviewed, no action needed &middot;
     <span class="refresh"><a href="?password=${password}">refresh</a></span>
   </p>
+
+  <h2>Retailer Clicks (${totalClicks})</h2>
+  ${
+    totalClicks === 0
+      ? '<p class="empty">No retailer link clicks logged yet.</p>'
+      : `<div style="display:flex;gap:32px;flex-wrap:wrap;">
+          <table style="width:auto;min-width:260px;"><thead><tr><th>Retailer</th><th>Clicks</th></tr></thead><tbody>${clickRetailerRows}</tbody></table>
+          <table style="width:auto;min-width:320px;"><thead><tr><th>Top books</th><th>Clicks</th></tr></thead><tbody>${clickTopBookRows}</tbody></table>
+        </div>`
+  }
 
   <h2>Messages (${messages.length})</h2>
   ${

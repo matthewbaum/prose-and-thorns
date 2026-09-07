@@ -6,6 +6,7 @@ import ScoreMethodologyInfo from './ScoreMethodologyInfo.jsx';
 import SubmissionModal from './SubmissionModal.jsx';
 import { QUALITY_DIMENSIONS, SPICE_FLAME_COUNT, CONTENT_WARNINGS, PUBLISHER_TYPE, DARKNESS_LEVELS } from '../constants/taxonomy.js';
 import { tropeLabel, subgenreLabel } from '../lib/labels.js';
+import { logRetailerClick } from '../api.js';
 import '../styles/DetailPanel.css';
 
 const WARNING_LABELS = Object.fromEntries(CONTENT_WARNINGS.map((w) => [w.value, w.label]));
@@ -108,11 +109,13 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
   const retailerLinks = book
     ? [
         {
+          retailer: 'bookshop',
           label: 'Bookshop.org',
           url: `https://bookshop.org/search?keywords=${encodeURIComponent(`${book.title} ${book.author}`)}`,
           note: 'Supports local indie bookstores',
         },
         {
+          retailer: 'amazon',
           label: 'Amazon',
           url: withAssociatesTag(
             `https://www.amazon.com/s?k=${encodeURIComponent(`${book.title} ${book.author}`)}&i=stripbooks`
@@ -124,10 +127,12 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
           // broken for every book in the catalog, not just this one, since
           // it's a shared template. Confirmed the new path against B&N's
           // own live search form action, not guessed.
+          retailer: 'barnes-noble',
           label: 'Barnes & Noble',
           url: `https://www.barnesandnoble.com/search?q=${encodeURIComponent(`${book.title} ${book.author}`)}`,
         },
         {
+          retailer: 'google-books',
           label: 'Google Books',
           url:
             book.google_books_link ||
@@ -185,9 +190,20 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                     {realRatingCount != null && ` (${realRatingCount.toLocaleString()} ratings)`}
                   </p>
                 )}
-                <button type="button" className="detail-write-review-btn" onClick={() => setReviewOpen(true)}>
-                  Write a review
-                </button>
+                <div className="detail-header-actions">
+                  <button type="button" className="detail-write-review-btn" onClick={() => setReviewOpen(true)}>
+                    Write a review
+                  </button>
+                  <button
+                    type="button"
+                    className="link-btn"
+                    onClick={() =>
+                      document.getElementById('find-book-section')?.scrollIntoView({ block: 'start' })
+                    }
+                  >
+                    Where to buy ↓
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -367,7 +383,7 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
               </section>
             )}
 
-            <div className="find-book-section">
+            <div className="find-book-section" id="find-book-section">
               <p className="find-book-label">Find this book</p>
               <div className="find-book-links">
                 {retailerLinks.map((r) => (
@@ -378,6 +394,7 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                     target="_blank"
                     rel="noreferrer"
                     title={r.note}
+                    onClick={() => logRetailerClick(book.id, r.retailer)}
                   >
                     {r.label}
                   </a>
@@ -387,7 +404,13 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
 
             {audibleUrl && (
               <div className="detail-audible-section">
-                <a className="find-book-btn detail-audible-btn" href={audibleUrl} target="_blank" rel="noreferrer">
+                <a
+                  className="find-book-btn detail-audible-btn"
+                  href={audibleUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => logRetailerClick(book.id, 'audible')}
+                >
                   Listen on Audible
                 </a>
               </div>
