@@ -367,14 +367,6 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
               </section>
             )}
 
-            {audibleUrl && (
-              <div className="detail-audible-section">
-                <a className="find-book-btn detail-audible-btn" href={audibleUrl} target="_blank" rel="noreferrer">
-                  Listen on Audible
-                </a>
-              </div>
-            )}
-
             <div className="find-book-section">
               <p className="find-book-label">Find this book</p>
               <div className="find-book-links">
@@ -392,6 +384,14 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                 ))}
               </div>
             </div>
+
+            {audibleUrl && (
+              <div className="detail-audible-section">
+                <a className="find-book-btn detail-audible-btn" href={audibleUrl} target="_blank" rel="noreferrer">
+                  Listen on Audible
+                </a>
+              </div>
+            )}
           </div>
         )}
       </aside>
