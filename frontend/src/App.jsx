@@ -323,6 +323,7 @@ export default function App() {
               )}
             </div>
           )}
+          {!loading && books.length > 0 && <p className="grid-hint grid-hint-center">Click any book for its full quality profile</p>}
           <BookGrid
             books={books}
             loading={loading}
@@ -379,6 +380,7 @@ export default function App() {
                 )}
               </div>
             </div>
+            {!loading && books.length > 0 && <p className="grid-hint">Click any book for its full quality profile</p>}
             <BookGrid
               books={books}
               loading={loading}

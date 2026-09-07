@@ -108,6 +108,16 @@
   font-weight: 700;
 }
 
+.grid-hint {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+
+.grid-hint-center {
+  text-align: center;
+}
+
 .recommend-title em {
   color: var(--gold);
   font-style: normal;
