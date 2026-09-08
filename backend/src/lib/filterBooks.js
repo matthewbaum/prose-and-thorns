@@ -104,6 +104,8 @@ export function applySort(books, sort) {
     sorted.sort((a, b) => (b.quality_profile?.review_count_used ?? 0) - (a.quality_profile?.review_count_used ?? 0));
   } else if (sort === 'newest') {
     sorted.sort((a, b) => (b.publication_date || '').localeCompare(a.publication_date || ''));
+  } else if (sort === 'author') {
+    sorted.sort((a, b) => (a.author || '').localeCompare(b.author || ''));
   } else if (sort === 'complete-first') {
     // A stable partition, not a full reorder — Array.sort is stable (ES2019+),
     // so books within "complete" and within "ongoing" keep whatever relative

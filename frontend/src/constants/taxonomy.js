@@ -136,16 +136,18 @@ export const SORT_OPTIONS = [
   { value: 'most-reviewed', label: 'Most reviewed (confidence)' },
   { value: 'newest', label: 'Newest' },
   { value: 'complete-first', label: 'Complete series first' },
+  { value: 'author', label: 'Author (A-Z)' },
 ];
 
 // Same underlying sort engine as SORT_OPTIONS (backend reuses applySort for
 // every value here except 'match', which is the recommendation algorithm's
 // own ranking) — 'best-match' doesn't apply in a recommend context since
 // there's no active filter set to rank relevance against, so 'match' is
-// substituted in as the default, equivalent option.
+// substituted in as the default, equivalent option. 'author' is Browse-only
+// (not requested for Recommendations), so it's excluded here too.
 export const RECOMMEND_SORT_OPTIONS = [
   { value: 'match', label: 'Strongest match' },
-  ...SORT_OPTIONS.filter((o) => o.value !== 'best-match'),
+  ...SORT_OPTIONS.filter((o) => o.value !== 'best-match' && o.value !== 'author'),
 ];
 
 export const SPICE_FLAME_COUNT = {
