@@ -1,5 +1,13 @@
 import { SORT_TO_DIMENSION, MIN_FILTER_TO_DIMENSION, COMPLETE_SERIES_STATUSES } from '../constants.js';
 
+// Last whitespace-separated word of the author field, lowercased for a
+// case-insensitive sort. A blunt heuristic (no particle/suffix handling),
+// but matches how the field is actually populated in this catalog.
+function lastName(author) {
+  const tokens = (author || '').trim().split(/\s+/);
+  return (tokens[tokens.length - 1] || '').toLowerCase();
+}
+
 function splitParam(value) {
   if (!value) return [];
   return String(value)
@@ -105,7 +113,7 @@ export function applySort(books, sort) {
   } else if (sort === 'newest') {
     sorted.sort((a, b) => (b.publication_date || '').localeCompare(a.publication_date || ''));
   } else if (sort === 'author') {
-    sorted.sort((a, b) => (a.author || '').localeCompare(b.author || ''));
+    sorted.sort((a, b) => lastName(a.author).localeCompare(lastName(b.author)));
   } else if (sort === 'complete-first') {
     // A stable partition, not a full reorder — Array.sort is stable (ES2019+),
     // so books within "complete" and within "ongoing" keep whatever relative
