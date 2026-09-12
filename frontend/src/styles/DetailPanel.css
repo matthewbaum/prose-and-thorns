@@ -449,11 +449,11 @@
 }
 
 .confidence-dot.confidence-medium {
-  background: var(--gold);
+  background: #e8c547;
 }
 
 .confidence-dot.confidence-low {
-  background: #d99568;
+  background: #e2703a;
 }
 
 .radar-wrap {
@@ -547,19 +547,23 @@
   color: var(--text-muted);
 }
 
+/* Confidence tiers read as a traffic-light scale (green/amber/red) so all
+   three are distinguishable at a glance, not just to someone reading the
+   label text -- amber and red-orange used to be close enough to blend
+   with each other (and with the site's own gold accent) at this size. */
 .confidence-high {
   border-color: #3f8f6b;
   color: #6fcf9e;
 }
 
 .confidence-medium {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: #9c7a1f;
+  color: #e8c547;
 }
 
 .confidence-low {
-  border-color: #8f5a3f;
-  color: #d99568;
+  border-color: #a14a1f;
+  color: #e2703a;
 }
 
 .craft-flags {
