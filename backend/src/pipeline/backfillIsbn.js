@@ -13,12 +13,29 @@ const HARDCOVER_DELAY_MS = 2500;
 // pick for a title, so this doesn't have to guess which of a book's many
 // editions (translations, box sets, reprints) is the right one to cite an
 // ISBN from.
-const DEFAULT_EDITION_ISBN_QUERY = `
-  query DefaultEditionIsbn($slug: String!) {
+//
+// Verified case: ~21/500 books had a default_physical_edition assigned but
+// no isbn_13 recorded on that specific edition row, even though other
+// (usually foreign-language) editions of the same book did have one --
+// e.g. The Night Circus's default edition has no ISBN, but 5+ others do.
+// The fallback below only fires when the default edition has nothing, and
+// is filtered to English-language (language_id 1) physical editions
+// (reading_format_id 1) with a real ISBN -- unlike the Audible ASIN case,
+// picking a non-default *edition* of the same book here risks a different
+// printing/cover showing on Bookshop.org, not linking to the wrong book
+// entirely, so this is a much lower-stakes guess.
+const ISBN_QUERY = `
+  query BookIsbn($slug: String!) {
     books(where: { slug: { _eq: $slug } }, limit: 1) {
       default_physical_edition {
         isbn_13
       }
+    }
+    editions(
+      where: { book: { slug: { _eq: $slug } }, isbn_13: { _is_null: false }, reading_format_id: { _eq: 1 }, language_id: { _eq: 1 } }
+      limit: 1
+    ) {
+      isbn_13
     }
   }
 `;
@@ -32,7 +49,7 @@ async function hardcoverQuery(variables) {
       Authorization: token,
       'User-Agent': 'prose-and-thorns/0.1 (romantasy book discovery prototype)',
     },
-    body: JSON.stringify({ query: DEFAULT_EDITION_ISBN_QUERY, variables }),
+    body: JSON.stringify({ query: ISBN_QUERY, variables }),
   });
   if (!res.ok) throw new Error(`Hardcover API error ${res.status}: ${await res.text()}`);
   const data = await res.json();
@@ -60,7 +77,7 @@ async function main() {
     await sleep(HARDCOVER_DELAY_MS);
     try {
       const data = await hardcoverQuery({ slug });
-      const isbn = data.books?.[0]?.default_physical_edition?.isbn_13 || null;
+      const isbn = data.books?.[0]?.default_physical_edition?.isbn_13 || data.editions?.[0]?.isbn_13 || null;
       if (isbn) {
         updateBook.run(isbn, book.id);
         found += 1;
