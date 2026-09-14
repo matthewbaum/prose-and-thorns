@@ -56,6 +56,13 @@ CREATE TABLE IF NOT EXISTS books (
   -- isn't worth it for a field that's cheap to recheck by rerunning the
   -- backfill.
   audible_asin TEXT,
+  -- ISBN-13 of the book's default physical edition on Hardcover, keyed off
+  -- the same already-matched hardcover_url slug (same reasoning as
+  -- audible_asin above -- Hardcover's own curated "default" edition avoids
+  -- guessing which of a title's many editions is the right one). Used to
+  -- build a direct, ISBN-specific Bookshop.org affiliate link; NULL falls
+  -- back to the storefront link.
+  isbn TEXT,
   tagged_at TEXT,
   quality_synthesized_at TEXT,
 

@@ -22,6 +22,14 @@ function withAssociatesTag(url) {
   return `${url}${url.includes('?') ? '&' : '?'}tag=${ASSOCIATES_TAG}`;
 }
 
+// Bookshop.org affiliate ID. An ISBN-specific link (/a/{id}/{isbn}) only
+// exists once isbn is backfilled for a book (see
+// backend/src/pipeline/backfillIsbn.js) -- until then, or if Hardcover never
+// has a matching default edition, the storefront link is still a real,
+// correctly-attributed affiliate link, just not book-specific.
+const BOOKSHOP_AFFILIATE_ID = '128534';
+const BOOKSHOP_STOREFRONT_URL = 'https://bookshop.org/shop/prose-and-thorns';
+
 function seriesLine(book) {
   if (!book.series_name) return null;
   const parts = [];
@@ -117,7 +125,7 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
         {
           retailer: 'bookshop',
           label: 'Bookshop.org',
-          url: `https://bookshop.org/search?keywords=${encodeURIComponent(`${book.title} ${book.author}`)}`,
+          url: book.isbn ? `https://bookshop.org/a/${BOOKSHOP_AFFILIATE_ID}/${book.isbn}` : BOOKSHOP_STOREFRONT_URL,
           note: 'Supports local indie bookstores',
         },
         {
