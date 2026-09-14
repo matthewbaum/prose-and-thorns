@@ -132,7 +132,10 @@ router.get('/dashboard', (req, res) => {
     .map((r) => `<tr><td>${RETAILER_LABEL[r.retailer] || escapeHtml(r.retailer)}</td><td>${r.clicks}</td></tr>`)
     .join('');
   const clickTopBookRows = clicks.topBooks
-    .map((b) => `<tr><td>#${b.book_id} ${escapeHtml(b.title)}</td><td>${b.clicks}</td></tr>`)
+    .map(
+      (b) =>
+        `<tr><td>#${b.book_id} ${escapeHtml(b.title)}</td><td>${RETAILER_LABEL[b.retailer] || escapeHtml(b.retailer)}</td><td>${b.clicks}</td></tr>`
+    )
     .join('');
 
   const reportRows = reports
@@ -235,7 +238,7 @@ router.get('/dashboard', (req, res) => {
       ? '<p class="empty">No retailer link clicks logged yet.</p>'
       : `<div style="display:flex;gap:32px;flex-wrap:wrap;">
           <table style="width:auto;min-width:260px;"><thead><tr><th>Retailer</th><th>Clicks</th></tr></thead><tbody>${clickRetailerRows}</tbody></table>
-          <table style="width:auto;min-width:320px;"><thead><tr><th>Top books</th><th>Clicks</th></tr></thead><tbody>${clickTopBookRows}</tbody></table>
+          <table style="width:auto;min-width:420px;"><thead><tr><th>Top books</th><th>Retailer</th><th>Clicks</th></tr></thead><tbody>${clickTopBookRows}</tbody></table>
         </div>`
   }
 
