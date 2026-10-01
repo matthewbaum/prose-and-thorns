@@ -47,6 +47,14 @@ CREATE TABLE IF NOT EXISTS books (
   hardcover_ratings_count INTEGER,
   hardcover_cover_url TEXT,
   hardcover_url TEXT,
+  -- Aggregate rating computed from every rated review pulled from the UCSD
+  -- Goodreads dataset for a title (not just the smaller sampled subset that
+  -- feeds quality-profile synthesis) -- a real, large-N number for books
+  -- added via that source, used as a display-rating fallback when neither
+  -- Hardcover nor Google Books has one (see booksRepo.js's rating
+  -- hierarchy). Distinct from any single quality_profiles synthesis run.
+  ucsd_avg_rating REAL,
+  ucsd_ratings_count INTEGER,
   -- Audible ASIN for this title's audiobook edition, from Hardcover's own
   -- editions table (reading_format 'Listened') keyed off the book's already-
   -- matched hardcover_url slug -- not guessed or constructed from title/

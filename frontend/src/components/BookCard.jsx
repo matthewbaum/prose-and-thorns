@@ -37,11 +37,10 @@ export default function BookCard({ book, onSelect, filters, matchLabel }) {
   // repeat ones already pinned in the always-visible matched-filters row above.
   const tropes = allTropes.filter((t) => !matchedKeys.has(t)).slice(0, 3);
 
-  // Hardcover has far more coverage than Google Books (thousands of ratings
-  // vs. often single digits) — prefer it whenever both are available.
-  const hasHardcover = book.hardcover_avg_rating != null;
-  const realRating = hasHardcover ? book.hardcover_avg_rating : book.avg_rating;
-  const realRatingCount = hasHardcover ? book.hardcover_ratings_count : book.ratings_count;
+  // Resolved server-side (booksRepo.js's resolveRealRating) so every surface
+  // agrees: Hardcover -> Google Books -> UCSD aggregate -> sampled reviews.
+  const realRating = book.real_rating;
+  const realRatingCount = book.real_rating_count;
 
   return (
     <button className="book-card" onClick={() => onSelect(book.id)}>

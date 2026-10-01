@@ -155,9 +155,10 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
       ]
     : [];
 
-  const hasHardcover = book?.hardcover_avg_rating != null;
-  const realRating = hasHardcover ? book?.hardcover_avg_rating : book?.avg_rating;
-  const realRatingCount = hasHardcover ? book?.hardcover_ratings_count : book?.ratings_count;
+  // Resolved server-side (booksRepo.js's resolveRealRating) so every surface
+  // agrees: Hardcover -> Google Books -> UCSD aggregate -> sampled reviews.
+  const realRating = book?.real_rating;
+  const realRatingCount = book?.real_rating_count;
 
   return (
     <>

@@ -62,8 +62,50 @@ export function resolveCoverUrl(row) {
   return isStubRecord ? null : row.cover_url || null;
 }
 
+// Centralized here (not duplicated per-component on the frontend) so every
+// surface that shows a star rating resolves it identically. Hierarchy:
+// Hardcover (most reviews, most trusted) -> Google Books -> the UCSD
+// dataset's own aggregate for the title (computed from every rated review
+// pulled for it, not just the smaller sample used for synthesis -- see
+// ucsd_avg_rating's schema comment) -> as a last resort, the mean of
+// whatever reviews actually ended up stored for this book (parsed from
+// reviews.score, e.g. "4/5 stars, 12 votes"). That last tier only ever
+// fires for a book with stored reviews but no aggregate from any of the
+// first three sources -- rare, but a real possibility for a book whose
+// Google Books/Hardcover/UCSD aggregate fetch failed outright while its
+// review text still came through.
+const selectReviewScoresForBook = db.prepare('SELECT score FROM reviews WHERE book_id = ?');
+
+function sampledReviewsAvgRating(bookId) {
+  const rows = selectReviewScoresForBook.all(bookId);
+  const ratings = rows
+    .map((r) => parseFloat(String(r.score ?? '').match(/^([\d.]+)\s*\/\s*5/)?.[1]))
+    .filter((n) => !Number.isNaN(n));
+  if (ratings.length === 0) return null;
+  return {
+    rating: Number((ratings.reduce((sum, n) => sum + n, 0) / ratings.length).toFixed(2)),
+    count: ratings.length,
+  };
+}
+
+export function resolveRealRating(row) {
+  if (row.hardcover_avg_rating != null) {
+    return { rating: row.hardcover_avg_rating, count: row.hardcover_ratings_count ?? null };
+  }
+  if (row.avg_rating != null) {
+    return { rating: row.avg_rating, count: row.ratings_count ?? null };
+  }
+  if (row.ucsd_avg_rating != null) {
+    return { rating: row.ucsd_avg_rating, count: row.ucsd_ratings_count ?? null };
+  }
+  const sampled = sampledReviewsAvgRating(row.id);
+  if (sampled) return sampled;
+  return { rating: null, count: null };
+}
+
 function serializeBook(row) {
   const quality_profile = buildQualityProfile(row);
+  const realRating = resolveRealRating(row);
   return {
     id: row.id,
     title: row.title || row.seed_title,
@@ -81,6 +123,10 @@ function serializeBook(row) {
     hardcover_avg_rating: row.hardcover_avg_rating ?? null,
     hardcover_ratings_count: row.hardcover_ratings_count ?? null,
     hardcover_url: row.hardcover_url || null,
+    ucsd_avg_rating: row.ucsd_avg_rating ?? null,
+    ucsd_ratings_count: row.ucsd_ratings_count ?? null,
+    real_rating: realRating.rating,
+    real_rating_count: realRating.count,
     audible_asin: row.audible_asin || null,
     isbn: row.isbn || null,
     editorial_review: row.editorial_review || null,
