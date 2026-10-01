@@ -77,6 +77,18 @@ function decodeEntities(s) {
 
 function normalizeText(s) {
   return decodeEntities(s || '')
+    // Verified case: Google Books descriptions routinely wrap praise/award
+    // text in inline markup (e.g. "<i>New York Times</i> bestselling"),
+    // which is real text TAG_PROMPT-extracted praise correctly reproduces
+    // without the tags -- comparing against the raw HTML left genuine,
+    // grounded praise flagged as fabricated. Strip tags before collapsing
+    // whitespace so the words on either side don't fuse together.
+    // Requires a letter (or /letter) right after "<", not just "<[^>]+>" --
+    // verified case: that looser pattern matched from a review's "<3" heart
+    // emoticon all the way to an unrelated ">" later in the same text,
+    // silently deleting a large real chunk of review content and breaking
+    // quote-grounding checks that had nothing to do with HTML at all.
+    .replace(/<\/?[a-zA-Z][^<>]*>/g, ' ')
     .toLowerCase()
     .replace(/[‘’]/g, "'")
     .replace(/[“”]/g, '"')

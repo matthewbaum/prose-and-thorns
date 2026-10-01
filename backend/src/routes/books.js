@@ -26,8 +26,17 @@ router.get('/search', (req, res) => {
     res.json({ books: [] });
     return;
   }
+  // Also match series_name, not just title/author -- verified case: searching
+  // "Anita Blake" (the series/protagonist name readers actually know a book
+  // by) returned nothing, because no book is titled or authored "Anita
+  // Blake"; every title in that series is its own distinct name.
   const matches = getAllBooks()
-    .filter((b) => (b.title || '').toLowerCase().includes(q) || (b.author || '').toLowerCase().includes(q))
+    .filter(
+      (b) =>
+        (b.title || '').toLowerCase().includes(q) ||
+        (b.author || '').toLowerCase().includes(q) ||
+        (b.series_name || '').toLowerCase().includes(q)
+    )
     .slice(0, 10)
     .map((b) => ({ id: b.id, title: b.title, author: b.author, cover_url: b.cover_url }));
   res.json({ books: matches });
