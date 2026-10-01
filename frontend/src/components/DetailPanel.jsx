@@ -158,7 +158,6 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
   const hasHardcover = book?.hardcover_avg_rating != null;
   const realRating = hasHardcover ? book?.hardcover_avg_rating : book?.avg_rating;
   const realRatingCount = hasHardcover ? book?.hardcover_ratings_count : book?.ratings_count;
-  const realRatingSource = hasHardcover ? 'Hardcover' : 'Google Books';
 
   return (
     <>
@@ -200,7 +199,7 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                 {seriesLine(book) && <p className="detail-series">{seriesLine(book)}</p>}
                 {realRating != null && (
                   <p className="detail-google-rating">
-                    <span className="star">&#9733;</span> {realRating.toFixed(1)} on {realRatingSource}
+                    <span className="star">&#9733;</span> {realRating.toFixed(1)} reader rating
                     {realRatingCount != null && ` (${realRatingCount.toLocaleString()} ratings)`}
                   </p>
                 )}
@@ -354,23 +353,20 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                     ))}
                   </div>
                   <p className="review-source-note">
-                    Quality profile distilled from {quality.review_count_used ?? 0} real reader
-                    reviews (Hardcover and review blogs), weighed against the book&apos;s aggregate
-                    rating shown above.
+                    Quality profile synthesized from {quality.review_count_used ?? 0} reader reviews
+                    across multiple sources.
                     {quality.confidence === 'low' && (
                       <> Limited review volume — treat these scores as a rough signal, not a verdict.</>
                     )}
                   </p>
-                  {book.hardcover_url && (
-                    <a
-                      className="hardcover-reviews-link"
-                      href={book.hardcover_url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Read the actual reviews on Hardcover &rarr;
-                    </a>
-                  )}
+                  <a
+                    className="hardcover-reviews-link"
+                    href={`https://www.google.com/search?q=${encodeURIComponent(`${book.title} ${book.author} reviews`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Search for reviews &rarr;
+                  </a>
                   <button
                     type="button"
                     className="report-error-link"

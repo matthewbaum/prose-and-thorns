@@ -42,7 +42,6 @@ export default function BookCard({ book, onSelect, filters, matchLabel }) {
   const hasHardcover = book.hardcover_avg_rating != null;
   const realRating = hasHardcover ? book.hardcover_avg_rating : book.avg_rating;
   const realRatingCount = hasHardcover ? book.hardcover_ratings_count : book.ratings_count;
-  const realRatingSource = hasHardcover ? 'Hardcover' : 'Google Books';
 
   return (
     <button className="book-card" onClick={() => onSelect(book.id)}>
@@ -85,7 +84,7 @@ export default function BookCard({ book, onSelect, filters, matchLabel }) {
           <Flames level={book.spice_level} />
           <div className="book-scores">
             {realRating != null && (
-              <span className="google-rating" title={`${realRatingCount ?? 0} ratings on ${realRatingSource}`}>
+              <span className="google-rating" title={`${realRatingCount ?? 0} ratings`}>
                 <span className="star">&#9733;</span> {realRating.toFixed(1)}
               </span>
             )}

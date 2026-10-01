@@ -35,10 +35,9 @@ export default function RatingLegend() {
                 <span className="star filled">&#9733;</span> Real reader rating
               </h3>
               <p>
-                A plain aggregate rating from Hardcover (or Google Books when Hardcover has no
-                match) — thousands of individual readers&apos; own star ratings, averaged. This is
-                not distilled or AI-generated; it&apos;s the same kind of number you&apos;d see on
-                any book platform.
+                A plain aggregate rating pulled from a review platform — thousands of individual
+                readers&apos; own star ratings, averaged. This is not distilled or AI-generated;
+                it&apos;s the same kind of number you&apos;d see on any book platform.
               </p>
 
               <h3>
