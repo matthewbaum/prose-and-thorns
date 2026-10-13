@@ -380,16 +380,23 @@ async function checkCoverImageIntegrity(books) {
   await Promise.all(Array.from({ length: COVER_CHECK_CONCURRENCY }, worker));
 }
 
+// Keyed on title AND author: two different authors can legitimately share a
+// title (verified case: "Burned" by Karen Marie Moning and by P. C. & Kristin
+// Cast), and flagging those as High -- in a category that can't be dismissed --
+// buries real findings. A same-title row with a *different* author that is
+// actually a bad match is caught by the author-mismatch check instead.
 function checkDuplicateTitles(books) {
-  const byTitle = new Map();
+  const norm = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  const byKey = new Map();
   for (const b of books) {
     if (!b.title) continue;
-    if (!byTitle.has(b.title)) byTitle.set(b.title, []);
-    byTitle.get(b.title).push(b.id);
+    const key = `${b.title}\u0000${norm(b.author)}`;
+    if (!byKey.has(key)) byKey.set(key, { title: b.title, ids: [] });
+    byKey.get(key).ids.push(b.id);
   }
-  for (const [title, ids] of byTitle) {
+  for (const { title, ids } of byKey.values()) {
     if (ids.length > 1) {
-      flag('high', 'duplicate-title', `Title "${title}" appears in ${ids.length} rows: ${ids.map((i) => `#${i}`).join(', ')}`);
+      flag('high', 'duplicate-title', `Title "${title}" appears in ${ids.length} rows by the same author: ${ids.map((i) => `#${i}`).join(', ')}`);
     }
   }
 }
