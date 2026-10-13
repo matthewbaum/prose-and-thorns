@@ -7,7 +7,7 @@ import HomePage from './components/HomePage.jsx';
 import AboutPage from './components/AboutPage.jsx';
 import BookPicker from './components/BookPicker.jsx';
 import QualityFilterPicker from './components/QualityFilterPicker.jsx';
-import { fetchBooks, fetchBook, fetchRecommendations } from './api.js';
+import { fetchBooks, fetchBook, fetchRecommendations, trackView } from './api.js';
 import { SORT_OPTIONS, RECOMMEND_SORT_OPTIONS } from './constants/taxonomy.js';
 import './styles/App.css';
 
@@ -44,6 +44,7 @@ export default function App() {
   // the fold until the reader scrolled up manually.
   useEffect(() => {
     window.scrollTo(0, 0);
+    trackView({ kind: 'view', view });
   }, [view]);
 
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
@@ -144,6 +145,7 @@ export default function App() {
       setSelectedBook(null);
       return;
     }
+    trackView({ kind: 'book', bookId: selectedId });
     let cancelled = false;
     setDetailLoading(true);
     fetchBook(selectedId)

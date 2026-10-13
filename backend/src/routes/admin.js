@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import db from '../db/index.js';
 import { getClickSummary } from '../db/clicksRepo.js';
+import { getTrafficSummary } from '../db/pageViewsRepo.js';
+import { getBookById } from '../db/booksRepo.js';
 
 const router = Router();
 
@@ -124,6 +126,23 @@ router.get('/dashboard', (req, res) => {
   const clicks = getClickSummary();
   const password = escapeHtml(req.query.password || '');
 
+  const traffic = getTrafficSummary();
+  const trafficTotalRows = traffic.totals
+    .map((t) => `<tr><td>${t.label}</td><td>${t.visits}</td><td>${t.pageViews}</td><td>${t.bookViews}</td></tr>`)
+    .join('');
+  const trafficDayRows = traffic.byDay
+    .map((d) => `<tr><td>${d.day}</td><td>${d.visits}</td><td>${d.views}</td></tr>`)
+    .join('');
+  const trafficSectionRows = traffic.bySection
+    .map((s) => `<tr><td>${escapeHtml(s.view)}</td><td>${s.views}</td></tr>`)
+    .join('');
+  const trafficBookRows = traffic.topBooks
+    .map((b) => {
+      const book = getBookById(b.book_id);
+      return `<tr><td>#${b.book_id} ${escapeHtml(book?.title ?? '(removed)')}</td><td>${b.views}</td><td>${b.visitors}</td></tr>`;
+    })
+    .join('');
+
   const needsFix = auditFindings.filter((f) => f.disposition === 'needs-fix');
   const accepted = auditFindings.filter((f) => f.disposition === 'accepted');
 
@@ -231,6 +250,19 @@ router.get('/dashboard', (req, res) => {
   <p class="subtitle">${messages.length} message(s) &middot; ${reports.length} reader report(s) &middot; ${needsFix.length} finding${needsFix.length === 1 ? '' : 's'} need attention &middot; ${accepted.length} reviewed, no action needed &middot;
     <span class="refresh"><a href="?password=${password}">refresh</a></span>
   </p>
+
+  <h2>Traffic</h2>
+  ${
+    traffic.since == null
+      ? '<p class="empty">No page views logged yet.</p>'
+      : `<p class="muted">Logging since ${escapeHtml(traffic.since)} UTC. A visit is one browser session; bots are excluded. Counts reset on redeploy unless <code>PT_LIVE_DB_PATH</code> points at a persistent volume (currently <code>${escapeHtml(traffic.dbPath)}</code>).</p>
+        <table style="width:auto;min-width:420px;"><thead><tr><th></th><th>Visits</th><th>Page views</th><th>Book opens</th></tr></thead><tbody>${trafficTotalRows}</tbody></table>
+        <div style="display:flex;gap:32px;flex-wrap:wrap;margin-top:16px;">
+          <table style="width:auto;min-width:260px;"><thead><tr><th>Day (last 14)</th><th>Visits</th><th>Views</th></tr></thead><tbody>${trafficDayRows}</tbody></table>
+          <table style="width:auto;min-width:200px;"><thead><tr><th>Section</th><th>Views</th></tr></thead><tbody>${trafficSectionRows}</tbody></table>
+          <table style="width:auto;min-width:420px;"><thead><tr><th>Most-opened books</th><th>Opens</th><th>Visitors</th></tr></thead><tbody>${trafficBookRows}</tbody></table>
+        </div>`
+  }
 
   <h2>Retailer Clicks (${totalClicks})</h2>
   ${

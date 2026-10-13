@@ -18,3 +18,5 @@ backend/data/manual-reviews/
 # see backend/src/db/index.js and `npm run export-slim`.
 backend/data/full/
 backend/data/backups/
+# Live visitor data (page views) -- never committed; see backend/src/db/liveDb.js
+backend/data/live/

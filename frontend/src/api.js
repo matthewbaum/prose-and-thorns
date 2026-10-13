@@ -65,3 +65,30 @@ export function logRetailerClick(bookId, retailer) {
     body: JSON.stringify({ retailer }),
   }).catch(() => {});
 }
+
+// Page-view tracking (see backend/src/routes/track.js). The session id is a
+// random string kept in sessionStorage -- it lasts until the tab closes and
+// isn't linked to anything about the person -- so the admin page can count
+// visits as well as views. Fire-and-forget; never throws or blocks the UI.
+function trackingSessionId() {
+  try {
+    let id = sessionStorage.getItem('pt_session');
+    if (!id) {
+      id = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`).slice(0, 64);
+      sessionStorage.setItem('pt_session', id);
+    }
+    return id;
+  } catch {
+    return null;
+  }
+}
+
+export function trackView(payload) {
+  const sessionId = trackingSessionId();
+  if (!sessionId) return;
+  fetch(`${BASE}/track`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...payload, sessionId }),
+  }).catch(() => {});
+}
