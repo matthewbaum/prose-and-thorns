@@ -76,7 +76,7 @@ export function resolveCoverUrl(row) {
 // review text still came through.
 const selectReviewScoresForBook = db.prepare('SELECT score FROM reviews WHERE book_id = ?');
 
-function sampledReviewsAvgRating(bookId) {
+export function sampledReviewsAvgRating(bookId) {
   const rows = selectReviewScoresForBook.all(bookId);
   const ratings = rows
     .map((r) => parseFloat(String(r.score ?? '').match(/^([\d.]+)\s*\/\s*5/)?.[1]))
@@ -100,6 +100,13 @@ export function resolveRealRating(row) {
   }
   const sampled = sampledReviewsAvgRating(row.id);
   if (sampled) return sampled;
+  // The deployed (slim) database has no review rows to average, so exportSlim.js
+  // pre-computes the same value into these columns. Only reached when the live
+  // reviews table had nothing to say -- in the full local database it never is
+  // for a book that has stored ratings, so behavior is identical in both.
+  if (row.sampled_avg_rating != null) {
+    return { rating: row.sampled_avg_rating, count: row.sampled_ratings_count ?? null };
+  }
   return { rating: null, count: null };
 }
 
@@ -181,10 +188,13 @@ const SELECT_SQL = `
 // with no code change needed, the moment real review data exists for it
 // (whether that's from a review scrape after release, or a wrong-product
 // match getting corrected and re-fetched).
+// stored_review_count stands in for the EXISTS check in the slim deployed
+// database, where the reviews table is empty by design (see exportSlim.js).
 const NO_SUBSTANCE_CLAUSE = `
   NOT (
     b.avg_rating IS NULL
     AND b.hardcover_avg_rating IS NULL
+    AND b.stored_review_count = 0
     AND NOT EXISTS (SELECT 1 FROM reviews r WHERE r.book_id = b.id)
   )
 `;

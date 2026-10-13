@@ -39,6 +39,43 @@ sweep). To test a small number of new titles cheaply without that side effect, c
 `processBook()` (exported from `runPipeline.js`) directly against just the new seeds
 instead of running the full `runPipeline()`.
 
+## Database: full vs. slim (since 2026-10-13) — read before touching the .sqlite
+
+There are two database files, because raw review text is ~85% of the database's size
+and GitHub rejects any single file over 100 MB:
+
+- **Slim — `backend/data/prose-and-thorns.sqlite`**: the *committed, deployed* file.
+  Everything the live site serves (books, tags, ratings, quality profiles, audit
+  findings) but **no review rows**. ~3.6 MB at 589 books, roughly 6 KB per added book.
+- **Full — `backend/data/full/prose-and-thorns-full.sqlite`**: the working copy, with
+  all review text. **Gitignored.** `db/index.js` picks it automatically whenever it
+  exists (override with `PT_DB_PATH`); on Railway only the slim file exists, so the
+  server falls back to it with no configuration.
+
+Consequences for any session:
+- Pipeline scripts, `npm run audit`, and the dev server all use the **full** copy
+  automatically. The audit's quote-grounding checks need the review text, so they only
+  work against the full copy.
+- **Before committing a change that should reach production, run `npm run export-slim`
+  (from `backend/`).** It refreshes the denormalized review stats
+  (`stored_review_count`, `sampled_avg_rating`, `sampled_ratings_count`), checkpoints
+  the full DB, and regenerates the slim file. Committing without it deploys stale data.
+  It refuses to run if the process opened the slim file (that would destroy review text).
+- Do **not** run pipeline scripts against the slim file or edit it directly.
+- The full copy exists **only on this machine** (git history holds older full versions
+  up to 2026-10-13). `npm run export-slim` also writes a dated, read-back-verified gzip
+  of the full DB to `PT_BACKUP_DIR` (set in the gitignored `backend/.env`; currently a
+  `prose-and-thorns-backups` folder in the user's personal Dropbox), keeping the newest 7.
+  If `PT_BACKUP_DIR` is unset or the write fails, the export still completes but prints a
+  loud SKIPPED/FAILED line — check for it. A one-off earlier gzip is in
+  `backend/data/backups/` (gitignored).
+- Two runtime queries stand in for the reviews table via the stored columns: the
+  "has any reviews" visibility check and the last-resort rating tier in `booksRepo.js`.
+  If another runtime query ever reads `reviews`, it will silently see nothing in
+  production — use a stored column instead.
+- Still true: production has no persistent volume, so anything users submit on the
+  live site (book requests, contact messages, retailer clicks) is lost on redeploy.
+
 ## Current state (as of 2026-08-14)
 
 ~305 books, 126 seed authors in `seedList.js`, all individually verified real

@@ -13,3 +13,8 @@ backend/data/*.sqlite-wal
 backend/data/*.sqlite-shm
 .DS_Store
 backend/data/manual-reviews/
+# Working copy of the database (with raw review text) and its backups. Only
+# the slim export at backend/data/prose-and-thorns.sqlite is committed --
+# see backend/src/db/index.js and `npm run export-slim`.
+backend/data/full/
+backend/data/backups/

@@ -12,7 +12,7 @@ romantasy titles.
 
 - **Frontend:** React + Vite (`frontend/`)
 - **Backend:** Node.js / Express (`backend/`)
-- **Database:** SQLite via `better-sqlite3`, file-based at `backend/data/prose-and-thorns.sqlite`
+- **Database:** SQLite via `better-sqlite3`. The committed, deployed file is `backend/data/prose-and-thorns.sqlite` (a "slim" copy without raw review text); the working copy lives in the gitignored `backend/data/full/` — see *Database: full vs. slim* in `CLAUDE.md`
 - **APIs:** Google Books, Reddit, Anthropic Claude
 
 ## Setup

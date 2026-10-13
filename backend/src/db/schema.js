@@ -55,6 +55,16 @@ CREATE TABLE IF NOT EXISTS books (
   -- hierarchy). Distinct from any single quality_profiles synthesis run.
   ucsd_avg_rating REAL,
   ucsd_ratings_count INTEGER,
+  -- Denormalized review stats, refreshed by exportSlim.js. The deployed
+  -- database ships WITHOUT the reviews table's contents (raw review text is
+  -- ~85% of the file and nothing at request time displays it), but two
+  -- runtime checks still need to know "does this book have reviews" and the
+  -- last-resort sampled-ratings average -- these columns carry that across.
+  -- In the full local database the live reviews table is still consulted
+  -- first, so these only ever matter in the slim copy.
+  stored_review_count INTEGER NOT NULL DEFAULT 0,
+  sampled_avg_rating REAL,
+  sampled_ratings_count INTEGER,
   -- Audible ASIN for this title's audiobook edition, from Hardcover's own
   -- editions table (reading_format 'Listened') keyed off the book's already-
   -- matched hardcover_url slug -- not guessed or constructed from title/
