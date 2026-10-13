@@ -16,7 +16,7 @@ const DARKNESS_LABELS = Object.fromEntries(DARKNESS_LEVELS.map((d) => [d.value, 
 // Amazon Associates tag -- Audible is Amazon-owned and enrolled under the
 // same Associates program, so the one tag covers both the Amazon search
 // link and the Audible product link below.
-const ASSOCIATES_TAG = 'proseandthorn-20';
+const ASSOCIATES_TAG = 'proseandthorns20';
 
 function withAssociatesTag(url) {
   return `${url}${url.includes('?') ? '&' : '?'}tag=${ASSOCIATES_TAG}`;
