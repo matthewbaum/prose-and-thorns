@@ -253,7 +253,7 @@ function checkFetchIntegrity(books) {
       flag('high', 'broken-row', `#${b.id} (seed "${b.seed_title}" by ${b.seed_author}): google_books_fetched_at is set but title/author is still null — fetch silently produced nothing.`, b.id);
     }
     const isStub = b.google_books_id && b.google_books_id.endsWith('ACAAJ');
-    if (isStub && !b.hardcover_cover_url) {
+    if (isStub && !b.hardcover_cover_url && (!b.cover_url || /^https?:\/\/books\.google\./.test(b.cover_url))) {
       flag('medium', 'stub-cover', `#${b.id} "${b.title}": google_books_id ${b.google_books_id} is an ACAAJ stub (no real cover) with no Hardcover cover fallback.`, b.id);
     }
     if (b.title && WRONG_PRODUCT_PATTERN.test(b.title)) {

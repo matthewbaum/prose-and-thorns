@@ -56,10 +56,18 @@ function buildQualityProfile(row) {
 // itself looks valid. Prefer Hardcover's cover (real edition art, and much
 // better matched overall) whenever we have it; only fall back to Google's
 // when Hardcover has nothing and Google's own ID isn't a known-bad stub.
+// A cover_url from anywhere other than Google Books (e.g. an Open Library
+// cover looked up by ISBN) is real art even when the Google ID is a stub, so
+// only Google-hosted URLs are suppressed for stub records.
+export function isGoogleHostedCover(url) {
+  return /^https?:\/\/books\.google\./.test(url || '');
+}
+
 export function resolveCoverUrl(row) {
   if (row.hardcover_cover_url) return row.hardcover_cover_url;
   const isStubRecord = row.google_books_id && row.google_books_id.endsWith('ACAAJ');
-  return isStubRecord ? null : row.cover_url || null;
+  if (isStubRecord && isGoogleHostedCover(row.cover_url)) return null;
+  return row.cover_url || null;
 }
 
 // Centralized here (not duplicated per-component on the frontend) so every
