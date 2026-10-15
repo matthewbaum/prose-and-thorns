@@ -36,7 +36,35 @@ function normalizeTitle(s) {
     .trim();
 }
 
-function titleMatchScore(item, seedTitle) {
+// Name tokens for the author check: accent-stripped, lowercase, >= 3 letters
+// (drops initials like "J." / "K.", which carry no signal).
+function authorTokens(s) {
+  return new Set(
+    String(s || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z\s]/g, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length >= 3)
+  );
+}
+
+// Title-only ranking let a same-titled book by a different author win (verified
+// case: "Affliction" resolved to a different author's book). A candidate whose
+// listed authors share no name token with the seed author gets a penalty large
+// enough (an exact title match scores at most 4) to sink it below MIN_ACCEPTABLE_SCORE; a candidate with no listed
+// authors is left alone (nothing to compare).
+export function authorMismatchPenalty(item, seedAuthor) {
+  const listed = (item.volumeInfo || {}).authors;
+  if (!seedAuthor || !Array.isArray(listed) || listed.length === 0) return 0;
+  const seed = authorTokens(seedAuthor);
+  if (seed.size === 0) return 0;
+  const cand = authorTokens(listed.join(' '));
+  return [...seed].some((w) => cand.has(w)) ? 0 : 5;
+}
+
+export function titleMatchScore(item, seedTitle, seedAuthor) {
   const info = item.volumeInfo || {};
   const c = normalizeTitle(info.title || '');
   const s = normalizeTitle(seedTitle || '');
@@ -53,6 +81,7 @@ function titleMatchScore(item, seedTitle) {
   score += overlap / Math.max(sWords.size, 1);
 
   if (WRONG_PRODUCT_PATTERN.test(info.title || '')) score -= 5;
+  score -= authorMismatchPenalty(item, seedAuthor);
   // Belt-and-suspenders on top of the langRestrict=en query param — a
   // translated edition can share the exact same title as the English
   // original, so it wouldn't otherwise lose any title-match points, and
@@ -96,7 +125,7 @@ async function fetchVolumes(apiKey, q) {
 // author at all — every candidate for it scores below this bar).
 const MIN_ACCEPTABLE_SCORE = 0.5;
 
-async function searchVolumes(apiKey, structuredQuery, unstructuredQuery, seedTitle) {
+async function searchVolumes(apiKey, structuredQuery, unstructuredQuery, seedTitle, seedAuthor) {
   // Try both query forms and pick the best candidate across both result
   // sets — the structured intitle:/inauthor: query can return a handful of
   // wrong-but-nonempty results (so the old "fallback only if empty" logic
@@ -108,7 +137,7 @@ async function searchVolumes(apiKey, structuredQuery, unstructuredQuery, seedTit
   let structuredItems, unstructuredItems;
   if (process.env.PT_GB_SINGLE_QUERY === '1') {
     structuredItems = await fetchVolumes(apiKey, structuredQuery);
-    const best = structuredItems.map((item) => titleMatchScore(item, seedTitle)).sort((a, b) => b - a)[0];
+    const best = structuredItems.map((item) => titleMatchScore(item, seedTitle, seedAuthor)).sort((a, b) => b - a)[0];
     unstructuredItems = best !== undefined && best >= MIN_ACCEPTABLE_SCORE ? [] : await fetchVolumes(apiKey, unstructuredQuery);
   } else {
     [structuredItems, unstructuredItems] = await Promise.all([
@@ -128,7 +157,7 @@ async function searchVolumes(apiKey, structuredQuery, unstructuredQuery, seedTit
   const ranked = allItems
     .map((item) => ({
       item,
-      score: titleMatchScore(item, seedTitle),
+      score: titleMatchScore(item, seedTitle, seedAuthor),
     }))
     .sort((a, b) => b.score - a.score);
 
@@ -150,7 +179,8 @@ export async function fetchGoogleBooksData(title, author) {
     apiKey,
     `intitle:${title} inauthor:${author}`,
     `${title} ${author}`,
-    title
+    title,
+    author
   );
   if (!item) {
     log(`No Google Books match for "${title}" by ${author}`);
