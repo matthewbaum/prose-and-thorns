@@ -73,12 +73,13 @@ Consequences for any session:
   "has any reviews" visibility check and the last-resort rating tier in `booksRepo.js`.
   If another runtime query ever reads `reviews`, it will silently see nothing in
   production — use a stored column instead.
-- Page views (`POST /api/track`, shown in the admin dashboard's Traffic section) live in a
-  separate, never-committed file, `backend/data/live/live.sqlite` (`db/liveDb.js`), so
-  local test traffic never ships and deploys never overwrite production traffic. On
-  Railway, set `PT_LIVE_DB_PATH` to a path on an attached volume or counts reset each deploy.
-- Still true: production has no persistent volume, so anything users submit on the
-  live site (book requests, contact messages, retailer clicks) is lost on redeploy.
+- Live visitor data (page views via `POST /api/track`, retailer clicks, and contact /
+  book-request / reader-report submissions) lives in a separate, never-committed file,
+  `backend/data/live/live.sqlite` (`db/liveDb.js`), so local test traffic never ships and
+  deploys never overwrite production data. The admin dashboard reads it. On Railway,
+  attach a volume (mount `/data`) and set `PT_LIVE_DB_PATH=/data/live.sqlite`, otherwise
+  all of it is lost on every redeploy. The `submissions` / `retailer_clicks` tables still
+  defined in `schema.js` are legacy and unused.
 
 ## Current state (as of 2026-08-14)
 

@@ -1,6 +1,6 @@
-import db from './index.js';
+import liveDb from './liveDb.js';
 
-const insertSubmission = db.prepare(
+const insertSubmission = liveDb.prepare(
   `INSERT INTO submissions (
      type, name, email, message, book_title, book_author, isbn, book_id, category, rating,
      prose_quality, romance_quality, world_building, pacing_quality, emotional_payoff, character_depth,

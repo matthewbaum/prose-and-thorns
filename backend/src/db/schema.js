@@ -180,6 +180,10 @@ CREATE TABLE IF NOT EXISTS user_preferences (
 -- fields are filled in. book_title is free text, not a books(id) foreign
 -- key: a reviewer describing a book they read shouldn't be blocked by
 -- fuzzy-matching it to the catalog at submission time.
+-- LEGACY: submissions and retailer_clicks now live in liveDb.js (a separate,
+-- never-committed file that can sit on a persistent volume). These definitions
+-- stay only so databases created before the move still open; nothing reads
+-- or writes these copies any more.
 CREATE TABLE IF NOT EXISTS submissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   type TEXT NOT NULL, -- 'contact' | 'review' | 'partnership' | 'correction' | 'book-request'

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import db from '../db/index.js';
 import { getClickSummary } from '../db/clicksRepo.js';
+import liveDb from '../db/liveDb.js';
 import { getTrafficSummary } from '../db/pageViewsRepo.js';
 import { getBookById } from '../db/booksRepo.js';
 
@@ -64,7 +65,7 @@ function loadFindings() {
     )
     .all(...NEVER_DISMISSIBLE_CATEGORIES);
 
-  const reports = db
+  const reports = liveDb
     .prepare(
       `SELECT id, 'reader-report' as source, category, message, book_id, book_title, name, email, status, created_at
        FROM submissions WHERE type = 'correction' AND status = 'new' ORDER BY created_at DESC`
@@ -75,7 +76,7 @@ function loadFindings() {
   // submissions table but were never surfaced anywhere before this —
   // they'd silently sit in the DB with zero visibility short of querying
   // it directly.
-  const messages = db
+  const messages = liveDb
     .prepare(
       `SELECT id, type, name, email, message, book_title, book_author, isbn, rating, channel_url, status, created_at
        FROM submissions WHERE type IN ('contact', 'review', 'partnership', 'book-request') AND status = 'new'
@@ -255,7 +256,7 @@ router.get('/dashboard', (req, res) => {
   ${
     traffic.since == null
       ? '<p class="empty">No page views logged yet.</p>'
-      : `<p class="muted">Logging since ${escapeHtml(traffic.since)} UTC. A visit is one browser session; bots are excluded. Counts reset on redeploy unless <code>PT_LIVE_DB_PATH</code> points at a persistent volume (currently <code>${escapeHtml(traffic.dbPath)}</code>).</p>
+      : `<p class="muted">Logging since ${escapeHtml(traffic.since)} UTC. A visit is one browser session; bots are excluded. Page views, retailer clicks and messages are stored together and reset on redeploy unless <code>PT_LIVE_DB_PATH</code> points at a persistent volume (currently <code>${escapeHtml(traffic.dbPath)}</code>).</p>
         <table style="width:auto;min-width:420px;"><thead><tr><th></th><th>Visits</th><th>Page views</th><th>Book opens</th></tr></thead><tbody>${trafficTotalRows}</tbody></table>
         <div style="display:flex;gap:32px;flex-wrap:wrap;margin-top:16px;">
           <table style="width:auto;min-width:260px;"><thead><tr><th>Day (last 14)</th><th>Visits</th><th>Views</th></tr></thead><tbody>${trafficDayRows}</tbody></table>
