@@ -75,7 +75,7 @@ function decodeEntities(s) {
     .replace(/&nbsp;/g, ' ');
 }
 
-function normalizeText(s) {
+export function normalizeText(s) {
   return decodeEntities(s || '')
     // Verified case: Google Books descriptions routinely wrap praise/award
     // text in inline markup (e.g. "<i>New York Times</i> bestselling"),
