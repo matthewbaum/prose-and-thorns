@@ -138,6 +138,11 @@ async function processBook(item) {
   if (!authorsAgree(author, gb.author)) {
     return { status: 'skipped', reason: `google-books-author-mismatch (got "${gb.author}", "${gb.title}")` };
   }
+  // Title check too: a same-author sibling ("Awaken" for "Abandon") passes the
+  // author test but is the wrong book, and would get its description tagged.
+  if (![...nameTokens(title)].some((w) => nameTokens(gb.title).has(w))) {
+    return { status: 'skipped', reason: `google-books-title-mismatch (got "${gb.title}")` };
+  }
   if (!gb.description) return { status: 'skipped', reason: 'no-description-for-tagging' };
 
   const existing = db.prepare('SELECT id FROM books WHERE google_books_id = ?').get(gb.google_books_id);
