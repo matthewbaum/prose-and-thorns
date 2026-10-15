@@ -22,6 +22,8 @@ import { sleep, RATE_LIMIT_DELAY_MS, log } from './util.js';
 // Resumable: progress lives in PROGRESS_PATH. Exit codes: 0 = batch done (more
 // may remain), 10 = nothing left to do, 42 = Google Books quota exhausted.
 
+process.env.PT_GB_SINGLE_QUERY = '1'; // see googleBooks.js: one query per book unless the first finds no match
+
 const POOL_PATH = '/tmp/goodreads-check/pool-final.json';
 const REVIEWS_DIR = '/tmp/goodreads-check/raw-reviews-for-add';
 const PROGRESS_PATH = '/tmp/goodreads-check/run-progress.json';
@@ -117,7 +119,8 @@ async function processBook(item) {
   if (!fs.existsSync(reviewsPath)) return { status: 'skipped', reason: 'no-review-file' };
   const allReviews = JSON.parse(fs.readFileSync(reviewsPath, 'utf8'));
 
-  // 5xx / network blips are transient: retry with backoff, and if they persist
+  // 5xx / network blips are transient: retry once after a pause (each attempt spends
+  // daily Google Books quota, so retrying hard burned about half of it), and if they persist
   // leave the book un-recorded (so a later batch retries it) instead of
   // writing a permanent skip.
   let gb;
@@ -129,8 +132,8 @@ async function processBook(item) {
       if (isQuotaError(err)) throw err;
       const transient = /Google Books API error 5\d\d|fetch failed|ECONN|ETIMEDOUT|ENOTFOUND|socket/i.test(err.message);
       if (!transient) return { status: 'skipped', reason: `google-books-error: ${err.message.slice(0, 120)}` };
-      if (attempt >= 3) throw Object.assign(new Error(`transient: ${err.message.slice(0, 100)}`), { transient: true });
-      await sleep(5000 * 3 ** attempt);
+      if (attempt >= 1) throw Object.assign(new Error(`transient: ${err.message.slice(0, 100)}`), { transient: true });
+      await sleep(15000);
     }
   }
   await sleep(RATE_LIMIT_DELAY_MS);

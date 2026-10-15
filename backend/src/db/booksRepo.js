@@ -209,6 +209,14 @@ const selectSeriesSiblings = db.prepare(`
   ORDER BY series_position ASC
 `);
 
+const countVisibleBooksStmt = db.prepare(`SELECT COUNT(*) AS n FROM books b WHERE ${NO_SUBSTANCE_CLAUSE}`);
+
+// Same visibility rule as every listing surface (NO_SUBSTANCE_CLAUSE), so the
+// number shown on the homepage matches what Browse can actually return.
+export function countVisibleBooks() {
+  return countVisibleBooksStmt.get().n;
+}
+
 export function getAllBooks() {
   return selectAllBooks.all().map(serializeBook);
 }

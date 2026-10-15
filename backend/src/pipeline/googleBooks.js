@@ -102,10 +102,20 @@ async function searchVolumes(apiKey, structuredQuery, unstructuredQuery, seedTit
   // wrong-but-nonempty results (so the old "fallback only if empty" logic
   // never reaches the unstructured query even when it has the right book,
   // e.g. an ampersand title variant only the unstructured search finds).
-  const [structuredItems, unstructuredItems] = await Promise.all([
-    fetchVolumes(apiKey, structuredQuery),
-    fetchVolumes(apiKey, unstructuredQuery),
-  ]);
+  // PT_GB_SINGLE_QUERY=1 (bulk runs against a tight daily quota): try the
+  // structured query alone, and only spend a second query when it yields no
+  // acceptable title match. Halves the quota use for the common case.
+  let structuredItems, unstructuredItems;
+  if (process.env.PT_GB_SINGLE_QUERY === '1') {
+    structuredItems = await fetchVolumes(apiKey, structuredQuery);
+    const best = structuredItems.map((item) => titleMatchScore(item, seedTitle)).sort((a, b) => b - a)[0];
+    unstructuredItems = best !== undefined && best >= MIN_ACCEPTABLE_SCORE ? [] : await fetchVolumes(apiKey, unstructuredQuery);
+  } else {
+    [structuredItems, unstructuredItems] = await Promise.all([
+      fetchVolumes(apiKey, structuredQuery),
+      fetchVolumes(apiKey, unstructuredQuery),
+    ]);
+  }
 
   const seen = new Set();
   const allItems = [...structuredItems, ...unstructuredItems].filter((item) => {

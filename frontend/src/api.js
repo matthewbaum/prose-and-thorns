@@ -30,6 +30,10 @@ export function fetchBook(id) {
   return request(`/books/${id}`);
 }
 
+export function fetchBookCount() {
+  return request('/books/count');
+}
+
 export function fetchShelves() {
   return request('/shelves');
 }

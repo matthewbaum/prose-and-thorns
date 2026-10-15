@@ -313,3 +313,19 @@
   text-align: center;
   padding: 40px 0;
 }
+
+
+/* Understated catalog-size line under the book picker. Same muted small-text
+   treatment as .quick-search-label; only the number picks up the gold accent. */
+.home-book-count {
+  margin: 18px 0 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.home-book-count-number {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllBooks, getBookById } from '../db/booksRepo.js';
+import { getAllBooks, getBookById, countVisibleBooks } from '../db/booksRepo.js';
 import { applyFilters, applySort } from '../lib/filterBooks.js';
 import { logClick, RETAILERS } from '../db/clicksRepo.js';
 
@@ -18,6 +18,12 @@ router.get('/', (req, res) => {
   const page = sorted.slice(offset, offset + limit);
 
   res.json({ books: page, total: sorted.length, limit, offset });
+});
+
+// Live catalog size for the homepage ("N books and growing"). Declared before
+// /:id so "count" isn't parsed as a book id.
+router.get('/count', (req, res) => {
+  res.json({ count: countVisibleBooks() });
 });
 
 router.get('/search', (req, res) => {

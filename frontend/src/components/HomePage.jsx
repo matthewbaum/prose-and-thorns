@@ -3,12 +3,28 @@ import Shelf from './Shelf.jsx';
 import RatingLegend from './RatingLegend.jsx';
 import QuickSearch from './QuickSearch.jsx';
 import BookPicker from './BookPicker.jsx';
-import { fetchShelves } from '../api.js';
+import { fetchShelves, fetchBookCount } from '../api.js';
 import '../styles/HomePage.css';
 
 export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onRecommend }) {
   const [shelves, setShelves] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bookCount, setBookCount] = useState(null);
+
+  // Live from the database on every visit, so it tracks the catalog as books
+  // are added. A failed fetch just leaves the line out -- it's decoration, not
+  // something worth an error state.
+  useEffect(() => {
+    let cancelled = false;
+    fetchBookCount()
+      .then((data) => {
+        if (!cancelled && Number.isFinite(data?.count)) setBookCount(data.count);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,6 +95,12 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
           them by quality once you see the matches:
         </p>
         <BookPicker onRecommend={onRecommend} />
+        {bookCount != null && (
+          <p className="home-book-count">
+            <span className="home-book-count-number">{bookCount.toLocaleString()}</span>{' '}
+            {bookCount === 1 ? 'book' : 'books'} and growing
+          </p>
+        )}
       </div>
 
       <QuickSearch onSearch={onQuickSearch} />
