@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import db from '../db/index.js';
 import { WRONG_PRODUCT_PATTERN } from './googleBooks.js';
 import { resolveCoverUrl } from '../db/booksRepo.js';
@@ -340,6 +343,14 @@ const COVER_SIZE_THRESHOLD_BYTES = 15000;
 const COVER_CHECK_CONCURRENCY = 8;
 
 async function fetchCoverSize(url) {
+  // Covers mirrored by mirrorCovers.js are static files under frontend/public/.
+  if (url.startsWith('/covers/')) {
+    try {
+      return fs.statSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'frontend', 'public', url)).size;
+    } catch {
+      return 0; // missing file -> flagged as a bad cover below
+    }
+  }
   try {
     const res = await fetch(url, { method: 'HEAD' });
     if (!res.ok) return null;
