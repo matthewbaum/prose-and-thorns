@@ -81,7 +81,34 @@ Consequences for any session:
   all of it is lost on every redeploy. The `submissions` / `retailer_clicks` tables still
   defined in `schema.js` are legacy and unused.
 
-## Current state (as of 2026-08-14)
+## Bulk UCSD run (2026-10-14 to 2026-10-16) — what it added and how to repeat it
+
+The catalog went from 589 to 1,252 books. The pool was every UCSD Goodreads book with
+>=200 written reviews that carries one of the tags paranormal-romance / romantasy /
+fantasy-romance / fae (a series qualifies if >=1/3 of its main novels are tagged), minus
+novellas, box sets, companions, foreign editions and anything already in the catalog:
+666 candidates, 663 added (3 skipped as already present, 1 with no description anywhere).
+Lists of what was added and cut are in `backend/data/ucsd-run/` (untracked CSVs).
+- Scripts (all in `backend/src/pipeline/`): `addFromUcsdPool.js` (the add loop; reads
+  `/tmp/goodreads-check/` data, which is scratch and was deleted afterwards),
+  `postBatchFixes.js` (run after every batch: series totals, out-of-taxonomy tropes,
+  ungrounded praise, wrong-book matches, missing syntheses, Google's fake cover images),
+  `mirrorCovers.js` (copies Open Library covers into `frontend/public/covers/`),
+  `repairConnectionFailures.js` (re-tags books left half-built by a network outage).
+- Metadata falls back to the UCSD record (description, publisher, pages, date, ISBN) when
+  Google Books is down, out of quota, or returns the wrong book. Google's quota is
+  1,000 queries/day; 503 retries burn it, so keep retries to one.
+- Covers: Google serves identical "image not available" graphics and interior text pages
+  (title pages, "other books by" lists) as covers. Size checks miss the larger ones; a
+  white-pixel scan (>=55% near-white) finds them. Open Library covers by ISBN are
+  mirrored locally; books with nothing usable show a "Cover art unavailable" title card.
+  Every replacement cover was checked by eye -- keep doing that.
+- Network outages mid-run left books created but un-tagged/un-synthesized three times.
+  `repairConnectionFailures.js` + `postBatchFixes.js` fix that; check for it after any
+  run that logs "Connection error".
+- The Mac must stay awake and plugged in (`caffeinate -i -m -w <pid>`); sleep freezes it.
+
+## Current state (as of 2026-08-14, before the bulk run above)
 
 ~305 books, 126 seed authors in `seedList.js`, all individually verified real
 against actual bibliographies (see `SEED_AUDIT_LOG.md` — a hallucinated-title sweep
