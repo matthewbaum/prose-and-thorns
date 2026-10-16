@@ -47,7 +47,8 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
   // worth being in that shelf. Eight, not four — more real catalog variety
   // rather than blowing up the same handful of covers. (Was six; widened
   // to eight alongside the hero's wider art column — see HomePage.css.)
-  const heroCovers = (shelves[0]?.books || []).slice(0, 8);
+  // Only books with real cover art -- a title card doesn't belong in the cover cluster.
+  const heroCovers = (shelves[0]?.books || []).filter((b) => b.cover_url).slice(0, 8);
 
   return (
     <div className="home-page">

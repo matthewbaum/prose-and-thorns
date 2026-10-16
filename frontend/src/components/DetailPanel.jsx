@@ -179,6 +179,7 @@ export default function DetailPanel({ book, loading, onClose, onSelectBook }) {
                 ) : (
                   <div className="detail-cover detail-cover-placeholder">
                     <span>{book.title}</span>
+                    <span className="detail-cover-placeholder-note">Cover art unavailable</span>
                   </div>
                 )}
               </div>

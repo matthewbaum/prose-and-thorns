@@ -51,6 +51,7 @@ export default function BookCard({ book, onSelect, filters, matchLabel }) {
           <div className="book-cover book-cover-placeholder">
             <span className="placeholder-title">{book.title}</span>
             <span className="placeholder-author">{book.author}</span>
+            <span className="placeholder-note">Cover art unavailable</span>
           </div>
         )}
         {book.series_status && (

@@ -57,6 +57,15 @@
   color: var(--text-muted);
 }
 
+.placeholder-note {
+  margin-top: 14px;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
 .status-badge {
   position: absolute;
   top: 8px;
