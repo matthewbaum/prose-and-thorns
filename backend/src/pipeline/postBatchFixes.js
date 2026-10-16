@@ -53,6 +53,14 @@ for (const g of groups) {
   log(`series "${g.series_name}": series_total set to ${g.m} on ${r.changes} book(s)`);
 }
 
+// 1b. a series' total can never be smaller than its highest known position
+const raised = db.prepare(
+  `UPDATE books SET series_total = (SELECT MAX(b2.series_position) FROM books b2 WHERE b2.series_name = books.series_name)
+   WHERE series_name IS NOT NULL AND series_total IS NOT NULL
+     AND series_total < (SELECT MAX(b2.series_position) FROM books b2 WHERE b2.series_name = books.series_name)`
+).run();
+if (raised.changes) log(`series_total raised to the highest known position on ${raised.changes} book(s)`);
+
 // 2. out-of-taxonomy tropes
 const ROMANCE = new Set(ROMANCE_TROPE_VALUES), PLOT = new Set(PLOT_TROPE_VALUES);
 for (const b of db.prepare('SELECT id, title, romance_tropes, plot_tropes FROM books').all()) {
