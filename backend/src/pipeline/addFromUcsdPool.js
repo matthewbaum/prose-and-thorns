@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import db from '../db/index.js';
 import { fetchGoogleBooksData } from './googleBooks.js';
 import { findOrCreateBook, saveGoogleBooksData, getReviewsForBook, saveQualityProfile, saveTags } from '../db/pipelineRepo.js';
@@ -111,6 +113,75 @@ const pool = JSON.parse(fs.readFileSync(POOL_PATH, 'utf8')).sort((a, b) => b.rev
 const progress = fs.existsSync(PROGRESS_PATH) ? JSON.parse(fs.readFileSync(PROGRESS_PATH, 'utf8')) : { done: {} };
 const save = () => fs.writeFileSync(PROGRESS_PATH, JSON.stringify(progress, null, 2));
 
+// ---- Google availability (shared across batch processes via a small state file) ----
+const GOOGLE_DOWN_PATH = '/tmp/goodreads-check/google-down-until.txt';
+function googleAvailable() {
+  try {
+    return Date.now() >= Number(fs.readFileSync(GOOGLE_DOWN_PATH, 'utf8'));
+  } catch {
+    return true;
+  }
+}
+function markGoogleDown(ms, why) {
+  fs.writeFileSync(GOOGLE_DOWN_PATH, String(Date.now() + ms));
+  log(`  Google Books ${why}; using UCSD metadata for ${Math.round(ms / 60000)} min`);
+}
+// Google's daily quota resets at midnight Pacific (07:00 UTC in daylight time).
+function msUntilQuotaReset() {
+  const next = new Date();
+  next.setUTCHours(7, 5, 0, 0);
+  if (next.getTime() <= Date.now()) next.setUTCDate(next.getUTCDate() + 1);
+  return next.getTime() - Date.now();
+}
+
+// ---- UCSD dataset record as a Google-Books-shaped object ----
+const META = JSON.parse(fs.readFileSync('/tmp/goodreads-check/pool-meta.json', 'utf8'));
+function ucsdMetadata(item) {
+  const m = META[item.gr_book_id];
+  if (!m || m.description.length < 40) return null;
+  const description = m.description.replace(/<br\s*\/?>/gi, '\n').replace(/\s+\n/g, '\n').trim();
+  const pad = (n) => String(n).padStart(2, '0');
+  const publication_date = m.year ? (m.month && m.day ? `${m.year}-${pad(m.month)}-${pad(m.day)}` : String(m.year)) : null;
+  return {
+    google_books_id: null,
+    title: item.title,
+    author: item.author,
+    publisher: m.publisher,
+    publication_date,
+    page_count: m.num_pages,
+    description,
+    cover_url: null,
+    google_books_link: null,
+    avg_rating: null,
+    ratings_count: null,
+    editorial_review: null,
+    series_name: null,
+    series_position: null,
+    _isbn: m.isbn13 || m.isbn,
+  };
+}
+
+// Downloads the Open Library cover for an ISBN into frontend/public/covers/ (same
+// place mirrorCovers.js uses) and returns its site path, or null if there isn't a
+// usable one. Titles-page scans are caught later in the end-of-run visual pass.
+const COVERS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'frontend', 'public', 'covers');
+async function mirrorOpenLibraryCover(bookId, isbn) {
+  if (!isbn) return null;
+  try {
+    const res = await fetch(`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`, { signal: AbortSignal.timeout(30000) });
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    const jpeg = buf[0] === 0xff && buf[1] === 0xd8, png = buf[0] === 0x89 && buf[1] === 0x50;
+    if (buf.length < 8000 || !(jpeg || png)) return null;
+    fs.mkdirSync(COVERS_DIR, { recursive: true });
+    const file = `${bookId}.${jpeg ? 'jpg' : 'png'}`;
+    fs.writeFileSync(path.join(COVERS_DIR, file), buf);
+    return `/covers/${file}`;
+  } catch {
+    return null;
+  }
+}
+
 async function processBook(item) {
   const { title, author } = item;
   log(`\n=== "${title}" by ${author} (${item.series_name ? `${item.series_name} #${item.series_position}, ` : ''}${item.review_count} UCSD reviews) ===`);
@@ -119,40 +190,48 @@ async function processBook(item) {
   if (!fs.existsSync(reviewsPath)) return { status: 'skipped', reason: 'no-review-file' };
   const allReviews = JSON.parse(fs.readFileSync(reviewsPath, 'utf8'));
 
-  // 5xx / network blips are transient: retry once after a pause (each attempt spends
-  // daily Google Books quota, so retrying hard burned about half of it), and if they persist
-  // leave the book un-recorded (so a later batch retries it) instead of
-  // writing a permanent skip.
-  let gb;
-  for (let attempt = 0; ; attempt++) {
+  // Metadata: Google Books when it answers and returns the right book; otherwise
+  // the UCSD dataset's own record (description, publisher, pages, date, ISBN),
+  // which by construction is the right book. Google outages or an exhausted
+  // quota therefore never stall the run -- they only mean a thinner record.
+  let gb = null;
+  let source = 'google-books';
+  if (googleAvailable()) {
     try {
       gb = await fetchGoogleBooksData(title, author);
-      break;
+      await sleep(RATE_LIMIT_DELAY_MS);
     } catch (err) {
-      if (isQuotaError(err)) throw err;
-      const transient = /Google Books API error 5\d\d|fetch failed|ECONN|ETIMEDOUT|ENOTFOUND|socket/i.test(err.message);
-      if (!transient) return { status: 'skipped', reason: `google-books-error: ${err.message.slice(0, 120)}` };
-      if (attempt >= 1) throw Object.assign(new Error(`transient: ${err.message.slice(0, 100)}`), { transient: true });
-      await sleep(15000);
+      if (isQuotaError(err)) markGoogleDown(msUntilQuotaReset(), 'daily quota exhausted');
+      else markGoogleDown(5 * 60 * 1000, `unavailable (${err.message.slice(0, 50).replace(/\s+/g, ' ')})`);
     }
   }
-  await sleep(RATE_LIMIT_DELAY_MS);
-  if (!gb) return { status: 'skipped', reason: 'no-google-books-match' };
-  if (!authorsAgree(author, gb.author)) {
-    return { status: 'skipped', reason: `google-books-author-mismatch (got "${gb.author}", "${gb.title}")` };
+  // A Google result must be the right book (same author, overlapping title) and
+  // have a description to tag from; anything else falls through to UCSD's record.
+  if (gb && (!authorsAgree(author, gb.author) || ![...nameTokens(title)].some((w) => nameTokens(gb.title).has(w)) || !gb.description)) gb = null;
+  if (!gb) {
+    gb = ucsdMetadata(item);
+    source = 'ucsd-metadata';
+    if (!gb) return { status: 'skipped', reason: 'no-description-anywhere' };
   }
-  // Title check too: a same-author sibling ("Awaken" for "Abandon") passes the
-  // author test but is the wrong book, and would get its description tagged.
-  if (![...nameTokens(title)].some((w) => nameTokens(gb.title).has(w))) {
-    return { status: 'skipped', reason: `google-books-title-mismatch (got "${gb.title}")` };
-  }
-  if (!gb.description) return { status: 'skipped', reason: 'no-description-for-tagging' };
 
-  const existing = db.prepare('SELECT id FROM books WHERE google_books_id = ?').get(gb.google_books_id);
-  if (existing) return { status: 'skipped', reason: `already-in-catalog-as-#${existing.id}` };
+  if (source === 'google-books') {
+    const existing = db.prepare('SELECT id FROM books WHERE google_books_id = ?').get(gb.google_books_id);
+    if (existing) return { status: 'skipped', reason: `already-in-catalog-as-#${existing.id}` };
+  } else {
+    const same = db
+      .prepare('SELECT id, COALESCE(author, seed_author) AS author FROM books WHERE LOWER(COALESCE(title, seed_title)) = LOWER(?)')
+      .all(title)
+      .find((r) => authorsAgree(author, r.author));
+    if (same) return { status: 'skipped', reason: `already-in-catalog-as-#${same.id}` };
+  }
 
   const book = findOrCreateBook(title, author);
   saveGoogleBooksData(book.id, gb);
+  if (source === 'ucsd-metadata') {
+    const local = await mirrorOpenLibraryCover(book.id, gb._isbn);
+    if (local) db.prepare("UPDATE books SET cover_url = ? WHERE id = ?").run(local, book.id);
+    if (gb._isbn) db.prepare('UPDATE books SET isbn = COALESCE(isbn, ?) WHERE id = ?').run(gb._isbn, book.id);
+  }
 
   const rated = allReviews.filter((r) => r.rating > 0);
   setUcsdAggregate.run({
@@ -204,7 +283,7 @@ async function processBook(item) {
   }
   saveQualityProfile(book.id, profile);
   log(`  saved profile (confidence ${profile.confidence}, review_count_used ${profile.review_count_used})`);
-  return { status: 'ok', book_id: book.id, dropped_quotes: bad.length };
+  return { status: 'ok', book_id: book.id, dropped_quotes: bad.length, source };
 }
 
 async function main() {
