@@ -48,7 +48,11 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
   // rather than blowing up the same handful of covers. (Was six; widened
   // to eight alongside the hero's wider art column — see HomePage.css.)
   // Only books with real cover art -- a title card doesn't belong in the cover cluster.
-  const heroCovers = (shelves[0]?.books || []).filter((b) => b.cover_url).slice(0, 8);
+  // Open Library covers redirect through archive.org and take 2-3s to appear, so the
+  // above-the-fold cluster prefers faster hosts (they still show everywhere else).
+  const heroCovers = (shelves[0]?.books || [])
+    .filter((b) => b.cover_url && !b.cover_url.includes('openlibrary.org'))
+    .slice(0, 8);
 
   return (
     <div className="home-page">

@@ -316,7 +316,8 @@
 
 
 /* Catalog-size line under the hero's "Browse all books" button. Same type
-   treatment as .home-hero-text (the paragraph above the button). */
+   treatment as .home-hero-text (the paragraph above the button); only the
+   number is gold. */
 .home-book-count {
   margin: 14px 0 0;
   color: var(--text-muted);
@@ -325,5 +326,6 @@
 }
 
 .home-book-count-number {
+  color: var(--gold);
   font-variant-numeric: tabular-nums;
 }
