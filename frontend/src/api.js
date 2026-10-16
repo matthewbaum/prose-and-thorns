@@ -87,7 +87,35 @@ function trackingSessionId() {
   }
 }
 
+// "Don't count me": visit any page with ?notrack once and this browser stops
+// being tracked (?track turns it back on). The flag lives in localStorage, so
+// it's per-browser, and the param is stripped from the address bar afterward.
+const NOTRACK_KEY = 'pt_notrack';
+(function applyTrackingSwitch() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('notrack') && !params.has('track')) return;
+    if (params.has('notrack')) localStorage.setItem(NOTRACK_KEY, '1');
+    else localStorage.removeItem(NOTRACK_KEY);
+    params.delete('notrack');
+    params.delete('track');
+    const qs = params.toString();
+    window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash);
+  } catch {
+    /* storage or history unavailable: tracking simply stays as it was */
+  }
+})();
+
+function trackingDisabled() {
+  try {
+    return localStorage.getItem(NOTRACK_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export function trackView(payload) {
+  if (trackingDisabled()) return;
   const sessionId = trackingSessionId();
   if (!sessionId) return;
   fetch(`${BASE}/track`, {

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import db from '../db/index.js';
 import { getClickSummary } from '../db/clicksRepo.js';
 import liveDb from '../db/liveDb.js';
-import { getTrafficSummary } from '../db/pageViewsRepo.js';
+import { getTrafficSummary, getRecentViews } from '../db/pageViewsRepo.js';
 import { getBookById } from '../db/booksRepo.js';
 
 const router = Router();
@@ -128,6 +128,22 @@ router.get('/dashboard', (req, res) => {
   const password = escapeHtml(req.query.password || '');
 
   const traffic = getTrafficSummary();
+  // viewed_at is stored as UTC ("YYYY-MM-DD HH:MM:SS"); show it in Eastern too.
+  const ADMIN_TZ = 'America/New_York';
+  const fmtTime = (utc) => {
+    const d = new Date(utc.replace(' ', 'T') + 'Z');
+    const eastern = d.toLocaleString('en-US', { timeZone: ADMIN_TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+    return `${eastern} <span class="muted">(${utc.slice(11, 16)} UTC)</span>`;
+  };
+  const recentRows = getRecentViews(30)
+    .map((r) => {
+      const what =
+        r.kind === 'book'
+          ? `Opened #${r.book_id} ${escapeHtml(getBookById(r.book_id)?.title ?? '(removed)')}`
+          : `Viewed ${escapeHtml(r.view)}`;
+      return `<tr><td>${fmtTime(r.viewed_at)}</td><td>${what}</td><td><code>${escapeHtml(r.session)}</code></td></tr>`;
+    })
+    .join('');
   const trafficTotalRows = traffic.totals
     .map((t) => `<tr><td>${t.label}</td><td>${t.visits}</td><td>${t.pageViews}</td><td>${t.bookViews}</td></tr>`)
     .join('');
@@ -262,7 +278,12 @@ router.get('/dashboard', (req, res) => {
           <table style="width:auto;min-width:260px;"><thead><tr><th>Day (last 14)</th><th>Visits</th><th>Views</th></tr></thead><tbody>${trafficDayRows}</tbody></table>
           <table style="width:auto;min-width:200px;"><thead><tr><th>Section</th><th>Views</th></tr></thead><tbody>${trafficSectionRows}</tbody></table>
           <table style="width:auto;min-width:420px;"><thead><tr><th>Most-opened books</th><th>Opens</th><th>Visitors</th></tr></thead><tbody>${trafficBookRows}</tbody></table>
-        </div>`
+        </div>
+        <details style="margin-top:16px;" open>
+          <summary class="muted" style="cursor:pointer;">Recent visits (newest first; same code = same browser session)</summary>
+          <table style="width:auto;min-width:520px;margin-top:8px;"><thead><tr><th>When</th><th>What</th><th>Session</th></tr></thead><tbody>${recentRows}</tbody></table>
+          <p class="muted">To keep your own browser out of the counts, open the site once with <code>?notrack</code> on the end of the address.</p>
+        </details>`
   }
 
   <h2>Retailer Clicks (${totalClicks})</h2>

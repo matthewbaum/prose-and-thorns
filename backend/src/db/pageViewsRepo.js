@@ -18,6 +18,16 @@ export function logPageView({ kind, view, bookId, sessionId }) {
 
 const one = (sql, ...args) => liveDb.prepare(sql).get(...args);
 
+// Newest-first raw rows for the admin "Recent visits" list. Session ids are
+// shortened: enough to see which rows belong to one browser session, not to
+// identify anyone.
+export function getRecentViews(limit = 30) {
+  return liveDb
+    .prepare('SELECT kind, view, book_id, session_id, viewed_at FROM page_views ORDER BY id DESC LIMIT ?')
+    .all(limit)
+    .map((r) => ({ ...r, session: r.session_id.slice(0, 6) }));
+}
+
 export function getTrafficSummary() {
   const windows = [
     ['Today', "date(viewed_at) = date('now')"],
