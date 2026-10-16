@@ -315,17 +315,15 @@
 }
 
 
-/* Understated catalog-size line under the book picker. Same muted small-text
-   treatment as .quick-search-label; only the number picks up the gold accent. */
+/* Catalog-size line under the hero's "Browse all books" button. Same type
+   treatment as .home-hero-text (the paragraph above the button). */
 .home-book-count {
-  margin: 18px 0 0;
-  text-align: center;
+  margin: 14px 0 0;
   color: var(--text-muted);
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
+  font-size: 0.98rem;
+  line-height: 1.6;
 }
 
 .home-book-count-number {
-  color: var(--gold);
   font-variant-numeric: tabular-nums;
 }

@@ -69,6 +69,12 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
           <button className="browse-all-btn" onClick={onBrowseAll}>
             Browse all books
           </button>
+          {bookCount != null && (
+            <p className="home-book-count">
+              <span className="home-book-count-number">{bookCount.toLocaleString()}</span>{' '}
+              {bookCount === 1 ? 'book' : 'books'} and growing
+            </p>
+          )}
         </div>
 
         {heroCovers.length > 0 && (
@@ -96,12 +102,6 @@ export default function HomePage({ onSelectBook, onBrowseAll, onQuickSearch, onR
           them by quality once you see the matches:
         </p>
         <BookPicker onRecommend={onRecommend} />
-        {bookCount != null && (
-          <p className="home-book-count">
-            <span className="home-book-count-number">{bookCount.toLocaleString()}</span>{' '}
-            {bookCount === 1 ? 'book' : 'books'} and growing
-          </p>
-        )}
       </div>
 
       <QuickSearch onSearch={onQuickSearch} />
