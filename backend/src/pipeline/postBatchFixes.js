@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import db from '../db/index.js';
 import { synthesizeQuality } from './claudeSynthesis.js';
 import { ROMANCE_TROPE_VALUES, PLOT_TROPE_VALUES } from './claudeTagging.js';
@@ -18,6 +19,8 @@ import { log } from './util.js';
 //  3. praise not verbatim in the description (as fixUngroundedPraise.js).
 //  4. books whose Google Books match shares no word with the seed title ->
 //     removed and recorded as skipped (wrong book; not safe to tag/synthesize).
+//  6. recently added books whose Google cover is one of Google's two known
+//     "image not available" graphics -> cover cleared (title card shows instead).
 //  5. books with reviews but no synthesized profile (e.g. a transient model
 //     JSON error) -> synthesize again, with the same quote-grounding check.
 
@@ -101,6 +104,24 @@ for (const b of missing) {
   }
   saveQualityProfile(b.id, profile);
   log(`#${b.id} "${b.title}": synthesis completed (dropped ${bad.length} ungrounded quote(s))`);
+}
+// 6. fake Google covers (identical images served for books Google has no art for)
+const FAKE_COVER_SHAS = new Set(['3efa8c43e5b4348f', '5e7f0425abc77878']);
+const recentGoogleCovers = db
+  .prepare("SELECT id, title, cover_url FROM books WHERE cover_url LIKE '%books.google.%' AND updated_at > datetime('now', '-6 hours')")
+  .all();
+for (const b of recentGoogleCovers) {
+  try {
+    const res = await fetch(b.cover_url, { signal: AbortSignal.timeout(30000) });
+    if (!res.ok) continue;
+    const sha = crypto.createHash('sha256').update(Buffer.from(await res.arrayBuffer())).digest('hex').slice(0, 16);
+    if (FAKE_COVER_SHAS.has(sha)) {
+      db.prepare("UPDATE books SET cover_url = NULL, updated_at = datetime('now') WHERE id = ?").run(b.id);
+      log(`#${b.id} "${b.title}": Google "image not available" cover cleared`);
+    }
+  } catch {
+    /* network blip: leave it for the end-of-run pass */
+  }
 }
 db.pragma('wal_checkpoint(TRUNCATE)');
 log('Post-batch fixes done.');
