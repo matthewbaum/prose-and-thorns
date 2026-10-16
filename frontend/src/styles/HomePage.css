@@ -291,6 +291,13 @@
   margin: 0 0 14px;
 }
 
+/* .book-picker carries a 40px bottom margin for when it stands alone. Inside this
+   card that stacked on the card's own bottom padding, leaving ~64px of blank space
+   below the button against ~22px above it. */
+.home-primary-card .book-picker {
+  margin-bottom: 0;
+}
+
 .browse-all-btn {
   background: var(--accent);
   color: var(--text);
